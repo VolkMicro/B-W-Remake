@@ -46,21 +46,33 @@ func run_test() -> void:
 		var cave_result := bridge.invoke(26, cave_search, {})
 		var home_result := bridge.invoke(26, home_search, {})
 		check(cave_result.get("ok", false) and home_result.get("ok", false) and StoryVm.as_int(cave_result["push"][0]) != StoryVm.as_int(home_result["push"][0]), "story queries resolve to the actual original cave and house")
-		var campaign := ChlReader.new()
-		var vm := StoryVm.new()
-		var original_ready := campaign.load_file(source.path_join("Scripts/Quests/challenge.chl")) and vm.configure(campaign, bridge.invoke) and vm.start("SetupLand1") > 0
+		var original_ready: bool = world.campaign.load_file(source.path_join("Scripts/Quests/challenge.chl"))
 		if original_ready:
-			for ignored in 100:
-				if not vm.tick(): break
-		check(original_ready and vm.error.get("detail", {}).get("native_id") == 254, "real setup stops at the unimplemented virtual-influence operation")
-		if original_ready and vm.error.get("detail", {}).get("native_id") == 254:
-			test_bridge = bridge
-			var resumed := vm.resume_unbound(_test_only_observe_influence)
-			if resumed:
-				for ignored in 100:
-					if not vm.tick(): break
-			check(resumed and vm.error.get("detail", {}).get("native_id") == 60 and not bridge._created_markers.is_empty(), "after test-only skip, real setup finds real landmarks and reaches missing influence creation")
-			bridge.clear_created()
+			world._start_story()
+			for ignored in 300:
+				if not world.story_vm.tick(): break
+		var vm: StoryVm = world.story_vm
+		check(original_ready and vm != null and vm.error.is_empty(), "the real first-island setup runs with no unported function (error: %s)" % (vm.error if vm else "none"))
+		check(vm != null and vm.finished.size() > 0, "SetupLand1 itself completes")
+		check(not world.virtual_influence, "setup turns off virtual influence for player one, as the original does")
+		var anti := 0
+		for source_row in world.influence_sources:
+			if source_row["anti"]:
+				anti += 1
+		check(world.influence_sources.size() == 2 and anti == 1, "setup creates the quarry influence and one anti-influence zone")
+		check(world.story_highlights.size() == 11, "setup places the eleven original 'Did you know' highlights")
+		var boosted := 0
+		for town in world.towns:
+			if town.has("desire_boosts"):
+				boosted += 1
+		check(boosted == 1, "setup boosts the desires of exactly one town")
+		var home: Vector3 = world.towns[0]["pos"]
+		check(world.has_influence(home) and not world.has_influence(home + Vector3(2000, 0, 2000)), "the Hand has influence at home and none far away")
+		var anti_node: Node3D = null
+		for source_row in world.influence_sources:
+			if source_row["anti"]:
+				anti_node = source_row["node"]
+		check(anti_node != null and not world.has_influence(anti_node.position), "anti-influence blocks the Hand at its centre")
 		var counts := {}
 		var cave_at_story_site := false
 		var scaled_home := false

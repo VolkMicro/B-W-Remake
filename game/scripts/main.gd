@@ -67,6 +67,14 @@ var _melty_checks := "" # Melty's test file: where to append "pass <check>" line
 const MELTY_SLUG := "black-white-godot-island"
 var creature: IslandCreature
 var campaign := ChlReader.new()
+var story_vm: StoryVm
+var story_bridge: StoryNatives
+var story_clock := 0.0
+var story_state := "not started"
+var virtual_influence := true
+var influence_sources: Array[Dictionary] = []
+var story_highlights: Array[Node3D] = []
+var town_nodes: Array[Node3D] = []
 var villager_anims := AnmReader.new()
 var landmark_anims := AnmReader.new()
 var animation_clock := 0.0
@@ -604,6 +612,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _process(delta: float) -> void:
 	if not loaded:
 		return
+	_tick_story(delta)
 	animation_clock += delta
 	var turn := 0.0
 	if Input.is_key_pressed(KEY_Q):
@@ -630,6 +639,7 @@ func _process(delta: float) -> void:
 	hand_ring.position = gp + Vector3(0, 0.6, 0)
 	hand_ring.scale = Vector3.ONE * clampf(dist / 200.0, 0.4, 5.0)
 	hand_pivot.rotation.y = yaw
+	hand_ring.transparency = 0.0 if has_influence(gp) else 0.75
 	if held:
 		held.position = gp + Vector3(0, float(cfg_hand["hold_height"]), 0)
 	for i in towns.size():
@@ -659,6 +669,9 @@ func _click(screen: Vector2) -> void:
 		if gp.y <= sea_y + 0.05 and held.kind != "rock":
 			_say("That would drown. Put it on land.")
 			return
+		if not has_influence(gp):
+			_say("Это вне вашего влияния.")
+			return
 		held.position = gp + Vector3(0, 5, 0)
 		held.velocity = Vector3.ZERO
 		held.thrown = false
@@ -677,6 +690,9 @@ func _click(screen: Vector2) -> void:
 			bd = d
 			best = t
 	if best:
+		if not has_influence(best.position):
+			_say("Это вне вашего влияния.")
+			return
 		pick_up(best)
 
 
@@ -1009,7 +1025,7 @@ func _build_preservation_hud() -> void:
 		buttons.add_child(button)
 	creature_panel.add_child(buttons)
 	var note := Label.new()
-	note.text = "Оригинальные модели и анимации.\nВоспитание пока упрощено; сюжет ещё не исполняется."
+	note.text = "Оригинальные модели и анимации.\nПодготовка острова — из оригинального сценария;\nзадания и воспитание ещё переносятся."
 	note.add_theme_font_size_override("font_size", 13)
 	creature_panel.add_child(note)
 	hud.add_child(panel)
@@ -1022,6 +1038,8 @@ func _load_preservation() -> void:
 		_log_test("campaign-index", "%d scripts; %d native functions require bindings" % [campaign.scripts.size(), campaign.native_calls.size()])
 	else:
 		campaign_status.text = "Сценарии не прочитаны: " + campaign.error
+	if indexed:
+		_start_story()
 	_build_advisers()
 	_spawn_food()
 	if not test_mode and not showcase_mode:
@@ -1206,6 +1224,8 @@ func _restore_preservation(announce := true) -> bool:
 func _run_preservation_test() -> void:
 	melty_check("campaign-index-loaded", campaign.scripts.has("SetupLand1"), campaign.error)
 	melty_check("advisers-loaded", adviser_nodes.size() == 2, "expected two original adviser meshes")
+	var setup_ran := story_state == "running" and story_vm.finished.size() > 0 and influence_sources.size() == 2 and story_highlights.size() == 11 and not virtual_influence
+	melty_check("story-setup", setup_ran, "%s; %d influences, %d highlights" % [story_state, influence_sources.size(), story_highlights.size()])
 	var learn_failed: Array[String] = []
 	for id in Data.CREATURES:
 		var ok := choose_creature(id, {"position":[towns[0]["pos"].x + 25,0,towns[0]["pos"].z + 20]})
@@ -1224,6 +1244,116 @@ func _run_preservation_test() -> void:
 	melty_check("creatures-learn", learn_failed.is_empty(), "praise did not reinforce: " + ", ".join(learn_failed))
 	_port_tests = true
 	await _test_closeups()
+
+
+# ---------------------------------------------------------------- original story
+
+# Runs the first island's own setup script from the player's CHL. Any call that
+# is not ported yet stops the story cleanly and is reported, never faked.
+func _start_story() -> void:
+	story_bridge = StoryNatives.new()
+	story_bridge.configure(self)
+	story_bridge.register_landmarks(story_landmarks)
+	for i in towns.size():
+		var anchor := Node3D.new()
+		anchor.name = "StoryTown%d" % i
+		anchor.position = towns[i]["pos"]
+		anchor.set_meta("town_index", i)
+		add_child(anchor)
+		town_nodes.append(anchor)
+		story_bridge.register_object(anchor, int(Data.PORT_RULES["story"]["town_object_type"]))
+	story_vm = StoryVm.new()
+	var script_name: String = Data.PORT_RULES["story"]["first_island_script"]
+	if story_vm.configure(campaign, story_bridge.invoke) and story_vm.start(script_name) > 0:
+		story_state = "running"
+	else:
+		story_state = "could not start"
+	_log_test("story", story_state)
+
+
+func _tick_story(delta: float) -> void:
+	if story_vm == null or story_state != "running":
+		return
+	story_clock += delta
+	var step := 1.0 / float(Data.STORY_VM["core"]["tick_rate"])
+	var budget := 4
+	while story_clock >= step and budget > 0:
+		story_clock -= step
+		budget -= 1
+		if not story_vm.tick():
+			var native: int = story_vm.error.get("detail", {}).get("native_id", -1)
+			story_state = "stopped at original function %d" % native if native >= 0 else "stopped: " + str(story_vm.error.get("kind", "?"))
+			campaign_status.text = "Сюжет первого острова: остановлен на ещё не перенесённой команде %d" % native
+			_log_test("story", story_state)
+			return
+	var setup_done := story_vm.finished.size() > 0
+	campaign_status.text = "Сюжет первого острова: подготовка выполнена" if setup_done else "Сюжет первого острова: подготовка…"
+
+
+func story_set_virtual_influence(enabled: bool) -> void:
+	virtual_influence = enabled
+
+
+func story_add_influence(position: Vector3, radius: float, anti: bool) -> Node3D:
+	var handle := Node3D.new()
+	handle.name = "StoryInfluence%d" % influence_sources.size()
+	handle.position = Vector3(position.x, ground_y(position), position.z)
+	add_child(handle)
+	influence_sources.append({"node":handle, "radius":radius, "anti":anti})
+	_log_test("influence", "%s r=%.0f at %.0f,%.0f" % ["anti" if anti else "add", radius, position.x, -position.z])
+	return handle
+
+
+func story_set_desire_boost(town: int, desire: int, boost: float) -> void:
+	var boosts: Dictionary = towns[town].get("desire_boosts", {})
+	boosts[desire] = boost
+	towns[town]["desire_boosts"] = boosts
+
+
+func story_belief(town: int) -> float:
+	return 100.0 if towns[town]["mine"] else float(towns[town]["belief"])
+
+
+func story_set_belief(town: int, belief: float) -> void:
+	if towns[town]["mine"]:
+		return
+	towns[town]["belief"] = clampf(belief, 0.0, float(cfg_belief["convert_at"]))
+
+
+func story_create_highlight(type: int, position: Vector3, challenge: int) -> Node3D:
+	var highlight := Node3D.new()
+	highlight.name = "StoryHighlight%d" % story_highlights.size()
+	highlight.position = Vector3(position.x, ground_y(position), position.z)
+	highlight.set_meta("highlight_type", type)
+	highlight.set_meta("challenge", challenge)
+	add_child(highlight)
+	story_highlights.append(highlight)
+	return highlight
+
+
+# The god may only touch the world inside his influence, as in the original.
+func has_influence(p: Vector3) -> bool:
+	for source in influence_sources:
+		var node: Node3D = source["node"]
+		if source["anti"] and Vector2(p.x - node.position.x, p.z - node.position.z).length() < float(source["radius"]):
+			return false
+	if virtual_influence or story_vm == null:
+		return true
+	var town_radius := float(Data.PORT_RULES["story"]["town_influence_radius"])
+	for town in towns:
+		if town["mine"] and Vector2(p.x - town["pos"].x, p.z - town["pos"].z).length() < town_radius:
+			return true
+	var settings: Dictionary = host_info.influence_settings
+	for source in influence_sources:
+		var node: Node3D = source["node"]
+		if source["anti"]:
+			continue
+		if settings.is_empty():
+			if Vector2(p.x - node.position.x, p.z - node.position.z).length() < float(source["radius"]):
+				return true
+		elif InfluenceMath.strength_at(node.position, p, float(source["radius"]), settings) > 0.0:
+			return true
+	return false
 
 
 # Close views of walking villagers and the advisers, so a test recording shows their animation.
