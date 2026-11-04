@@ -1,0 +1,62 @@
+[
+  {
+    "system": "belief",
+    "params": {
+      "start_player_town": 100,
+      "start_neutral": 0,
+      "convert_at": 100,
+      "town_radius": 45,
+      "decay_per_min": 2
+    }
+  },
+  {
+    "system": "alignment",
+    "params": {
+      "min": -100,
+      "max": 100,
+      "sky_tint": true
+    }
+  },
+  {
+    "system": "win",
+    "params": {
+      "condition": "campaign completion must be driven by original story; prototype village conversion is not a campaign ending",
+      "enabled": false
+    }
+  },
+  {
+    "system": "camera",
+    "params": {
+      "min_dist": 40,
+      "max_dist": 1400,
+      "pitch_deg": 50
+    }
+  },
+  {
+    "system": "hand",
+    "params": {
+      "hold_height": 14,
+      "throw_speed": 160,
+      "gravity": 60,
+      "scare_radius": 14,
+      "crush_radius": 3.0,
+      "fling_kill_dist": 60
+    }
+  },
+  {
+    "system": "villager_ai",
+    "params": {
+      "wander_radius": 22,
+      "speed": 4.0,
+      "flee_speed": 11.0,
+      "flee_time": 4.0
+    }
+  },
+  {
+    "system": "test_mode",
+    "params": {
+      "trigger": "--melty-test",
+      "steps": "load island, gift tree to town, throw rock at town, log checks"
+    }
+  }
+]

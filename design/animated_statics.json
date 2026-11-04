@@ -1,0 +1,5 @@
+[
+  {"id":"Norse Gate","source":"object_info","render":"original_rig","animation":"on_script_request"},
+  {"id":"Gate Stone Plinth","source":"object_info","render":"original_rig","animation":"on_script_request"},
+  {"id":"Piper Cave Entrance","source":"object_info","render":"original_rig","animation":"on_script_request"}
+]

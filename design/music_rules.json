@@ -1,0 +1,3 @@
+[
+  {"id":"soundtrack","default_mode":"neutral","good_mode":"good","evil_mode":"evil","debounce_seconds":3.0,"max_sections":1000,"loop":true}
+]

@@ -1,0 +1,8 @@
+[
+  {"id":0,"kind":"scenery","pickable":false,"physics":"none","description":"short fence"},
+  {"id":1,"kind":"scenery","pickable":false,"physics":"none","description":"tall fence"},
+  {"id":2,"kind":"rock","pickable":true,"physics":"rock","description":"movable rock"},
+  {"id":49,"kind":"scenery","pickable":false,"physics":"none","description":"creature gate totem"},
+  {"id":50,"kind":"scenery","pickable":false,"physics":"none","description":"blank gate totem"},
+  {"id":53,"kind":"toy","pickable":true,"physics":"toy","description":"creature toy"}
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "l3d_rig",
+    "reader": "l3d_rig.gd",
+    "source": "Data/CreatureMesh/C_Ape_Boned_Base.L3D",
+    "purpose": "Read original geometry, embedded skins and bone hierarchy in memory"
+  },
+  {
+    "id": "morph",
+    "reader": "morph_reader.gd",
+    "source": "Data/CTR/Bape.CBN",
+    "purpose": "Read original creature animation channels and original morph specification"
+  },
+  {
+    "id": "campaign",
+    "reader": "chl_reader.gd",
+    "source": "Scripts/Quests/challenge.chl",
+    "purpose": "Index original campaign scripts; explicitly report story execution unavailable"
+  },
+  {
+    "id": "hand_rig",
+    "reader": "l3d_rig.gd",
+    "source": "Data/CreatureMesh/Hand_Boned_Base2.l3d",
+    "purpose": "Original god Hand rendering from host files"
+  },
+  {
+    "id": "adviser_rig",
+    "reader": "l3d_rig.gd",
+    "source": "Data/HelpSprite/markgood.hd",
+    "purpose": "Original embedded adviser meshes read in place"
+  },
+  {
+    "id": "villager_animations",
+    "reader": "anm_reader.gd",
+    "source": "Data/AllAnims.anm",
+    "purpose": "Original matrix animation keyframes for villager skeletons and state changes"
+  },
+  {
+    "id": "story_vm",
+    "reader": "story_vm.gd",
+    "source": "Scripts/Quests/challenge.chl",
+    "purpose": "Run original instruction records through a strict and budgeted compatibility engine"
+  },
+  {
+    "id": "story_natives",
+    "reader": "story_natives.gd",
+    "source": "Scripts/Quests/challenge.chl",
+    "purpose": "Strict bindings for independently verified original script functions"
+  }
+]

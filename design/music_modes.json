@@ -1,0 +1,5 @@
+[
+  {"id":"neutral","source":"music_neutral","decoder":"mpeg","volume_db":-18.0,"section_prefix":"SECT","min_alignment":-25.0,"max_alignment":25.0},
+  {"id":"good","source":"music_good","decoder":"mpeg","volume_db":-18.0,"section_prefix":"SECT","min_alignment":25.0,"max_alignment":100.0},
+  {"id":"evil","source":"music_evil","decoder":"mpeg","volume_db":-18.0,"section_prefix":"SECT","min_alignment":-100.0,"max_alignment":-25.0}
+]

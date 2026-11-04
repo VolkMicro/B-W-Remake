@@ -1,0 +1,16 @@
+# Generated builds, imported project caches, local research and recordings.
+/build/
+/scratch/
+/shots/
+/game/.godot/
+/tools/research-venv/
+/tools/vendor/zig/
+/tools/vendor/zig-*.zip
+__pycache__/
+*.pyc
+
+# Unrelated local helpers and temporary files.
+/tools/as-user.py
+/tools/cancel-test.py
+/tools/mat.py
+*.log

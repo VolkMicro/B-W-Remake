@@ -1,0 +1,3 @@
+[
+  {"id":"core","tick_rate":10,"stack_limit":32,"instructions_per_tick":20000,"maximum_tasks":256,"native_policy":"reject_unbound","campaign_enabled":false,"script_source":"campaign","original_version":7}
+]

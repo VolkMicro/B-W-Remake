@@ -1,0 +1,58 @@
+[
+  {
+    "villager_type": "NORSE_FORESTER",
+    "mesh": "MSH_P_NORS_M_A_1",
+    "pickable": true,
+    "scale": 2.0,
+    "animation_profile": "male"
+  },
+  {
+    "villager_type": "NORSE_HOUSEWIFE",
+    "mesh": "MSH_P_NORS_F_A_1",
+    "pickable": true,
+    "scale": 2.0,
+    "animation_profile": "female"
+  },
+  {
+    "villager_type": "AZTEC_FORESTER",
+    "mesh": "MSH_P_AZTC_M_A_1",
+    "pickable": true,
+    "scale": 2.0,
+    "animation_profile": "male"
+  },
+  {
+    "villager_type": "AZTEC_HOUSEWIFE",
+    "mesh": "MSH_P_AZTC_F_A_1",
+    "pickable": true,
+    "scale": 2.0,
+    "animation_profile": "female"
+  },
+  {
+    "villager_type": "AZTEC_FISHERMAN",
+    "mesh": "MSH_P_AZTC_M_A_2",
+    "pickable": true,
+    "scale": 2.0,
+    "animation_profile": "male"
+  },
+  {
+    "villager_type": "AZTEC_SHEPHERD",
+    "mesh": "MSH_P_AZTC_M_A_3",
+    "pickable": true,
+    "scale": 2.0,
+    "animation_profile": "male"
+  },
+  {
+    "villager_type": "CELTIC_FORESTER",
+    "mesh": "MSH_P_CELT_M_A_1",
+    "pickable": true,
+    "scale": 2.0,
+    "animation_profile": "male"
+  },
+  {
+    "villager_type": "CELTIC_HOUSEWIFE",
+    "mesh": "MSH_P_CELT_F_A_1",
+    "pickable": true,
+    "scale": 2.0,
+    "animation_profile": "female"
+  }
+]

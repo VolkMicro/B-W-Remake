@@ -1,0 +1,76 @@
+[
+  {
+    "id": "creature",
+    "params": {
+      "spawn_offset": [
+        25.0,
+        0.0,
+        20.0
+      ],
+      "interaction_radius": 14.0,
+      "follow_distance": 18.0,
+      "hunger_per_second": 0.002,
+      "initial_hunger": 0.3,
+      "decision_seconds": 12.0,
+      "feedback_seconds": 15.0,
+      "alignment_limit": 100.0,
+      "morph_threshold": 25.0
+    }
+  },
+  {
+    "id": "physics",
+    "params": {
+      "step_hz": 60,
+      "max_speed": 300.0,
+      "restitution": 0.25,
+      "friction": 0.75,
+      "settle_speed": 4.0,
+      "sweep_spacing": 1.0,
+      "max_sweep_steps": 64
+    }
+  },
+  {
+    "id": "save",
+    "params": {
+      "version": 1,
+      "file": "user://preservation-save.json",
+      "autosave_seconds": 30.0,
+      "enabled_in_test": false
+    }
+  },
+  {
+    "id": "story",
+    "params": {
+      "mode": "campaign_index_only",
+      "do_not_claim_complete": true,
+      "first_island_script": "SetupLand1",
+      "native_bindings_implemented": 12
+    }
+  },
+  {
+    "id": "controls",
+    "params": {
+      "follow_key": "C",
+      "praise_key": "R",
+      "punish_key": "F",
+      "save_key": "F5",
+      "load_key": "F9",
+      "advisers_key": "H",
+      "select_keys": [
+        "1",
+        "2",
+        "3"
+      ]
+    }
+  },
+  {
+    "id": "villager_animation",
+    "params": {
+      "update_hz": 20,
+      "far_update_hz": 5,
+      "near_distance": 260.0,
+      "phase_groups": 8,
+      "blend_seconds": 0.15
+    }
+  }
+]

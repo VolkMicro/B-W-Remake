@@ -1,0 +1,14 @@
+[
+  {"id":"HELP_TEXT_NEWEST_GET_CREATURE_05","event":"creature_choice","order":5,"bank":"adviser_bank","text_source":"dialogue_text"},
+  {"id":"HELP_TEXT_NEWEST_GET_CREATURE_06","event":"creature_choice","order":6,"bank":"adviser_bank","text_source":"dialogue_text"},
+  {"id":"HELP_TEXT_NEWEST_GET_CREATURE_07","event":"creature_choice","order":7,"bank":"adviser_bank","text_source":"dialogue_text"},
+  {"id":"HELP_TEXT_NEWEST_GET_CREATURE_08","event":"creature_choice","order":8,"bank":"adviser_bank","text_source":"dialogue_text"},
+  {"id":"HELP_TEXT_NEWEST_GET_CREATURE_09","event":"creature_choice","order":9,"bank":"adviser_bank","text_source":"dialogue_text"},
+  {"id":"HELP_TEXT_NEWEST_GET_CREATURE_10","event":"creature_choice","order":10,"bank":"adviser_bank","text_source":"dialogue_text"},
+  {"id":"HELP_TEXT_NEWEST_GET_CREATURE_11","event":"creature_choice","order":11,"bank":"adviser_bank","text_source":"dialogue_text"},
+  {"id":"HELP_TEXT_NEWEST_GET_CREATURE_12","event":"creature_choice","order":12,"bank":"adviser_bank","text_source":"dialogue_text"},
+  {"id":"HELP_TEXT_NEWEST_GET_CREATURE_13","event":"creature_choice","order":13,"bank":"adviser_bank","text_source":"dialogue_text"},
+  {"id":"HELP_TEXT_NEWEST_GET_CREATURE_14","event":"creature_choice","order":14,"bank":"adviser_bank","text_source":"dialogue_text"},
+  {"id":"HELP_TEXT_NEWEST_GET_CREATURE_15","event":"creature_choice","order":15,"bank":"adviser_bank","text_source":"dialogue_text"},
+  {"id":"HELP_TEXT_NEWEST_GET_CREATURE_16","event":"creature_chosen","order":16,"bank":"adviser_bank","text_source":"dialogue_text"}
+]

@@ -1,0 +1,4 @@
+[
+  {"id":"male","idle":"M_P_Stand","walk":"M_P_Walk_Man","flee":"M_P_Panic_Man","held":"M_P_Jump_At_Hand","flying":"M_P_Thrown","dead":"M_P_Dead1"},
+  {"id":"female","idle":"M_P_Stand","walk":"M_P_Walk_Woman","flee":"M_P_Panic_Woman","held":"M_P_Jump_At_Hand","flying":"M_P_Thrown","dead":"M_P_Dead1"}
+]

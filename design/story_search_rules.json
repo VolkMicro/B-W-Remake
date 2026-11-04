@@ -1,0 +1,4 @@
+[
+  {"id":"exact_feature","object_type":3,"any_subtype":5000,"position_tolerance":0.01,"exclude_scripted_supported":false,"ambiguous_result":"block"},
+  {"id":"exact_abode","object_type":2,"any_subtype":5000,"position_tolerance":0.01,"exclude_scripted_supported":false,"ambiguous_result":"block"}
+]

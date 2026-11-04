@@ -1,0 +1,94 @@
+[
+ {
+  "abode_type": "NORSE_ABODE_A",
+  "mesh": "MSH_B_NORS_1"
+ },
+ {
+  "abode_type": "NORSE_ABODE_B",
+  "mesh": "MSH_B_NORS_2"
+ },
+ {
+  "abode_type": "NORSE_ABODE_C",
+  "mesh": "MSH_B_NORS_3"
+ },
+ {
+  "abode_type": "NORSE_ABODE_D",
+  "mesh": "MSH_B_NORS_4"
+ },
+ {
+  "abode_type": "NORSE_ABODE_E",
+  "mesh": "MSH_B_NORS_5"
+ },
+ {
+  "abode_type": "NORSE_ABODE_F",
+  "mesh": "MSH_B_NORS_2_A"
+ },
+ {
+  "abode_type": "NORSE_ABODE_CRECHE",
+  "mesh": "MSH_B_NORS_CRECHE"
+ },
+ {
+  "abode_type": "NORSE_ABODE_GRAVEYARD",
+  "mesh": "MSH_B_NORS_GRAVEYARD"
+ },
+ {
+  "abode_type": "NORSE_ABODE_STORAGE_PIT",
+  "mesh": "MSH_B_NORS_STORAGE_PIT"
+ },
+ {
+  "abode_type": "NORSE_ABODE_TOWN_CENTRE",
+  "mesh": "MSH_B_NORS_VILLAGECENTRE"
+ },
+ {
+  "abode_type": "NORSE_ABODE_WONDER",
+  "mesh": "MSH_B_NORS_WONDER"
+ },
+ {
+  "abode_type": "AZTEC_ABODE_A",
+  "mesh": "MSH_B_AZTC_1"
+ },
+ {
+  "abode_type": "AZTEC_ABODE_B",
+  "mesh": "MSH_B_AZTC_2"
+ },
+ {
+  "abode_type": "AZTEC_ABODE_C",
+  "mesh": "MSH_B_AZTC_3"
+ },
+ {
+  "abode_type": "AZTEC_ABODE_D",
+  "mesh": "MSH_B_AZTC_4"
+ },
+ {
+  "abode_type": "AZTEC_ABODE_CRECHE",
+  "mesh": "MSH_B_AZTC_CRECHE"
+ },
+ {
+  "abode_type": "AZTEC_ABODE_GRAVEYARD",
+  "mesh": "MSH_B_AZTC_GRAVEYARD"
+ },
+ {
+  "abode_type": "AZTEC_ABODE_STORAGE_PIT",
+  "mesh": "MSH_B_AZTC_STORAGE_PIT"
+ },
+ {
+  "abode_type": "AZTEC_ABODE_TOWN_CENTRE",
+  "mesh": "MSH_B_AZTC_VILLAGECENTRE"
+ },
+ {
+  "abode_type": "AZTEC_ABODE_WONDER",
+  "mesh": "MSH_B_AZTC_WONDER"
+ },
+ {
+  "abode_type": "CELTIC_ABODE_A",
+  "mesh": "MSH_B_CELT_1"
+ },
+ {
+  "abode_type": "CELTIC_ABODE_E",
+  "mesh": "MSH_B_CELT_5"
+ },
+ {
+  "abode_type": "JAPANESE_ABODE_A",
+  "mesh": "MSH_B_JAPN_1"
+ }
+]

@@ -1,0 +1,17 @@
+config_version=5
+
+[application]
+
+config/name="Black & White: Godot Island"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.7")
+
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+
+[rendering]
+
+textures/vram_compression/import_s3tc_bptc=true
+anti_aliasing/quality/msaa_3d=2

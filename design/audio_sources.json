@@ -1,0 +1,7 @@
+[
+  {"id":"adviser_bank","path":"Audio/Dialogue/HelpSprites.sad","kind":"sound_bank","reader":"sound_bank.gd"},
+  {"id":"dialogue_text","path":"Scripts/InfoScript2.txt","kind":"dialogue_table","reader":"original_dialogue.gd"},
+  {"id":"music_neutral","path":"Audio/Music/align/Neutral.sad","kind":"music_bank","reader":"original_music.gd"},
+  {"id":"music_good","path":"Audio/Music/align/Good.sad","kind":"music_bank","reader":"original_music.gd"},
+  {"id":"music_evil","path":"Audio/Music/align/Evil.sad","kind":"music_bank","reader":"original_music.gd"}
+]

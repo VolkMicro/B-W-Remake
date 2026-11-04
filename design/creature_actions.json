@@ -1,0 +1,9 @@
+[
+  {"id":"stand","clip":"move/stand","duration":1.0,"learning":0.0,"alignment":0.0},
+  {"id":"walk","clip":"move/walk","duration":1.0,"learning":0.0,"alignment":0.0},
+  {"id":"praise","clip":"reward/head","duration":2.5,"learning":0.15,"alignment":1.0},
+  {"id":"punish","clip":"punish/head_slap_r","duration":1.5,"learning":-0.15,"alignment":-1.0},
+  {"id":"help","clip":"individual/feeling_nice","duration":3.0,"learning":0.0,"alignment":2.0},
+  {"id":"scare","clip":"individual/angry","duration":3.0,"learning":0.0,"alignment":-2.0},
+  {"id":"eat","clip":"object_remove/eat","duration":2.0,"learning":0.0,"alignment":0.0}
+]

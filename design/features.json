@@ -1,0 +1,22 @@
+[
+ {
+  "feature": "Fat Pilar Lime",
+  "mesh": "MSH_FAT_PILAR_LIME"
+ },
+ {
+  "feature": "Pilar2 Lime",
+  "mesh": "MSH_PILAR2_LIME"
+ },
+ {
+  "feature": "Pilar3 Lime",
+  "mesh": "MSH_PILAR3_LIME"
+ },
+ {
+  "feature": "Spikey Pilar Lime",
+  "mesh": "MSH_SPIKEY_PILAR_LIME"
+ },
+ {
+  "feature": "Aztec Statue Feature",
+  "mesh": "MSH_B_AZTC_STATUE"
+ }
+]

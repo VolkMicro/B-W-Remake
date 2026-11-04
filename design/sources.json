@@ -1,0 +1,51 @@
+[
+  {
+    "id": "landscape",
+    "file": "Data/Landscape/Land1.lnd",
+    "format": "LND blocks 17x17 cells, ARGB1555 materials",
+    "reader": "lnd_reader.gd",
+    "used_for": "island terrain, ground textures, sea level"
+  },
+  {
+    "id": "island_script",
+    "file": "Scripts/Land1.txt",
+    "format": "text commands",
+    "reader": "island_script.gd",
+    "used_for": "towns, abodes, villagers, trees, rocks, features, start camera"
+  },
+  {
+    "id": "meshes",
+    "file": "Data/AllMeshes.g3d",
+    "format": "LiOnHeAd pack, MESHES=MKJC of L3D0",
+    "reader": "g3d_reader.gd",
+    "used_for": "trees, houses, villagers, rocks, pillars"
+  },
+  {
+    "id": "mesh_textures",
+    "file": "Data/AllMeshes.g3d",
+    "format": "LiOnHeAd chunks named by hex id, DDS DXT1/DXT3",
+    "reader": "g3d_reader.gd",
+    "used_for": "textures of all meshes"
+  },
+  {
+    "id": "ambience",
+    "file": "Audio/SFX/Atmos/country.sad",
+    "format": "LiOnHeAd, LHAudioWaveData with RIFF WAVs",
+    "reader": "sad_reader.gd",
+    "used_for": "countryside ambience loop"
+  },
+  {
+    "id": "night_ambience",
+    "file": "Audio/SFX/Atmos/ocean.sad",
+    "format": "LiOnHeAd, LHAudioWaveData with RIFF WAVs",
+    "reader": "sad_reader.gd",
+    "used_for": "sea ambience layer"
+  },
+  {
+    "id": "object_info",
+    "file": "Scripts/info.dat",
+    "format": "Lionhead Info pack, versioned 284-byte mobile static records",
+    "reader": "host_info_reader.gd",
+    "used_for": "original mesh identifiers, categories and maximum scales for island objects"
+  }
+]

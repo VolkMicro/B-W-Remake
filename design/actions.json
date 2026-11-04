@@ -1,0 +1,86 @@
+[
+ {
+  "action": "grab",
+  "input": "left click on tree, rock or villager",
+  "effect": "object goes into the Hand",
+  "belief": 0,
+  "alignment": 0
+ },
+ {
+  "action": "pan",
+  "input": "left drag on land",
+  "effect": "drag the island under the Hand",
+  "belief": 0,
+  "alignment": 0
+ },
+ {
+  "action": "rotate",
+  "input": "right drag or Q/E",
+  "effect": "turn the view around the focus",
+  "belief": 0,
+  "alignment": 0
+ },
+ {
+  "action": "zoom",
+  "input": "mouse wheel",
+  "effect": "zoom in/out",
+  "belief": 0,
+  "alignment": 0
+ },
+ {
+  "action": "place",
+  "input": "left click while holding",
+  "effect": "set the object down gently at the cursor",
+  "belief": 0,
+  "alignment": 0
+ },
+ {
+  "action": "throw",
+  "input": "right click while holding",
+  "effect": "hurl the object at the cursor",
+  "belief": 0,
+  "alignment": 0
+ },
+ {
+  "action": "gift_wood",
+  "input": "place a tree inside a town",
+  "effect": "town is grateful",
+  "belief": 18,
+  "alignment": 6
+ },
+ {
+  "action": "rock_scare",
+  "input": "rock lands near a town's villagers",
+  "effect": "villagers flee in awe",
+  "belief": 10,
+  "alignment": -5
+ },
+ {
+  "action": "rock_crush",
+  "input": "rock lands on a villager",
+  "effect": "villager is killed",
+  "belief": 6,
+  "alignment": -12
+ },
+ {
+  "action": "villager_missionary",
+  "input": "place a villager in another town",
+  "effect": "he preaches about you",
+  "belief": 12,
+  "alignment": 3
+ },
+ {
+  "action": "villager_fling",
+  "input": "throw a villager far",
+  "effect": "villager dies on landing",
+  "belief": 4,
+  "alignment": -15
+ },
+ {
+  "action": "home",
+  "input": "Space",
+  "effect": "fly back to your home town",
+  "belief": 0,
+  "alignment": 0
+ }
+]

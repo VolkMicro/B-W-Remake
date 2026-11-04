@@ -1,0 +1,3 @@
+[
+  {"id":"mpeg","executable":"bw_audio_decode.exe","input_limit_bytes":33554432,"output_limit_bytes":134217728,"library":"minimp3","library_license":"CC0-1.0","protocol":"memory_pipe_v1","reader":"mpeg_audio.gd"}
+]

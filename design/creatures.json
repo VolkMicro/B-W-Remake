@@ -1,0 +1,5 @@
+[
+  {"id":"ape","name":"Обезьяна","mesh_file":"Data/CreatureMesh/C_Ape_Boned_Base.L3D","good_file":"Data/CreatureMesh/C_Ape_Boned_Good.L3D","evil_file":"Data/CreatureMesh/C_Ape_Boned_Evil.L3D","animation_file":"Data/CTR/Bape.CBN","scale":0.6,"speed":9.0},
+  {"id":"cow","name":"Корова","mesh_file":"Data/CreatureMesh/C_Cow_Boned.l3d","good_file":"Data/CreatureMesh/C_Cow_Good.l3d","evil_file":"Data/CreatureMesh/C_Cow_Evil.l3d","animation_file":"Data/CTR/Bcow.CBN","scale":0.6,"speed":7.0},
+  {"id":"tiger","name":"Тигр","mesh_file":"Data/CreatureMesh/A_Tiger2_Base.l3d","good_file":"Data/CreatureMesh/A_Tiger2_Good.l3d","evil_file":"Data/CreatureMesh/A_Tiger2_Evil.l3d","animation_file":"Data/CTR/btiger.CBN","scale":0.6,"speed":11.0}
+]

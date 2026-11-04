@@ -1,0 +1,14 @@
+[
+  {"id":23,"name":"get_position","arguments":1,"returns":3,"handler":"get_position","scope":"registered_nodes"},
+  {"id":25,"name":"get_distance","arguments":6,"returns":1,"handler":"distance","scope":"finite_vectors"},
+  {"id":26,"name":"call","arguments":6,"returns":1,"handler":"exact_landmark","scope":"unique_feature_or_abode_at_exact_position"},
+  {"id":27,"name":"create","arguments":5,"returns":1,"handler":"create_marker","scope":"marker_subtype_zero_only"},
+  {"id":28,"name":"random","arguments":2,"returns":1,"handler":"random_range","scope":"reconstructed_random_generator"},
+  {"id":151,"name":"get_land_height","arguments":3,"returns":1,"handler":"land_height","scope":"loaded_terrain"},
+  {"id":256,"name":"thing_valid","arguments":1,"returns":1,"handler":"thing_valid","scope":"registered_nodes"},
+  {"id":397,"name":"square_root","arguments":1,"returns":1,"handler":"square_root","scope":"finite_values"},
+  {"id":460,"name":"can_skip_tutorial","arguments":0,"returns":1,"handler":"skip_tutorial","scope":"training_enabled"},
+  {"id":461,"name":"can_skip_creature_training","arguments":0,"returns":1,"handler":"skip_creature_training","scope":"training_enabled"},
+  {"id":462,"name":"is_keeping_old_creature","arguments":0,"returns":1,"handler":"keep_old_creature","scope":"profile_flag"},
+  {"id":463,"name":"current_profile_has_creature","arguments":0,"returns":1,"handler":"profile_has_creature","scope":"profile_flag"}
+]
