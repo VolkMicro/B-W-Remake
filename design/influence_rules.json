@@ -1,0 +1,11 @@
+[
+  {
+    "id": "scripted_object",
+    "settings_source": "object_info",
+    "host_format": "bw_1_2",
+    "distance": "horizontal",
+    "outer_tail": 0.2,
+    "curve": "native_1_2_piecewise",
+    "verification": "original executable in isolated x86 emulator"
+  }
+]

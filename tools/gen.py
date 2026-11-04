@@ -186,6 +186,20 @@ for row in S['statics']:
 if fmt is None:
     problems.append('original info.dat version is not supported')
 else:
+    influence_rules = {r['id']: r for r in S['influence_rules']}
+    influence = influence_rules.get('scripted_object', {})
+    if (set(influence_rules) != {'scripted_object'} or
+            influence.get('settings_source') not in {r['id'] for r in S['sources']} or
+            influence.get('host_format') != fmt['id'] or influence.get('distance') != 'horizontal' or
+            influence.get('curve') != 'native_1_2_piecewise' or influence.get('outer_tail') != 0.2):
+        problems.append('original influence rule has missing or unsupported references')
+    offset = fmt['influence_offset']
+    if fmt['influence_float_count'] != 3 or offset < 0 or offset + 12 > len(info):
+        problems.append('original influence settings are truncated')
+    else:
+        full, gradient, small = struct.unpack_from('<3f', info, offset)
+        if not all(math.isfinite(x) for x in (full, gradient, small)) or not (0 < full < 1 and 0 < gradient and full + gradient < 1 and 0 <= small <= 1):
+            problems.append('original influence settings are invalid')
     for t in set(int(x) for x in re.findall(r'^CREATE_MOBILE_STATIC\("[^"]+", (\d+)', script, re.M)):
         if t >= fmt['record_count']:
             problems.append(f'original static {t} outside info table')
@@ -288,7 +302,7 @@ out.append("const STATICS := " + gd({str(r['id']):r for r in S['statics']}))
 out.append("const ACTIONS := " + gd({r['action']: {"belief": r['belief'], "alignment": r['alignment'], "effect": r['effect'], "input": r['input']} for r in S['actions']}))
 out.append("const SYSTEMS := " + gd({r['system']: r['params'] for r in S['systems']}))
 out.append("const SOURCES := " + gd({r['id']: r['file'] for r in S['sources']}))
-for sheet, name in [('creatures','CREATURES'), ('advisers','ADVISERS'), ('creature_actions','CREATURE_ACTIONS'), ('port_modules','PORT_MODULES'), ('physics_profiles','PHYSICS_PROFILES'), ('villager_animations','VILLAGER_ANIMATIONS'), ('villager_skeletons','VILLAGER_SKELETONS'), ('story_opcodes','STORY_OPCODES'), ('story_vm','STORY_VM'), ('story_natives','STORY_NATIVES'), ('story_search_rules','STORY_SEARCH_RULES'), ('story_create_rules','STORY_CREATE_RULES'), ('audio_sources','AUDIO_SOURCES'), ('audio_decoder','AUDIO_DECODER'), ('story_dialogue','STORY_DIALOGUE'), ('music_modes','MUSIC_MODES'), ('music_rules','MUSIC_RULES'), ('host_info_formats','HOST_INFO_FORMATS'), ('animated_statics','ANIMATED_STATICS'), ('placement_rules','PLACEMENT_RULES'), ('landmark_animation_rules','LANDMARK_ANIMATION_RULES')]:
+for sheet, name in [('creatures','CREATURES'), ('advisers','ADVISERS'), ('creature_actions','CREATURE_ACTIONS'), ('port_modules','PORT_MODULES'), ('physics_profiles','PHYSICS_PROFILES'), ('villager_animations','VILLAGER_ANIMATIONS'), ('villager_skeletons','VILLAGER_SKELETONS'), ('story_opcodes','STORY_OPCODES'), ('story_vm','STORY_VM'), ('story_natives','STORY_NATIVES'), ('story_search_rules','STORY_SEARCH_RULES'), ('story_create_rules','STORY_CREATE_RULES'), ('audio_sources','AUDIO_SOURCES'), ('audio_decoder','AUDIO_DECODER'), ('story_dialogue','STORY_DIALOGUE'), ('music_modes','MUSIC_MODES'), ('music_rules','MUSIC_RULES'), ('host_info_formats','HOST_INFO_FORMATS'), ('animated_statics','ANIMATED_STATICS'), ('placement_rules','PLACEMENT_RULES'), ('landmark_animation_rules','LANDMARK_ANIMATION_RULES'), ('influence_rules','INFLUENCE_RULES')]:
     out.append('const ' + name + ' := ' + gd({str(r['id']):r for r in S[sheet]}))
 out.append('const PORT_RULES := ' + gd({r['id']:r['params'] for r in S['port_rules']}))
 open(os.path.join(R, 'game/scripts/data.gd'), 'w', encoding='utf-8').write("\n".join(out) + "\n")

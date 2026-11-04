@@ -30,6 +30,8 @@
     "animal_altitude_normal_offset": 616,
     "animal_age_scale_offset": 620,
     "animal_age_scale_count": 20,
+    "influence_offset": 306828,
+    "influence_float_count": 3,
     "verification": "validated on installed 1.2 data"
   }
 ]

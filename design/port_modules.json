@@ -46,5 +46,11 @@
     "reader": "story_natives.gd",
     "source": "Scripts/Quests/challenge.chl",
     "purpose": "Strict bindings for independently verified original script functions"
+  },
+  {
+    "id": "influence_math",
+    "reader": "influence_math.gd",
+    "source": "Scripts/info.dat",
+    "purpose": "Evaluate the original scripted influence falloff using settings read from the installed host"
   }
 ]

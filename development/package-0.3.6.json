@@ -1,0 +1,280 @@
+{
+  "version": "0.3.6-development",
+  "status": "local-unverified-in-game",
+  "fileName": "GodotIsland-0.3.6-development.zip",
+  "sizeBytes": 38416311,
+  "sha256": "53c9887d0cec06b4aa77bc4c5ecf2069b69aca77a0b0617cc293720b9a98324b",
+  "entries": [
+    {
+      "path": "GodotIsland/GodotIsland.exe",
+      "sizeBytes": 109422560
+    },
+    {
+      "path": "GodotIsland/bw_audio_decode.exe",
+      "sizeBytes": 109568
+    },
+    {
+      "path": "GodotIsland/README.md",
+      "sizeBytes": 9737
+    },
+    {
+      "path": "GodotIsland/GODOT-NOTICES.txt",
+      "sizeBytes": 112900
+    },
+    {
+      "path": "GodotIsland/MINIMP3-LICENSE.txt",
+      "sizeBytes": 6556
+    },
+    {
+      "path": "GodotIsland/Source/tools/bw_audio_decode.c",
+      "sizeBytes": 4050
+    },
+    {
+      "path": "GodotIsland/Source/tools/vendor/minimp3/minimp3.h",
+      "sizeBytes": 76831
+    },
+    {
+      "path": "GodotIsland/Source/tools/vendor/minimp3/LICENSE",
+      "sizeBytes": 6556
+    },
+    {
+      "path": "GodotIsland/Source/tools/vendor/minimp3/SOURCE.json",
+      "sizeBytes": 138
+    },
+    {
+      "path": "GodotIsland/Source/design/abodes.json",
+      "sizeBytes": 1753
+    },
+    {
+      "path": "GodotIsland/Source/design/actions.json",
+      "sizeBytes": 1782
+    },
+    {
+      "path": "GodotIsland/Source/design/advisers.json",
+      "sizeBytes": 315
+    },
+    {
+      "path": "GodotIsland/Source/design/animated_statics.json",
+      "sizeBytes": 325
+    },
+    {
+      "path": "GodotIsland/Source/design/audio_decoder.json",
+      "sizeBytes": 216
+    },
+    {
+      "path": "GodotIsland/Source/design/audio_sources.json",
+      "sizeBytes": 558
+    },
+    {
+      "path": "GodotIsland/Source/design/creatures.json",
+      "sizeBytes": 756
+    },
+    {
+      "path": "GodotIsland/Source/design/creature_actions.json",
+      "sizeBytes": 628
+    },
+    {
+      "path": "GodotIsland/Source/design/features.json",
+      "sizeBytes": 367
+    },
+    {
+      "path": "GodotIsland/Source/design/host_info_formats.json",
+      "sizeBytes": 1107
+    },
+    {
+      "path": "GodotIsland/Source/design/influence_rules.json",
+      "sizeBytes": 265
+    },
+    {
+      "path": "GodotIsland/Source/design/landmark_animation_rules.json",
+      "sizeBytes": 130
+    },
+    {
+      "path": "GodotIsland/Source/design/music_modes.json",
+      "sizeBytes": 434
+    },
+    {
+      "path": "GodotIsland/Source/design/music_rules.json",
+      "sizeBytes": 144
+    },
+    {
+      "path": "GodotIsland/Source/design/physics_profiles.json",
+      "sizeBytes": 388
+    },
+    {
+      "path": "GodotIsland/Source/design/placement_rules.json",
+      "sizeBytes": 394
+    },
+    {
+      "path": "GodotIsland/Source/design/port_modules.json",
+      "sizeBytes": 1824
+    },
+    {
+      "path": "GodotIsland/Source/design/port_rules.json",
+      "sizeBytes": 1784
+    },
+    {
+      "path": "GodotIsland/Source/design/sources.json",
+      "sizeBytes": 1590
+    },
+    {
+      "path": "GodotIsland/Source/design/statics.json",
+      "sizeBytes": 556
+    },
+    {
+      "path": "GodotIsland/Source/design/story_create_rules.json",
+      "sizeBytes": 112
+    },
+    {
+      "path": "GodotIsland/Source/design/story_dialogue.json",
+      "sizeBytes": 1606
+    },
+    {
+      "path": "GodotIsland/Source/design/story_natives.json",
+      "sizeBytes": 1445
+    },
+    {
+      "path": "GodotIsland/Source/design/story_opcodes.json",
+      "sizeBytes": 1597
+    },
+    {
+      "path": "GodotIsland/Source/design/story_search_rules.json",
+      "sizeBytes": 299
+    },
+    {
+      "path": "GodotIsland/Source/design/story_vm.json",
+      "sizeBytes": 208
+    },
+    {
+      "path": "GodotIsland/Source/design/systems.json",
+      "sizeBytes": 1232
+    },
+    {
+      "path": "GodotIsland/Source/design/trees.json",
+      "sizeBytes": 2225
+    },
+    {
+      "path": "GodotIsland/Source/design/villagers.json",
+      "sizeBytes": 1289
+    },
+    {
+      "path": "GodotIsland/Source/design/villager_animations.json",
+      "sizeBytes": 305
+    },
+    {
+      "path": "GodotIsland/Source/design/villager_skeletons.json",
+      "sizeBytes": 125
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/anm_reader.gd",
+      "sizeBytes": 5367
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/chl_reader.gd",
+      "sizeBytes": 3678
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/creature.gd",
+      "sizeBytes": 6739
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/data.gd",
+      "sizeBytes": 22779
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/g3d_reader.gd",
+      "sizeBytes": 7052
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/host_info_reader.gd",
+      "sizeBytes": 6469
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/influence_math.gd",
+      "sizeBytes": 1466
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/island_script.gd",
+      "sizeBytes": 1849
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/l3d_rig.gd",
+      "sizeBytes": 8348
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/lnd_reader.gd",
+      "sizeBytes": 5948
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/main.gd",
+      "sizeBytes": 46370
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/morph_reader.gd",
+      "sizeBytes": 6794
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/mpeg_audio.gd",
+      "sizeBytes": 2333
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/original_dialogue.gd",
+      "sizeBytes": 3942
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/original_landmark.gd",
+      "sizeBytes": 1826
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/original_music.gd",
+      "sizeBytes": 4602
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/sad_reader.gd",
+      "sizeBytes": 1066
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/sound_bank.gd",
+      "sizeBytes": 3725
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/story_natives.gd",
+      "sizeBytes": 6582
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/story_vm.gd",
+      "sizeBytes": 16180
+    },
+    {
+      "path": "GodotIsland/Source/game/scripts/thing.gd",
+      "sizeBytes": 6444
+    },
+    {
+      "path": "GodotIsland/Source/game/shaders/terrain.gdshader",
+      "sizeBytes": 1061
+    },
+    {
+      "path": "GodotIsland/Source/game/shaders/water.gdshader",
+      "sizeBytes": 479
+    },
+    {
+      "path": "GodotIsland/Source/game/main.tscn",
+      "sizeBytes": 159
+    },
+    {
+      "path": "GodotIsland/Source/game/project.godot",
+      "sizeBytes": 319
+    },
+    {
+      "path": "GodotIsland/Source/game/export_presets.cfg",
+      "sizeBytes": 391
+    },
+    {
+      "path": "GodotIsland/Source/tools/gen.py",
+      "sizeBytes": 20631
+    }
+  ],
+  "containsOriginalGameAssets": false,
+  "requiresGame": "Black & White",
+  "requiresStoryImplementation": true
+}

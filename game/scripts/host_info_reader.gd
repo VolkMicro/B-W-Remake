@@ -8,6 +8,7 @@ var version := ""
 var mobile_statics: Array[Dictionary] = []
 var animated_statics: Dictionary = {}
 var animals: Array[Dictionary] = []
+var influence_settings: Dictionary = {}
 
 
 func load_file(path: String, mesh_count: int) -> bool:
@@ -16,6 +17,7 @@ func load_file(path: String, mesh_count: int) -> bool:
 	mobile_statics.clear()
 	animated_statics.clear()
 	animals.clear()
+	influence_settings.clear()
 	var f := FileAccess.open(path, FileAccess.READ)
 	if f == null or f.get_buffer(8).get_string_from_ascii() != "LiOnHeAd":
 		return _fail("Original object information is unavailable")
@@ -41,6 +43,15 @@ func _read_info(bytes: PackedByteArray, mesh_count: int) -> bool:
 			break
 	if format.is_empty():
 		return _fail("Unsupported Black & White object information version")
+	var influence_offset: int = format["influence_offset"]
+	if int(format["influence_float_count"]) != 3 or influence_offset < 0 or influence_offset + 12 > bytes.size():
+		return _fail("Original influence settings are truncated")
+	var full := bytes.decode_float(influence_offset)
+	var gradient := bytes.decode_float(influence_offset + 4)
+	var small := bytes.decode_float(influence_offset + 8)
+	if not is_finite(full) or not is_finite(gradient) or not is_finite(small) or full <= 0.0 or gradient <= 0.0 or full + gradient >= 1.0 or small < 0.0 or small > 1.0:
+		return _fail("Original influence settings are invalid")
+	influence_settings = {"full":full,"gradient":gradient,"small":small}
 	var start: int = format["mobile_static_offset"]
 	var count: int = format["record_count"]
 	var size: int = format["record_size"]
@@ -121,4 +132,5 @@ func _fail(message: String) -> bool:
 	mobile_statics.clear()
 	animated_statics.clear()
 	animals.clear()
+	influence_settings.clear()
 	return false
