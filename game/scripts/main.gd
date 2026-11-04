@@ -499,6 +499,14 @@ func _update_camera() -> void:
 	focus.y = maxf(ground_y(focus), sea_y)
 	var off := Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch)) * dist
 	cam.position = focus + off
+	# Keep the eye above hills along its line of sight, so it never sits inside the land.
+	var clearance := 4.0 + dist * 0.03
+	var raise := 0.0
+	for i in range(1, 9):
+		var p := focus + off * (float(i) / 8.0)
+		var lift := maxf(ground_y(p), sea_y) + clearance - p.y
+		raise = maxf(raise, lift * 8.0 / float(i))
+	cam.position.y += raise
 	cam.look_at(focus, Vector3.UP)
 
 
@@ -1198,6 +1206,7 @@ func _restore_preservation(announce := true) -> bool:
 func _run_preservation_test() -> void:
 	melty_check("campaign-index-loaded", campaign.scripts.has("SetupLand1"), campaign.error)
 	melty_check("advisers-loaded", adviser_nodes.size() == 2, "expected two original adviser meshes")
+	var learn_failed: Array[String] = []
 	for id in Data.CREATURES:
 		var ok := choose_creature(id, {"position":[towns[0]["pos"].x + 25,0,towns[0]["pos"].z + 20]})
 		melty_check("creature-" + id, ok and creature.rig.bone_count > 0 and creature.morph.clips.has("move/walk"), "original creature rig/animation unavailable")
@@ -1209,8 +1218,10 @@ func _run_preservation_test() -> void:
 		creature.perform("help", 0)
 		var before: float = creature.memory["help"]
 		creature.feedback(true)
-		melty_check("learning-" + id, creature.memory["help"] > before, "praise did not reinforce action")
+		if creature.memory["help"] <= before:
+			learn_failed.append(id)
 		await get_tree().create_timer(3.0).timeout
+	melty_check("creatures-learn", learn_failed.is_empty(), "praise did not reinforce: " + ", ".join(learn_failed))
 	_port_tests = true
 	await _test_closeups()
 
