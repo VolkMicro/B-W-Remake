@@ -79,7 +79,8 @@
       "input_space": "parent_local_absolute",
       "engine_pose": "parent_local_absolute",
       "initial_pose": "model_rest",
-      "basis_decomposition": "signed_scale"
+      "basis_decomposition": "signed_scale",
+      "morph_rotation": "rest_basis_times_reflected_xyz_euler"
     }
   }
 ]

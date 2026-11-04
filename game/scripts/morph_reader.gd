@@ -131,13 +131,13 @@ func sample(name: String, seconds: float, rest: Array[Transform3D]) -> Array[Tra
 	var pose: Array[Transform3D] = rest.duplicate()
 	# Base stand defines channels not present in a sparse action clip.
 	if clips.has("move/stand"):
-		_apply(clips["move/stand"], 0.0, pose, false)
+		_apply(clips["move/stand"], 0.0, pose, rest, false)
 	if clips.has(name):
-		_apply(clips[name], seconds, pose, true)
+		_apply(clips[name], seconds, pose, rest, true)
 	return pose
 
 
-func _apply(clip: Dictionary, seconds: float, pose: Array[Transform3D], lock_root: bool) -> void:
+func _apply(clip: Dictionary, seconds: float, pose: Array[Transform3D], rest: Array[Transform3D], lock_root: bool) -> void:
 	var nf: int = clip["frames"]
 	var frame: float = fposmod(seconds, float(clip["duration"])) / float(clip["duration"]) * float(nf - 1)
 	var a := int(frame)
@@ -153,10 +153,11 @@ func _apply(clip: Dictionary, seconds: float, pose: Array[Transform3D], lock_roo
 			continue
 		var ea := _vec(base + a * stride + i * 12)
 		var eb := _vec(base + b * stride + i * 12)
-		# The original data stores XYZ Euler radians in the left-handed frame.
+		# The original data stores XYZ Euler radians in the left-handed frame,
+		# relative to the model's rest orientation (zero = the bone's bind pose).
 		var qa := Basis.from_euler(ea, EULER_ORDER_XYZ).get_rotation_quaternion()
 		var qb := Basis.from_euler(eb, EULER_ORDER_XYZ).get_rotation_quaternion()
-		pose[idx].basis = L3dRig.reflected(Transform3D(Basis(qa.slerp(qb, weight)), Vector3.ZERO)).basis
+		pose[idx].basis = rest[idx].basis * L3dRig.reflected(Transform3D(Basis(qa.slerp(qb, weight)), Vector3.ZERO)).basis
 	for i in tids.size():
 		var idx := tids[i]
 		if idx >= pose.size():

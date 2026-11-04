@@ -97,7 +97,14 @@ func _run() -> void:
 		for clip in ["move/stand", "move/walk"]:
 			var pose := morph.sample(clip, 0.31, rig.rests)
 			rig.apply_local_pose(pose)
-			check_applied_pose(rig, pose, id + " " + clip)
+			# Creature frames are rotations relative to the (slightly sheared) rest basis,
+			# so they inherit the rest decomposition tolerance.
+			check_applied_pose(rig, pose, id + " " + clip, true)
+			var turned := 0
+			for bi in rig.bone_count:
+				if pose[bi].basis.orthonormalized().get_rotation_quaternion().angle_to(rig.rests[bi].basis.orthonormalized().get_rotation_quaternion()) < 1.2:
+					turned += 1
+			check(turned * 10 >= rig.bone_count * 9, id + " " + clip + " stays near the original bind orientation")
 		visual.free()
 	for id in Data.ADVISERS:
 		var row: Dictionary = Data.ADVISERS[id]

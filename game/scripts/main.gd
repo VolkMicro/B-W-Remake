@@ -80,6 +80,9 @@ var _adviser_time := 0.0
 var _speaking_adviser := ""
 var _save_clock := 0.0
 var hand_rig: L3dRig
+var hand_pivot := Node3D.new()
+const HAND_LENGTH := 16.0 # world units at the default camera distance
+const HAND_HOVER := 7.0
 var _port_tests := false
 var showcase_mode := false
 
@@ -453,10 +456,17 @@ func _build_hand() -> void:
 	hand_rig = L3dRig.new()
 	var visual := hand_rig.load_file(_p("Data/CreatureMesh/Hand_Boned_Base2.l3d"))
 	if visual:
+		# The original mesh stands fingers-up with the back of the hand towards +Z.
+		# Lay it palm-down over the land, fingers pointing away from the camera.
 		visual.name = "OriginalHand"
-		visual.scale = Vector3.ONE * 0.15
-		visual.position.y = 2.0
-		hand_ring.add_child(visual)
+		var length := maxf(hand_rig.bounds.get_longest_axis_size(), 1.0)
+		var s := HAND_LENGTH / length
+		visual.scale = Vector3.ONE * s
+		visual.position = -hand_rig.bounds.get_center() * s
+		hand_pivot.rotation_degrees.x = -90.0
+		hand_pivot.position.y = HAND_HOVER
+		hand_pivot.add_child(visual)
+		hand_ring.add_child(hand_pivot)
 
 
 func _start_audio() -> void:
@@ -611,6 +621,7 @@ func _process(delta: float) -> void:
 	var gp := ground_point(mouse)
 	hand_ring.position = gp + Vector3(0, 0.6, 0)
 	hand_ring.scale = Vector3.ONE * clampf(dist / 200.0, 0.4, 5.0)
+	hand_pivot.rotation.y = yaw
 	if held:
 		held.position = gp + Vector3(0, float(cfg_hand["hold_height"]), 0)
 	for i in towns.size():
@@ -1201,6 +1212,57 @@ func _run_preservation_test() -> void:
 		melty_check("learning-" + id, creature.memory["help"] > before, "praise did not reinforce action")
 		await get_tree().create_timer(3.0).timeout
 	_port_tests = true
+	await _test_closeups()
+
+
+# Close views of walking villagers and the advisers, so a test recording shows their animation.
+func _test_closeups() -> void:
+	var shown := 0
+	var moved := false
+	for t in things:
+		if shown >= 4:
+			break
+		if t.kind != "villager" or t.state == Thing.State.DEAD or t.rig == null or t.rig.skeleton == null:
+			continue
+		t._target = t.position + Vector3(10, 0, 4)
+		t._wait = 0.0
+		var sk: Skeleton3D = t.rig.skeleton
+		var last := sk.get_bone_count() - 1
+		var before := sk.get_bone_global_pose(last)
+		for i in 12:
+			focus = t.position
+			dist = 14.0
+			pitch = deg_to_rad(22.0)
+			yaw = 0.4 + i * 0.05
+			_update_camera()
+			await get_tree().create_timer(0.5).timeout
+		if not sk.get_bone_global_pose(last).is_equal_approx(before):
+			moved = true
+		shown += 1
+	melty_check("villagers-animate", moved, "villager bones did not move")
+	if not creature:
+		return
+	# Walk the creature between villages for the rest of the run; Melty closes the game.
+	creature.following = true
+	dist = 150.0
+	pitch = deg_to_rad(30.0)
+	var stop := 0
+	var waited := 0
+	while is_inside_tree():
+		stop = (stop + 1) % towns.size()
+		var goal: Vector3 = towns[stop]["pos"]
+		while is_inside_tree() and Vector2(focus.x - goal.x, focus.z - goal.z).length() > 10.0:
+			var step := Vector3(goal.x - focus.x, 0, goal.z - focus.z)
+			if Vector2(creature.position.x - focus.x, creature.position.z - focus.z).length() < 40.0:
+				focus += step.normalized() * minf(7.0 * 0.1, step.length())
+				waited = 0
+			else:
+				waited += 1
+				if waited > 100: # blocked by water: carry on from where the camera is
+					creature.position = Vector3(focus.x, ground_y(focus), focus.z)
+			focus.y = ground_y(focus)
+			yaw += 0.002
+			await get_tree().create_timer(0.1).timeout
 
 
 func _exit_tree() -> void:

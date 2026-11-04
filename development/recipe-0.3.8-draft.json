@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "mode": "standalone",
+  "games": [{"slug": "custom-black-and-white", "role": "primary"}],
+  "components": [{"id": "main", "fileName": "GodotIsland-0.3.8-development.zip", "label": "Main files", "kind": "main", "required": true}],
+  "requirements": [],
+  "mappings": [{"component": "main", "from": "GodotIsland/", "to": "{managed}"}],
+  "launch": {"kind": "exe", "path": "{managed}/GodotIsland.exe", "env": {"BW_GAME_DIR": "{game}"}},
+  "test": {"checks": ["island-loaded", "villages-loaded", "gift-raises-belief", "rock-scares-villagers", "campaign-index-loaded", "advisers-loaded", "creature-ape", "creature-cow", "creature-tiger", "learning-ape", "villagers-animate"], "minutes": 3}
+}

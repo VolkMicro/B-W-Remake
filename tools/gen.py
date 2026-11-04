@@ -45,7 +45,8 @@ if sorted(opcodes) != list(range(31)):
     problems.append('story_opcodes must define each original opcode 0..30 exactly once')
 pose_rules = next((row['params'] for row in S['port_rules'] if row['id'] == 'skeleton_pose'), {})
 expected_pose_rules = {'input_space':'parent_local_absolute', 'engine_pose':'parent_local_absolute',
-                       'initial_pose':'model_rest', 'basis_decomposition':'signed_scale'}
+                       'initial_pose':'model_rest', 'basis_decomposition':'signed_scale',
+                       'morph_rotation':'rest_basis_times_reflected_xyz_euler'}
 if pose_rules != expected_pose_rules:
     problems.append('skeleton_pose must specify verified Godot 4 parent-local poses, rest initialization and signed scale')
 story_sources = {r['id'] for r in S['port_modules']}
