@@ -2,6 +2,7 @@
 class_name L3dRig
 extends RefCounted
 
+const Data := preload("res://scripts/data.gd")
 var error := ""
 var bone_count := 0
 var surface_count := 0
@@ -188,6 +189,8 @@ func load_bytes(bytes: PackedByteArray, external_material := Callable()) -> Node
 			skin.add_bind(bi, global_rests[bi].affine_inverse())
 		instance.skin = skin
 		instance.skeleton = NodePath("../OriginalSkeleton")
+		if Data.PORT_RULES["skeleton_pose"]["initial_pose"] == "model_rest":
+			apply_local_pose(rests)
 	surface_count = mesh.get_surface_count()
 	bounds = mesh.get_aabb()
 	_bytes.clear()
@@ -212,12 +215,13 @@ func apply_local_pose(pose: Array[Transform3D]) -> void:
 	if pose.size() != bone_count:
 		return
 	for bi in bone_count:
-		# Pose supplied by original animation is absolute local, while Godot
-		# skeleton pose transforms are relative to each bone's local rest.
-		var relative := rests[bi].affine_inverse() * pose[bi]
-		skeleton.set_bone_pose_position(bi, relative.origin)
-		skeleton.set_bone_pose_rotation(bi, relative.basis.orthonormalized().get_rotation_quaternion())
-		skeleton.set_bone_pose_scale(bi, relative.basis.get_scale())
+		# Godot 4's local bone pose already includes the bone's rest transform.
+		# The original readers also produce a parent-local absolute pose, so
+		# applying the inverse rest here would distort the entire hierarchy.
+		var local := pose[bi]
+		skeleton.set_bone_pose_position(bi, local.origin)
+		skeleton.set_bone_pose_rotation(bi, local.basis.get_rotation_quaternion())
+		skeleton.set_bone_pose_scale(bi, local.basis.get_scale())
 
 
 func _transform(p: int) -> Transform3D:

@@ -72,5 +72,14 @@
       "phase_groups": 8,
       "blend_seconds": 0.15
     }
+  },
+  {
+    "id": "skeleton_pose",
+    "params": {
+      "input_space": "parent_local_absolute",
+      "engine_pose": "parent_local_absolute",
+      "initial_pose": "model_rest",
+      "basis_decomposition": "signed_scale"
+    }
   }
 ]

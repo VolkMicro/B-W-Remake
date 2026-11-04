@@ -40,5 +40,9 @@ Villagers now instantiate their original 22-bone skeletons and play the original
 
 156 automated checks passed at that stage. After the creator renewed permission, a 0.3.4 showcase process was started on 2026-11-04, but computer-use access to its window was not approved. The process is no longer running, no showcase images were produced, and its visual result is unknown. No new Melty release test has occurred. The Windows package remains a local development build.
 
+## 0.3.5 skeleton correction
+
+The previous rig applied an inverse rest transform as if Godot 4 bone poses were rest-relative. Godot 4 expects the parent-local pose including rest, so this distorted villagers, creatures, advisers and animated landmarks. The rig now initializes the skeleton from the original rest pose and applies the decoded parent-local poses directly, retaining signed scale. New automated checks compare the actual Godot bone poses and hierarchy against the original data for all eight villager types, three creatures and both advisers. The source matrices include small amounts of shear in some rest poses, which Godot's rotation-and-scale pose representation approximates. This fixes a confirmed transform error, but its appearance and any remaining T-pose problems still require a real visual check.
+
 ## Credits and permissions
 Original game: Lionhead Studios, published by Electronic Arts. Original content stays in each player's own game installation. Godot Engine: MIT, https://godotengine.org/license/. Audio decoder: minimp3 by lieff and contributors, CC0-1.0, https://github.com/lieff/minimp3; its source and license are included. Original file format research: openblack contributors' public documentation and format definitions. No openblack implementation is bundled. This port's original code: all rights reserved; creator permits Melty remixes. Third party components keep their own licenses. Created with AI assistance.
