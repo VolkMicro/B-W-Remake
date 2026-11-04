@@ -1360,6 +1360,10 @@ func has_influence(p: Vector3) -> bool:
 func _test_closeups() -> void:
 	var shown := 0
 	var moved := false
+	# Keep the creature out of the villager close-ups (it follows the camera otherwise).
+	if is_instance_valid(creature):
+		creature.following = false
+		creature._target = creature.position
 	for t in things:
 		if shown >= 4:
 			break
