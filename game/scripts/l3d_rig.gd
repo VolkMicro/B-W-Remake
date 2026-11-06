@@ -26,7 +26,7 @@ func load_file(path: String) -> Node3D:
 	return load_bytes(FileAccess.get_file_as_bytes(path))
 
 
-func load_bytes(bytes: PackedByteArray, external_material := Callable()) -> Node3D:
+func load_bytes(bytes: PackedByteArray, external_material := Callable(), submesh_states := PackedInt32Array()) -> Node3D:
 	error = ""
 	_bytes = bytes
 	if _bytes.size() < 76:
@@ -41,7 +41,8 @@ func load_bytes(bytes: PackedByteArray, external_material := Callable()) -> Node
 	_bytes = _bytes.slice(offset)
 	var nsub := _u(12)
 	var sub_table := _u(16)
-	if nsub < 1 or nsub > 256 or not _fits(sub_table, nsub * 4):
+	# The original main temple room contains 263 static submeshes.
+	if nsub < 1 or nsub > 1024 or not _fits(sub_table, nsub * 4):
 		return _fail("Invalid submesh table")
 	# Embedded RGBA4 skins have their own id before the 256x256 texels.
 	var skin_count := _u(56)
@@ -69,15 +70,18 @@ func load_bytes(bytes: PackedByteArray, external_material := Callable()) -> Node
 	skeleton.name = "OriginalSkeleton"
 	root.add_child(skeleton)
 	var mesh := ArrayMesh.new()
+	var mesh_parts: Array[ArrayMesh] = []
 	for si in nsub:
 		var so := _u(sub_table + si * 4)
 		if not _fits(so, 20):
 			return _fail("Truncated submesh")
 		if (_u(so) & 0x20000000) == 0:
 			continue
+		if not submesh_states.is_empty() and not submesh_states.has(int((_u(so) >> 4) & 63)):
+			continue
 		var nb := _u(so + 12)
 		var bo := _u(so + 16)
-		if nb > 256 or not _fits(bo, nb * 60):
+		if nb > 256 or (nb > 0 and not _fits(bo, nb * 60)):
 			return _fail("Invalid bones")
 		# Creature/adviser files each have one skinned high-detail submesh.
 		if nb > 0 and bone_count > 0:
@@ -162,6 +166,10 @@ func load_bytes(bytes: PackedByteArray, external_material := Callable()) -> Node
 			if nb > 0:
 				arrays[Mesh.ARRAY_BONES] = bones
 				arrays[Mesh.ARRAY_WEIGHTS] = weights
+			# Rooms can exceed Godot's 256-surface limit for one ArrayMesh.
+			if mesh.get_surface_count() >= 256:
+				mesh_parts.append(mesh)
+				mesh = ArrayMesh.new()
 			mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 			var material := StandardMaterial3D.new()
 			material.cull_mode = BaseMaterial3D.CULL_DISABLED
@@ -180,19 +188,21 @@ func load_bytes(bytes: PackedByteArray, external_material := Callable()) -> Node
 			mesh.surface_set_material(mesh.get_surface_count() - 1, material)
 	if mesh.get_surface_count() == 0:
 		return _fail("Model has no supported surfaces")
-	var instance := MeshInstance3D.new()
-	instance.mesh = mesh
-	root.add_child(instance)
-	if bone_count > 0:
-		var skin := Skin.new()
-		for bi in bone_count:
-			skin.add_bind(bi, global_rests[bi].affine_inverse())
-		instance.skin = skin
-		instance.skeleton = NodePath("../OriginalSkeleton")
-		if Data.PORT_RULES["skeleton_pose"]["initial_pose"] == "model_rest":
-			apply_local_pose(rests)
-	surface_count = mesh.get_surface_count()
-	bounds = mesh.get_aabb()
+	mesh_parts.append(mesh)
+	var skin := Skin.new()
+	for bi in bone_count:
+		skin.add_bind(bi, global_rests[bi].affine_inverse())
+	for part in mesh_parts:
+		var instance := MeshInstance3D.new()
+		instance.mesh = part
+		root.add_child(instance)
+		if bone_count > 0:
+			instance.skin = skin
+			instance.skeleton = NodePath("../OriginalSkeleton")
+		bounds = part.get_aabb() if surface_count == 0 else bounds.merge(part.get_aabb())
+		surface_count += part.get_surface_count()
+	if bone_count > 0 and Data.PORT_RULES["skeleton_pose"]["initial_pose"] == "model_rest":
+		apply_local_pose(rests)
 	_bytes.clear()
 	return root
 

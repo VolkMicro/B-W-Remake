@@ -9,6 +9,13 @@ var _cache: Dictionary = {}
 var _cache_tick := -1
 
 
+func load_standalone(path: String, name: String) -> bool:
+	var bytes := FileAccess.get_file_as_bytes(path)
+	if bytes.size() < 84 or bytes.decode_u32(64) != bytes.size():
+		return _fail("Invalid standalone original ANM")
+	return _decode(name, bytes)
+
+
 func load_file(path: String, wanted: Array[String], wanted_indices := PackedInt32Array()) -> bool:
 	error = ""
 	clips.clear()

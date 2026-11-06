@@ -32,6 +32,12 @@
     "animal_age_scale_count": 20,
     "influence_offset": 306828,
     "influence_float_count": 3,
+    "highlight_offset": 229714,
+    "highlight_record_size": 256,
+    "highlight_record_count": 4,
+    "villager_offset": 141200,
+    "villager_record_size": 916,
+    "villager_record_count": 84,
     "verification": "validated on installed 1.2 data"
   }
 ]

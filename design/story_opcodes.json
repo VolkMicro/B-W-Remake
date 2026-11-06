@@ -22,7 +22,7 @@
   {"id":20,"name":"jump","family":"control"},
   {"id":21,"name":"timer_complete","family":"time"},
   {"id":22,"name":"add_handler","family":"exception"},
-  {"id":23,"name":"reinterpret_or_clear","family":"stack"},
+  {"id":23,"name":"cast_or_clear","family":"stack"},
   {"id":24,"name":"call_script","family":"tasks"},
   {"id":25,"name":"remove_handler_or_yield","family":"exception"},
   {"id":26,"name":"return_from_handler","family":"exception"},

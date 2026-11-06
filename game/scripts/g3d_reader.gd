@@ -94,23 +94,32 @@ func has_mesh(mesh_name: String) -> bool:
 	return name_to_index.has(mesh_name)
 
 
-func mesh(mesh_name: String) -> ArrayMesh:
-	if _mesh_cache.has(mesh_name):
-		return _mesh_cache[mesh_name]
+func mesh(mesh_name: String, submesh_states := PackedInt32Array()) -> ArrayMesh:
+	var key := _mesh_cache_key(mesh_name, submesh_states)
+	if _mesh_cache.has(key):
+		return _mesh_cache[key]
 	var am: ArrayMesh = null
 	if name_to_index.has(mesh_name):
-		am = _build(meshes_base + mesh_offsets[name_to_index[mesh_name]])
-	_mesh_cache[mesh_name] = am
+		am = _build(meshes_base + mesh_offsets[name_to_index[mesh_name]], submesh_states)
+	_mesh_cache[key] = am
 	return am
 
 
-func mesh_index(index: int) -> ArrayMesh:
+func mesh_index(index: int, submesh_states := PackedInt32Array()) -> ArrayMesh:
 	if index < 0 or index >= mesh_offsets.size():
 		return null
-	var key := "index:%d" % index
+	var key := _mesh_cache_key("index:%d" % index, submesh_states)
 	if not _mesh_cache.has(key):
-		_mesh_cache[key] = _build(meshes_base + mesh_offsets[index])
+		_mesh_cache[key] = _build(meshes_base + mesh_offsets[index], submesh_states)
 	return _mesh_cache[key]
+
+
+func _mesh_cache_key(key: String, submesh_states: PackedInt32Array) -> String:
+	if submesh_states.is_empty():
+		return key
+	var states := submesh_states.duplicate()
+	states.sort()
+	return key + ":states=" + str(states)
 
 
 func rig(mesh_name: String) -> L3dRig:
@@ -144,7 +153,7 @@ func close() -> void:
 	_rig_cache.clear()
 
 
-func _build(q: int) -> ArrayMesh:
+func _build(q: int, submesh_states := PackedInt32Array()) -> ArrayMesh:
 	if data.slice(q, q + 4).get_string_from_ascii() != "L3D0":
 		return null
 	var nsub := data.decode_u32(q + 12)
@@ -155,6 +164,11 @@ func _build(q: int) -> ArrayMesh:
 		var sflags := data.decode_u32(so)
 		if (sflags & 0x20000000) == 0:
 			continue # lower detail levels and collision hulls
+		# Ordinary finished abodes use state 0; state 1 is their scaffold.
+		# Leave the default unfiltered: graveyards and other animated props use
+		# these bits for their own components rather than construction stages.
+		if not submesh_states.is_empty() and not submesh_states.has(int((sflags >> 4) & 63)):
+			continue
 		var nprim := data.decode_u32(so + 4)
 		var primo := data.decode_u32(so + 8)
 		var nb := data.decode_u32(so + 12)

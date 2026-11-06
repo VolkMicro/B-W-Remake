@@ -1,0 +1,41 @@
+{
+  "preview": 9,
+  "executable": "GodotIsland-village-preview9.exe",
+  "sha256": "02C376D866799231EFFB9220A4C3E0BAE543ECB38B8351DA6DCC366870C3D43C",
+  "verified_utc": "2026-11-06T08:19:45.6712749Z",
+  "checks": {
+    "release_startup": "passed",
+    "release_rendered_startup": "passed",
+    "rendered_opening_through_first_key": "passed",
+    "rendered_opening_engine_errors": 0,
+    "rehearsal_media": "skipped_by_test_fixture",
+    "temple_door_30_second_wait": "stable",
+    "hand_pose_assertions": 30,
+    "rendered_hand_world_assertions": 18,
+    "construction_assertions": 38,
+    "village_workflow_assertions": 10,
+    "source_tutorial_workflow_assertions": 11,
+    "gate_key_lifecycle_and_contact_assertions": 24,
+    "mouse_keeper_key_assertions": 27,
+    "story_assertions": 100,
+    "island_assertions": 54,
+    "port_assertions": 199
+  },
+  "complete_campaign": false,
+  "requires_original_install": true,
+  "standalone_importer": "planned",
+  "unfinished_quests": [
+    "LostBrother",
+    "ThrowingStones",
+    "TheLostFlock",
+    "RemainingGateKeys",
+    "CreatureSelection"
+  ],
+  "approximate_systems": [
+    "object_highlight_outline",
+    "general_physics",
+    "bounded_land_routes",
+    "full_hand_controller",
+    "economy"
+  ]
+}

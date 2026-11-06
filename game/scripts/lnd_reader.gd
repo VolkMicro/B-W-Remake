@@ -85,11 +85,23 @@ func height_at(x: float, z: float) -> float:
 	var iz := int(fz)
 	var tx := fx - ix
 	var tz := fz - iz
-	var h00 := heights[iz * GRID + ix]
-	var h10 := heights[iz * GRID + ix + 1]
-	var h01 := heights[(iz + 1) * GRID + ix]
-	var h11 := heights[(iz + 1) * GRID + ix + 1]
-	return lerpf(lerpf(h00, h10, tx), lerpf(h01, h11, tx), tz)
+	var gi := iz * GRID + ix
+	if has_cell[gi] == 0 or has_cell[gi + 1] == 0 or has_cell[gi + GRID] == 0 or has_cell[gi + GRID + 1] == 0:
+		return 0.0
+	var h00 := heights[gi]
+	var h10 := heights[gi + 1]
+	var h01 := heights[gi + GRID]
+	var h11 := heights[gi + GRID + 1]
+	# Objects and the Hand must stand on the same triangles build_mesh renders.
+	# Bilinear interpolation bends a quad between its vertices and can put feet
+	# above or below the visible ground, especially on the coast and steep slopes.
+	if (cells[gi * 8 + 6] & 0x10) != 0:
+		if tx >= tz:
+			return h00 + (h10 - h00) * tx + (h11 - h10) * tz
+		return h00 + (h11 - h01) * tx + (h01 - h00) * tz
+	if tx + tz <= 1.0:
+		return h00 + (h10 - h00) * tx + (h01 - h00) * tz
+	return h11 + (h01 - h11) * (1.0 - tx) + (h10 - h11) * (1.0 - tz)
 
 
 func _corner(gx: int, gz: int) -> Vector3:

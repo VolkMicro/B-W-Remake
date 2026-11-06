@@ -9,6 +9,8 @@ var mobile_statics: Array[Dictionary] = []
 var animated_statics: Dictionary = {}
 var animals: Array[Dictionary] = []
 var influence_settings: Dictionary = {}
+var highlights: Array[Dictionary] = []
+var villagers: Array[Dictionary] = []
 
 
 func load_file(path: String, mesh_count: int) -> bool:
@@ -18,6 +20,8 @@ func load_file(path: String, mesh_count: int) -> bool:
 	animated_statics.clear()
 	animals.clear()
 	influence_settings.clear()
+	highlights.clear()
+	villagers.clear()
 	var f := FileAccess.open(path, FileAccess.READ)
 	if f == null or f.get_buffer(8).get_string_from_ascii() != "LiOnHeAd":
 		return _fail("Original object information is unavailable")
@@ -109,6 +113,27 @@ func _read_info(bytes: PackedByteArray, mesh_count: int) -> bool:
 				return _fail("Invalid original animal age scale %d" % i)
 			age_scales.append(value)
 		animals.append({"subtype":subtype,"mesh_id":mesh,"animation_id":animation,"normal_altitude":altitude,"age_scales":age_scales})
+	for i in int(format["highlight_record_count"]):
+		var p := int(format["highlight_offset"]) + i * int(format["highlight_record_size"])
+		if p < 0 or p + 256 > bytes.size() or bytes.decode_u32(p) != 35:
+			return _fail("Invalid original highlight record")
+		var mesh := bytes.decode_u32(p + 0xf0)
+		var active := bytes.decode_u32(p + 0xf4)
+		if mesh >= mesh_count or active >= mesh_count:
+			return _fail("Invalid original scroll meshes")
+		highlights.append({"mesh_id":mesh,"active_mesh_id":active,"effect":bytes.decode_u32(p + 0xf8),"active_effect":bytes.decode_u32(p + 0xfc)})
+	for i in int(format["villager_record_count"]):
+		var p := int(format["villager_offset"]) + i * int(format["villager_record_size"])
+		if p < 0 or p + 916 > bytes.size() or bytes.decode_u32(p) != 2:
+			return _fail("Invalid original villager record")
+		var mesh := bytes.decode_u32(p + 0x204)
+		var high := bytes.decode_u32(p + 0x200)
+		if mesh >= mesh_count or high >= mesh_count:
+			return _fail("Invalid original villager meshes")
+		var scales := PackedFloat32Array()
+		for age in 20:
+			scales.append(bytes.decode_float(p + 0x2d4 + age * 4))
+		villagers.append({"mesh_id":mesh,"high_mesh_id":high,"child_mesh_id":bytes.decode_u32(p + 0x1f4),"sex":bytes.decode_u32(p + 0x1e8),"age_scales":scales})
 	version = format["id"]
 	return true
 
@@ -126,6 +151,14 @@ func animal(index: int) -> Dictionary:
 	return animals[index] if index >= 0 and index < animals.size() else {}
 
 
+func highlight(index: int) -> Dictionary:
+	return highlights[index] if index >= 0 and index < highlights.size() else {}
+
+
+func villager(index: int) -> Dictionary:
+	return villagers[index] if index >= 0 and index < villagers.size() else {}
+
+
 func _fail(message: String) -> bool:
 	error = message
 	version = ""
@@ -133,4 +166,6 @@ func _fail(message: String) -> bool:
 	animated_statics.clear()
 	animals.clear()
 	influence_settings.clear()
+	highlights.clear()
+	villagers.clear()
 	return false

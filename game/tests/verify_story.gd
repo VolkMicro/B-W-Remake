@@ -66,11 +66,69 @@ func prepare(vm: StoryVm, source: ChlReader) -> bool:
 
 
 func run_tests() -> void:
+	verify_quest_suspension()
+	verify_scripted_villager_movement()
 	var world := TestTerrain.new()
 	bridge.configure(world)
 	var args := [StoryVm.number(11, StoryVm.VECTOR),StoryVm.number(200, StoryVm.VECTOR),StoryVm.number(13, StoryVm.VECTOR)]
 	var native := bridge.invoke(151, args, {})
 	check(native.get("ok", false) and is_equal_approx(StoryVm.as_float(native["push"][0]), 24.0), "land-height native reads original map axes through game terrain")
+	var flock := bridge.invoke(36, args, {})
+	check(flock.get("ok", false) and flock.get("pop") == 3 and StoryVm.as_int(flock["push"][0]) > 0, "FLOCK_CREATE returns a registered object handle")
+	if flock.get("ok", false):
+		var position := bridge.invoke(23, flock["push"], {})
+		check(position.get("ok", false) and position.get("push") == args, "a flock starts at its supplied position in original map axes")
+		var group_handle: Dictionary = flock["push"][0]
+		var leader := Thing.new()
+		leader.kind = "villager"
+		var member := Thing.new()
+		member.kind = "villager"
+		var leader_handle := StoryVm.integer(bridge.register_object(leader, 4), StoryVm.OBJECT)
+		var member_handle := StoryVm.integer(bridge.register_object(member, 4), StoryVm.OBJECT)
+		var attached := bridge.invoke(37, [leader_handle, group_handle, StoryVm.integer(1, StoryVm.BOOL)], {})
+		var follower := bridge.invoke(37, [member_handle, group_handle, StoryVm.integer(0, StoryVm.BOOL)], {})
+		check(attached.get("push", []) == [group_handle] and follower.get("ok", false) and member.story_flock != null and member.story_flock.leader == leader, "FLOCK_ATTACH assigns the leader and follower to the same group")
+		var spacing := bridge.invoke(56, [group_handle, StoryVm.number(1.0), StoryVm.number(3.0), StoryVm.number(0.0)], {})
+		check(spacing.get("ok", false) and member.story_flock.inner_radius == 1.0 and member.story_flock.outer_radius == 3.0, "the first-island script sets its flock's inner and outer radii")
+		var ground := WalkTerrain.new()
+		member.world = ground
+		leader.position = Vector3(3, 5, 0)
+		member.position = Vector3(0, 5, 0)
+		member._physics_process(1.0)
+		var stayed_inside_outer := member.position == Vector3(0, 5, 0)
+		leader.position.x = 5.0
+		member._physics_process(2.0)
+		check(stayed_inside_outer and member.position.is_equal_approx(Vector3(4, 5, 0)), "flock followers start outside the outer radius and stop at the inner radius")
+		ground.free()
+		var keep_inner := bridge.invoke(56, [group_handle, StoryVm.number(0.0), StoryVm.number(5.9), StoryVm.number(0.0)], {})
+		check(keep_inner.get("ok", false) and member.story_flock.inner_radius == 1.0 and member.story_flock.outer_radius == 5.0, "zero preserves a flock radius and fractional radii truncate")
+		var detached := bridge.invoke(38, [member_handle, group_handle], {})
+		check(detached.get("push", []) == [member_handle] and member.story_flock == null, "FLOCK_DETACH removes the member and returns its handle")
+		var disbanded := bridge.invoke(39, [group_handle], {})
+		var valid := bridge.invoke(256, [group_handle], {})
+		check(disbanded.get("ok", false) and leader.story_flock == null and StoryVm.as_int(valid["push"][0]) == 0, "FLOCK_DISBAND releases members and invalidates the group handle")
+		leader.free()
+		member.free()
+	check(not bridge.invoke(36, [args[0], args[1], StoryVm.number(INF, StoryVm.VECTOR)], {}).get("ok", false), "FLOCK_CREATE rejects a non-finite position")
+	var time := preload("res://scripts/story_time.gd").new()
+	bridge.game_time = time
+	var script_task := {"task": 1}
+	var other_task := {"task": 2}
+	check(bridge.invoke(112, [StoryVm.number(7.3)], script_task).get("ok", false) and bridge.invoke(288, [StoryVm.integer(0, StoryVm.BOOL)], script_task).get("ok", false), "script can set and freeze daylight at the intro hour")
+	time.advance(60.0)
+	var game_hour := bridge.invoke(113, [], script_task)
+	check(is_equal_approx(StoryVm.as_float(game_hour["push"][0]), 7.3), "frozen daylight retains the original script's requested hour")
+	bridge.invoke(288, [StoryVm.integer(1, StoryVm.BOOL)], script_task)
+	time.advance(60.0)
+	check(is_equal_approx(time.hour, 8.3), "daylight resumes when the script re-enables it")
+	bridge.invoke(128, [], script_task)
+	bridge.invoke(128, [], other_task)
+	bridge.invoke(66, [StoryVm.number(2.0)], script_task)
+	bridge.invoke(66, [StoryVm.number(0.5)], other_task)
+	bridge.invoke(129, [], other_task)
+	check(time.speed_owner == 1 and is_equal_approx(time.speed, 2.0), "only the owning task can change or release game speed")
+	bridge.invoke(129, [], script_task)
+	check(time.speed_owner == 0 and is_equal_approx(time.speed, 1.0), "ending script speed control restores normal simulation speed")
 	var object := Node.new()
 	var handle := bridge.register_object(object)
 	native = bridge.invoke(256, [StoryVm.integer(handle, StoryVm.OBJECT)], {})
@@ -104,7 +162,9 @@ func run_tests() -> void:
 	native = bridge.invoke(23, [StoryVm.integer(marker_id, StoryVm.OBJECT)], {})
 	check(native.get("ok", false) and StoryVm.as_float(native["push"][0]) == 0.0 and StoryVm.as_float(native["push"][1]) == 0.0 and StoryVm.as_float(native["push"][2]) == 0.0, "invalid object position returns original zero vector")
 	native = bridge.invoke(25, [StoryVm.number(1, StoryVm.VECTOR), StoryVm.number(2, StoryVm.VECTOR), StoryVm.number(3, StoryVm.VECTOR), StoryVm.number(4, StoryVm.VECTOR), StoryVm.number(6, StoryVm.VECTOR), StoryVm.number(3, StoryVm.VECTOR)], {})
-	check(native.get("ok", false) and is_equal_approx(StoryVm.as_float(native["push"][0]), 5.0), "distance calculates between complete original coordinate vectors")
+	check(native.get("ok", false) and is_equal_approx(StoryVm.as_float(native["push"][0]), 3.0), "original distance ignores height")
+	native = bridge.invoke(25, [StoryVm.number(1, StoryVm.VECTOR), StoryVm.number(2, StoryVm.VECTOR), StoryVm.number(3, StoryVm.VECTOR), StoryVm.number(1.49, StoryVm.VECTOR), StoryVm.number(20, StoryVm.VECTOR), StoryVm.number(3, StoryVm.VECTOR)], {})
+	check(native.get("ok", false) and StoryVm.as_float(native["push"][0]) == 0.0, "original distance below half a map unit snaps to zero")
 	native = bridge.invoke(28, [StoryVm.number(3.5), StoryVm.number(3.5)], {})
 	check(native.get("ok", false) and is_equal_approx(StoryVm.as_float(native["push"][0]), 3.5), "random range with equal bounds is exact")
 	var in_range := true
@@ -189,10 +249,12 @@ func run_tests() -> void:
 	check(execute_all(vm) and StoryVm.as_float(vm.variables[1]) == -3 and StoryVm.as_float(vm.variables[2]) == -4 and StoryVm.as_float(vm.variables[3]) == -5, "vector scale, negate and division preserve component order")
 
 	vm = StoryVm.new()
-	source = fixture([inst(2,0,2,input_float(1.0)),inst(23,0,1),inst(3,1,1,1),inst(0)])
+	source = fixture([inst(2,0,2,input_float(1.0)),inst(23,0,1),inst(3,1,1,1),
+		inst(2,0,1,4171),inst(23,0,2),inst(3,1,2,2),inst(0)])
 	prepare(vm, source)
 	vm.start("main")
-	check(execute_all(vm) and StoryVm.as_int(vm.variables[1]) == 1065353216, "cast reinterprets original bits instead of numeric conversion")
+	check(execute_all(vm) and StoryVm.as_int(vm.variables[1]) == 1, "cast converts a float to the integer used by original animation repeat counts")
+	check(StoryVm.as_float(vm.variables[2]) == 4171.0, "cast converts an integer text enum to a numeric float")
 
 	vm = StoryVm.new()
 	source = fixture([
@@ -217,7 +279,7 @@ func run_tests() -> void:
 	source = fixture([
 		inst(2,0,3,input_float(1)),inst(2,0,3,input_float(2)),inst(2,0,3,input_float(3)),
 		inst(2,0,3,input_float(1)),inst(2,0,3,input_float(2)),inst(2,0,3,input_float(3)),inst(14,0,3),inst(3,1,6,1),
-		inst(2,0,1,13),inst(3,1,1,6),inst(2,1,1,6),inst(3,1,1,2),inst(23,1,1,6),inst(2,1,2,6),inst(3,1,2,3),inst(0)],
+		inst(2,0,1,13),inst(3,1,1,6),inst(2,1,1,6),inst(3,1,1,2),inst(23,1,2,6),inst(2,1,2,6),inst(3,1,2,3),inst(0)],
 		{"main":{"id":1,"address":0,"params":0,"variables":1,"variable_offset":5}})
 	prepare(vm, source)
 	vm.start("main")
@@ -425,6 +487,33 @@ func _fixture_native(id: int, stack: Array, _context: Dictionary) -> Dictionary:
 	return {"ok":false}
 
 
+func verify_quest_suspension() -> void:
+	var source := fixture([inst(24, 0, 1, 2), inst(2, 0, 1, 42), inst(3, 1, 1, 1), inst(0), inst(2, 0, 1, 7), inst(5, 0, 0, 99), inst(3, 1, 1, 2), inst(0), inst(2, 0, 1, 9), inst(3, 1, 1, 3), inst(0)], {
+		"parent":{"id":1,"address":0,"params":0,"variables":0,"variable_offset":5},
+		"child":{"id":2,"address":4,"params":0,"variables":0,"variable_offset":5},
+		"other":{"id":3,"address":8,"params":0,"variables":0,"variable_offset":5}})
+	var vm := StoryVm.new()
+	prepare(vm, source)
+	vm.isolate_unbound_tasks = true
+	vm.strict_scripts = PackedStringArray(["parent"])
+	var parent := vm.start("parent")
+	var other := vm.start("other")
+	for ignored in 3: vm.tick()
+	check(vm.error.is_empty() and vm.suspended.size() == 1 and vm.finished.has(other), "unsupported later quest suspends without stopping independent original scripts")
+	var child := int(vm.suspended.keys()[0]) if not vm.suspended.is_empty() else 0
+	check(vm.tasks.has(child) and vm.tasks[child]["pc"] == 5 and vm.tasks[child]["stack"] == [StoryVm.integer(7)], "suspended quest retains its exact original call and argument stack")
+	check(vm.tasks.has(parent) and vm.tasks[parent]["waiting"] == child and not vm.finished.has(parent), "synchronous parent does not receive fabricated quest completion")
+	check(vm.resume_suspended(child, _fixture_native) and execute_all(vm) and StoryVm.as_int(vm.variables[1]) == 42 and StoryVm.as_int(vm.variables[2]) == 11, "real native binding resumes the suspended quest and then its waiting parent")
+	var strict := StoryVm.new()
+	prepare(strict, source)
+	strict.isolate_unbound_tasks = true
+	strict.strict_scripts = PackedStringArray(["child"])
+	strict.start("parent")
+	for ignored in 3:
+		if not strict.tick(): break
+	check(strict.error.get("kind", "") == "unbound_native" and strict.suspended.is_empty(), "opening scripts keep strict unsupported-command reporting")
+
+
 func _observe_first_native(id: int, stack: Array, _context: Dictionary) -> Dictionary:
 	natives_seen.append(id)
 	if id == 254 and stack.size() >= 2:
@@ -440,3 +529,38 @@ func _bridge_after_observed_influence(id: int, stack: Array, context: Dictionary
 class TestTerrain extends RefCounted:
 	func ground_y(position: Vector3) -> float:
 		return position.x - position.z
+
+
+class WalkTerrain extends Node:
+	var cfg_villager := {"speed": 4.0}
+	var sea_y := 0.0
+
+	func ground_y(_position: Vector3) -> float:
+		return 5.0
+
+
+func verify_scripted_villager_movement() -> void:
+	var ground := WalkTerrain.new()
+	var villager := Thing.new()
+	villager.world = ground
+	villager.kind = "villager"
+	villager.position.y = 5.0
+	var handle := StoryVm.integer(bridge.register_object(villager, 4), StoryVm.OBJECT)
+	var args := [handle, StoryVm.number(0, StoryVm.VECTOR), StoryVm.number(5, StoryVm.VECTOR), StoryVm.number(6, StoryVm.VECTOR), StoryVm.number(1)]
+	check(bridge.invoke(33, args, {}).get("ok", false) and villager.position == Vector3(0, 5, 0), "MOVE_GAME_THING queues a move without teleporting")
+	villager._physics_process(1.0)
+	check(villager.position.is_equal_approx(Vector3(0, 5, -4)) and villager.animation_walk, "scripted villagers walk toward the original map position")
+	villager._physics_process(1.0)
+	check(villager.position.is_equal_approx(Vector3(0, 5, -5)), "scripted villagers stop within the requested radius")
+	var heading := [handle, StoryVm.number(10, StoryVm.VECTOR), StoryVm.number(5, StoryVm.VECTOR), StoryVm.number(5, StoryVm.VECTOR)]
+	check(bridge.invoke(34, heading, {}).get("ok", false) and is_equal_approx(villager.rotation.y, PI / 2.0), "SET_FOCUS turns the villager to face the scripted point")
+	var detail_on := bridge.invoke(290, [StoryVm.integer(1, StoryVm.BOOL), handle], {})
+	check(detail_on.get("ok", false) and villager.story_high_detail, "SET_HIGH_GRAPHICS_DETAIL enables the villager's near animation rate")
+	var detail_off := bridge.invoke(290, [StoryVm.integer(0, StoryVm.BOOL), handle], {})
+	check(detail_off.get("ok", false) and not villager.story_high_detail, "SET_HIGH_GRAPHICS_DETAIL restores distance-based animation updates")
+	villager.story_speed_per_turn = 0.2
+	bridge.invoke(33, heading + [StoryVm.number(0)], {})
+	villager._physics_process(1.0)
+	check(villager.position.is_equal_approx(Vector3(2, 5, -5)), "scripted speed converts meters per game turn to the villager's walk speed")
+	villager.free()
+	ground.free()

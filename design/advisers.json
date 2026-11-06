@@ -1,4 +1,4 @@
 [
-  {"id":"good","name":"Добрая совесть","file":"Data/HelpSprite/markgood.hd","side":-1,"color":"#dfe9ff","speech_clip":"adviser/Yogi_Speak_AAA"},
-  {"id":"evil","name":"Злая совесть","file":"Data/HelpSprite/markevil.hd","side":1,"color":"#ff9985","speech_clip":"adviser/Demon_Speak_AAA"}
+  {"id":"good","name":"Добрая совесть","file":"Data/HelpSprite/markgood.hd","side":1,"color":"#dfe9ff","speech_clip":"adviser/Yogi_Speak_AAA"},
+  {"id":"evil","name":"Злая совесть","file":"Data/HelpSprite/markevil.hd","side":-1,"color":"#ff9985","speech_clip":"adviser/Demon_Speak_AAA"}
 ]

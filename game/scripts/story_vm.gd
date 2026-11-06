@@ -16,6 +16,9 @@ var variables: Array[Dictionary] = []
 var tasks: Dictionary = {}
 var finished: Dictionary = {}
 var error: Dictionary = {}
+var isolate_unbound_tasks := false
+var strict_scripts := PackedStringArray()
+var suspended: Dictionary = {}
 var native_handler := Callable()
 var ticks := 0
 var executed := 0
@@ -36,6 +39,7 @@ func configure(source: ChlReader, handler := Callable()) -> bool:
 	tasks.clear()
 	finished.clear()
 	error.clear()
+	suspended.clear()
 	ticks = 0
 	executed = 0
 	opcode_counts.clear()
@@ -143,6 +147,15 @@ func resume_unbound(handler: Callable) -> bool:
 	return true
 
 
+func resume_suspended(id: int, handler: Callable) -> bool:
+	if not suspended.has(id) or not tasks.has(id) or tasks[id]["state"] != "blocked":
+		return false
+	native_handler = handler
+	tasks[id]["state"] = "running"
+	suspended.erase(id)
+	return true
+
+
 func _run(t: Dictionary) -> void:
 	var handler_mode: bool = t["in_handler"]
 	while t["state"] == "running" and int(t["waiting"]) == 0 and bool(t["in_handler"]) == handler_mode:
@@ -227,11 +240,22 @@ func _run(t: Dictionary) -> void:
 				t["handlers"].append(bits)
 			23:
 				if mode == 1:
+					if type != FLOAT:
+						_fail(t, "unsupported_mode", {"opcode":op,"type":type}); return
 					if not _set_var(t, bits, number(0.0)): return
 				elif mode == 0:
 					if not _need(t, 1): return
 					var value: Dictionary = stack.pop_back().duplicate()
-					value["type"] = type
+					# ScriptLibraryR.dll dispatches CAST by the destination type.
+					if type == INT:
+						var converted := as_float(value)
+						if not is_finite(converted) or converted < -2147483648.0 or converted >= 2147483648.0:
+							_fail(t, "invalid_integer_cast", {}); return
+						value = integer(int(converted))
+					elif type == FLOAT:
+						value = number(float(int(value["bits"]) & 0xffffffff))
+					else:
+						value["type"] = type
 					if not _push(t, value): return
 				else:
 					_fail(t, "unsupported_mode", {"opcode":op,"mode":mode}); return
@@ -290,7 +314,7 @@ func _native(t: Dictionary, id: int, address: int) -> bool:
 		_fail(t, "unbound_native", {"native_id":id})
 		return false
 	var stack: Array = t["stack"]
-	var reply = native_handler.call(id, stack.duplicate(true), {"script":t["script"],"address":address,"tick":ticks})
+	var reply = native_handler.call(id, stack.duplicate(true), {"task":t["id"],"script":t["script"],"address":address,"tick":ticks})
 	if not reply is Dictionary or not reply.get("ok", false):
 		t["pc"] = address
 		_fail(t, "unbound_native", {"native_id":id})
@@ -309,7 +333,7 @@ func _native(t: Dictionary, id: int, address: int) -> bool:
 	stack.resize(stack.size() - count)
 	for value in output:
 		stack.append(value.duplicate())
-	return true
+	return not reply.get("yield_task", false)
 
 
 func _jump(t: Dictionary, address: int) -> bool:
@@ -363,6 +387,12 @@ func _fail(t: Dictionary, kind: String, detail: Dictionary) -> void:
 	var ins := program.instruction(address)
 	error = {"kind":kind,"task":t["id"],"script":t["script"],"address":address,"opcode":ins.get("opcode", -1),"line":ins.get("line", -1),"detail":detail}
 	t["state"] = "blocked" if kind == "unbound_native" else "failed"
+	# Development preview: keep unsupported later quests suspended at their
+	# exact call/stack without treating them as completed. Original synchronous
+	# parents still wait for them. Intro scripts retain the strict failure path.
+	if kind == "unbound_native" and isolate_unbound_tasks and not strict_scripts.has(t["script"]):
+		suspended[t["id"]] = error.duplicate(true)
+		error.clear()
 
 
 func _arithmetic(t: Dictionary, op: int, type: int) -> bool:
