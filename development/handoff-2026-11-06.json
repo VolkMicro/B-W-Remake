@@ -1,0 +1,22 @@
+{
+  "checked_utc": "2026-11-06T13:46:28.9821072Z",
+  "source_revision": "27e6109bcdbf14214c6ff67e5b57b7a9eb31352b",
+  "source": "git archive HEAD game design tools; no original build/research/cache directories",
+  "godot": "4.7.2",
+  "windows_export": "passed",
+  "exported_executable_sha256": "CBE51EBD369FB6D5C97F0E57F9705DE88743E80A9B83E2BB38ADFCD142279F0F",
+  "headless_startup_exit": 0,
+  "rendered_startup_exit": 0,
+  "engine_script_errors": 0,
+  "current_hand_world_assertions": 18,
+  "current_item_contact_probe_assertions": 3,
+  "new_collision_report_reproduced": false,
+  "open_user_bugs": [
+    "BW-001",
+    "BW-002",
+    "BW-003",
+    "BW-004"
+  ],
+  "original_install_still_required": true,
+  "complete_campaign": false
+}
