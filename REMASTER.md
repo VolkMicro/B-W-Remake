@@ -1,5 +1,13 @@
 # Preservation target
 
+Current product direction (2026-11-06): a noncommercial fan remake on Godot,
+with recognizable original play followed by modern presentation and deeper
+systems. Original data files may remain required in the finished game.
+Observable fidelity and playability are the target; bit-exact reproduction of
+every internal calculation is not required. See PROJECT_RU.md and
+TASK_CLAUDE_RU.md. New clean-room work follows CLEAN_ROOM_RU.md; legacy code
+does not acquire clean-room provenance retrospectively.
+
 The creator's explicit target is a full Black & White remaster: to feel like playing the original childhood game. The port must keep the original story, behaviour, atmosphere and content, rather than turn the original landscape into an unrelated sandbox. Modern-PC support is the purpose of moving to Godot. Full scope is not satisfied by one island; island one is the first complete playable milestone.
 
 ## First milestone acceptance
@@ -302,12 +310,13 @@ Preview9 separately passes headless and rendered startup checks. The launcher
 and local shortcut select this executable. Full campaign and remaining quests
 are still pending.
 
-## Standalone restoration requirement
+## Optional standalone packaging
 
-The final Godot edition must run without an installed original after a one-time
-import of the player's required resources into its own data directory. Replacing
+The user now accepts requiring original files in the finished remake. A one-time
+import into the port's data directory is optional future packaging work. Replacing
 engine code does not replace the terrain, models, music, voices, videos and
 campaign data which still define the original game. Current previews read those
 resources directly from the original folder. An importer, versioned resource
-manifest and clean launch test with that folder unavailable are required before
-removing the dependency. Keep the installed original during restoration.
+manifest and clean launch test with that folder unavailable would be required
+before claiming that dependency was removed. Keep the original installation for
+the current preview; importer work does not block the next gameplay milestone.
