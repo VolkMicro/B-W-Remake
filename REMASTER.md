@@ -333,6 +333,25 @@ startup and a fresh Git-source build. The original user-specific case still
 needs confirmation. Storage, resource transfer and gesture throwing remain
 open; this is not the complete Preview10 delivery. See its verification JSON.
 
+## Preview 9.2: actual storage pile presentation
+
+The two original first-island storage pits now display one grain pile and five
+wood piles loaded from the installed data. ExtraMetrics translations, building
+pose and terrain determine placement. Whole meshes lower with stock; grain uses
+its quantity-dependent UV offset. Overflow remains in the authoritative stock.
+Construction and the existing givewood demonstration share that stock.
+
+ResourceStore and StockPilesView were written in separate fixed remote Claude
+requests with tools/MCP unavailable, following reviewed packets. Their manifests
+record the limited boundary; this does not certify the legacy repository or its
+integration adapters. Synthetic checks161/149 and real storage22 headless/25
+rendered passed. Full exported-pack opening, exact executable startup and a fresh
+Git-source export/startup passed. See development/preview9.2-verification.json.
+
+Manual resource collection/return, animated transport and gesture throwing remain
+open. This is an intermediate checkpoint, not the complete Preview10 acceptance
+or a manual campaign playthrough. Prior9.1 collision work remains in place.
+
 ## Optional standalone packaging
 
 The user now accepts requiring original files in the finished remake. A one-time

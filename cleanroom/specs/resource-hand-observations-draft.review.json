@@ -1,0 +1,100 @@
+{
+  "document": "resource-hand-observations-draft.md",
+  "observationsVersion": "0.1",
+  "reviewerRole": "research observations reviewer",
+  "reviewerId": "/root/camera",
+  "reviewedAtUtc": "2026-11-07T16:14:49.5469429Z",
+  "reviewedDocumentSha256": "6D007D37B82473DD949A8825D04B4EA0DA241D395031B6465B7D51F065AF348B",
+  "status": "approved_bounded_static_observations",
+  "scope": "Review of bounded static observations and explicitly conditional numerical fixtures; not approval of an implementation packet or original runtime behavior.",
+  "implementationPacketApproved": false,
+  "productCodeWritten": false,
+  "originalExecuted": false,
+  "researchManifestSha256": "96E1BC33E4E530220B960FA7B557F3A7A29CB6D83C1AB42B0F47F5003E6EFD03",
+  "artifactHashesVerified": 80,
+  "artifactHashMismatches": 0,
+  "boundedPasses": [
+    {
+      "evidence": "BW002-STATIC-20261107-A",
+      "exported": 10,
+      "failed": 0,
+      "saved": true
+    },
+    {
+      "evidence": "BW002-STATIC-20261107-B",
+      "exported": 15,
+      "failed": 0,
+      "saved": true
+    },
+    {
+      "evidence": "BW002-STATIC-20261107-C",
+      "exported": 8,
+      "failed": 0,
+      "saved": true
+    },
+    {
+      "evidence": "BW002-STATIC-20261107-D",
+      "exported": 6,
+      "failed": 0,
+      "saved": true
+    }
+  ],
+  "verifiedFacts": [
+    "Current executable, object-data and help-text SHA256 match the draft input identities.",
+    "Hand Food record12 and Hand Wood record11 identify meshes323 and329, initial25, per-turn rate8..70, six-second ramp, maximum20000 and independent visual nominal1600.",
+    "Magic Food record10 is a different data record with mesh533 and zero parameters for this gather path.",
+    "The reviewed interaction continuation bounds the requested portion by source availability and remaining hand capacity.",
+    "The continuation call sequence debits the source and forwards the actual returned quantity to the held pot in the same call path. The ordinary pot mutation is synchronous; no per-particle economic ledger was established in this path.",
+    "Stopping locked collection stops the pickup effect in the reviewed branch and does not itself debit, delete or return the retained hand stock.",
+    "The reviewed multipickup visual update selects hand-spec slot9.",
+    "The recorded 100ms turn initialization supports the stated ten-turns-per-second fixtures as a bounded static configuration.",
+    "Pickup and putdown use separate particle-system creation paths and the stated ID ranges; this establishes their existence and separation from quantitative credit, not exact visual motion.",
+    "Receiver checks distinguish suitable resource stores and same-resource pots. The bounded ordinary apply path calls the receiver before disposal of the applied pot, with additional receiver-specific behavior left unknown."
+  ],
+  "numericalFixtureReview": {
+    "method": "Independent in-memory rational arithmetic calculation of the stated formula; no original function execution.",
+    "portionsAtTurns": {
+      "0": 8,
+      "10": 9,
+      "30": 23,
+      "60": 70,
+      "100": 70
+    },
+    "firstTenPostBeginPortions": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      9,
+      9,
+      9
+    ],
+    "totalsUnderExplicitInitial25ThenN1Convention": {
+      "10": 108,
+      "30": 413,
+      "60": 1746,
+      "100": 4546
+    },
+    "firstTickBoundaryMeasured": false
+  },
+  "preservedUnknowns": [
+    "Exact hand-pot scale, finger anchor, geometry transforms and pose transition timing remain unknown.",
+    "PSys trajectories, particle cadence, textures/models, duration and disappearance behavior remain unknown.",
+    "The first ProcessInInteract timestamp relative to begin is unmeasured; cumulative fixtures are conditional convention results.",
+    "Default physical Action mouse-button mapping and full camera behavior during locked interaction are unverified.",
+    "Special receiver partial acceptance, overflow, source deletion, competing builder interleavings and rollback are not generalized from this ordinary path.",
+    "Huge frame delta, NaN/Inf, cancellation, source/receiver destruction and duplicate release handling must be explicit new API policy, not claims about original behavior.",
+    "General throw/aftertouch mechanics, complete receiver coverage and original rendered behavior were not approved here."
+  ],
+  "limitations": [
+    "The reviewer has coordinator legacy/research access as allowed for evidence review; this does not certify legacy provenance.",
+    "Draft textual observations were checked against the private manifest and selected instruction/decompiler evidence, with inferred ABI warnings retained.",
+    "No source, decompiler output, original bytes or raw address evidence was copied into this public review.",
+    "The full observations document remains research input. A separately scoped reviewed API packet and implementation boundary are still required.",
+    "This review does not close BW-002, establish a manual playthrough or certify a product implementation."
+  ],
+  "requiredDraftCorrections": []
+}

@@ -1,0 +1,73 @@
+{
+  "date": "2026-11-07",
+  "preview": "9.2",
+  "sourceCommit": "cf74fad",
+  "status": "verified intermediate storage checkpoint; not Preview10 acceptance",
+  "engine": "Godot 4.7.2 stable ed1daf0bf",
+  "executable": "build/story-preview/GodotIsland-village-preview9.2.exe",
+  "sha256": "7B7183ABCA04D81C9BA84884A5959B9D3C1D206F12790A6F441534A579C4FFE6",
+  "requiresOriginalInstall": true,
+  "originalInstallUsed": "C:/Games/Black and White Complete Collection",
+  "completeCampaign": false,
+  "changes": [
+    "Actual grain and five wood meshes at the original storage ExtraMetrics anchors in both first-island storage pits.",
+    "One authoritative owner-metadata stock shared by presentation, construction and the existing givewood demonstration.",
+    "Overflow preserved; quantity changes lower whole meshes and animate grain UV over one second; empty piles hide.",
+    "Unquantified sandbox wheat props no longer spawn in the story preview."
+  ],
+  "provenance": {
+    "modules": ["ResourceStore", "StockPilesView"],
+    "manifests": [
+      "cleanroom/specs/SPEC-RESOURCE-STORE-001.implementation.json",
+      "cleanroom/specs/SPEC-STOCK-PILES-VIEW-001.implementation.json"
+    ],
+    "boundary": "Separate fixed remote model requests with empty tools/MCP; reviewed input hashes and capability probes. Not an OS sandbox or a clean-room certification of the legacy repository.",
+    "adapters": "Coordinator-written main, G3dReader, HostInfoReader and construction integration remain legacy/coordinator scope."
+  },
+  "checks": [
+    {"test":"verify_resource_store.gd", "passed":161, "exit":0},
+    {"test":"verify_stock_piles_view.gd", "passed":149, "exit":0},
+    {"test":"verify_storage_piles.gd", "passed":22, "exit":0, "mode":"actual data, headless"},
+    {"test":"verify_storage_piles.gd --capture=...", "passed":25, "exit":0, "mode":"rendered source and exact exported pack; full/partial/empty frames viewed"},
+    {"test":"verify_citadel_construction.gd", "passed":38, "exit":0},
+    {"test":"verify_citadel_workflow.gd", "passed":10, "exit":0},
+    {"test":"verify_citadel_workflow.gd --source-tutorial", "passed":11, "exit":0},
+    {"test":"verify_hand_pose.gd", "passed":30, "exit":0},
+    {"test":"verify_hand_world.gd", "passed":18, "exit":0},
+    {"test":"verify_gate_keys.gd", "passed":24, "exit":0, "warning":"Existing fixture teardown:2 ObjectDB instances leaked; no engine/script errors."},
+    {"test":"verify_item_contacts.gd", "passed":12, "exit":0},
+    {"test":"verify_story_scrolls.gd --deliver-key", "passed":27, "exit":0, "warning":"Existing fixture teardown:4 ObjectDB instances leaked; no engine/script errors."},
+    {"test":"verify_port.gd", "passed":199, "exit":0},
+    {"test":"verify_opening_runtime.gd --runtime-automation --runtime-key --runtime-seconds=1300", "exit":0, "mode":"rendered exact exported pack via matching console engine", "result":"OPENING RESULT PASS; temple visited, stable door wait, keeper intro and first key true; bits2", "minimumCameraClearance":0.5, "limitation":"Accelerated simulation and skipped media; not a normal-speed manual playthrough."},
+    {"test":"exact exported executable startup", "exit":0, "mode":"headless90frames and rendered180frames; separate log files checked"},
+    {"test":"fresh git archive cf74fad export, actual storage and exported startup", "exit":0, "passedStorageChecks":22, "sha256":"E5380410029A2B425F0EEF2C3A76E8A3AA7C12C9443BE2B5609D4FA26099BF24", "mode":"No checkout build/cache/research copied; original installation read separately."}
+  ],
+  "commands": {
+    "build": "tools/build_preview.ps1 -Godot <godot_console.exe> -PreviewVersion 9.2 -OutputDirectory build/storage-candidate",
+    "focused": "godot_console.exe --headless --path game --script res://tests/<test>.gd -- --bw=<original-install>",
+    "renderedStorage": "godot_console.exe --path game --script res://tests/verify_storage_piles.gd -- --bw=<original-install> --capture=<absolute-output-prefix>",
+    "exportedPackHarness": "Matching Godot GUI+console binaries beside bw_audio_decode.exe, then console --main-pack <preview9.2.exe> --script <absolute-test.gd> -- <test-args>",
+    "startup": "Start-Process <preview9.2.exe> -WindowStyle Hidden -Wait -PassThru with --quit-after and --log-file; inspect returned ExitCode and engine log."
+  },
+  "verificationFindings": [
+    "Initial new storage fixture leaked its preallocated unattached world nodes; fixture teardown was fixed and final source/pack runs are free of those warnings.",
+    "Initial pack opening harness lacked the decoder beside its engine binary and stopped at native44. Repeated with the matching engine and decoder in the same directory:PASS. Actual exported executable startup resolved its adjacent decoder correctly.",
+    "A release export ignores the external --script diagnostic route; relevant pack scene tests use the matching console engine. One diagnostic process created by the ignored route was explicitly stopped."
+  ],
+  "finalEngineScriptErrors": 0,
+  "localEvidence": [
+    "scratch/storage-*.log",
+    "build/story-preview/storage-9.2-full.png",
+    "build/story-preview/storage-9.2-partial.png",
+    "build/story-preview/storage-9.2-empty.png"
+  ],
+  "remaining": [
+    "BW-001 is partially open: API withdrawal/refund and automatic construction are tested, player Action collection/return is not connected.",
+    "BW-002 manual resource pickup, release and visual transport remain unimplemented; separately reviewed research observations are not an implementation packet.",
+    "BW-004 gesture momentum throwing and aftertouch remain unimplemented.",
+    "BW-003 exact user-reported episode still needs confirmation; the12 collision regressions pass.",
+    "Aggregate wood distribution is not persistent independent per-pile stock accounting.",
+    "No frame comparison with a running original game; numerical pile behavior comes from bounded static analysis and reviewed data.",
+    "Remaining first-island quests, keys, creature selection and later campaign remain unfinished."
+  ]
+}

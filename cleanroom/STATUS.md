@@ -4,7 +4,8 @@
 
 - Некоммерческий фанатский ремейк на Godot; файлы оригинала допустимы
   и в готовой версии. Цель и этапы — PROJECT_RU.md.
-- Проверенная игровая основа — Preview 9.1, collision commit a061205.
+- Проверенная игровая основа — Preview9.2, storage source commit cf74fad.
+  Collision checkpoint9.1 — a061205.
   Исторический checkpoint передачи — dce3b21 (Preview9).
 - Первое задание — Preview 10 по TASK_CLAUDE_RU.md.
 - Основной checkout/старые исследования — legacy, без заявления
@@ -54,11 +55,20 @@ headless/25PASS rendered, hand30/world18, key24, contacts12, scrolls27PASS.
 engine/script errors нет. Кадры actual storage полное/частичное/пустое
 проверены локально. Rendered opening на экспортированном9.2 pack прошёл до
 первого ключа, temple/door/keeper/key true. Media пропускается, время ускорено.
-Exact9.2 exe startup passed headless/rendered; fresh Git-source проверка впереди.
+Exact9.2 exe startup passed headless/rendered. Fresh Git-source cf74fad
+собран без build/cache/research; actual storage22 и startup0, engine errors0.
+Отчёт — development/preview9.2-verification.json. Normal launcher переключён9.2
+после этих проверок;9/9.1 сохранены.
 Stock metadata остаётся единственным источником. Manifest и exact spec hash —
 specs/SPEC-RESOURCE-STORE-001.implementation.json и
 specs/SPEC-STOCK-PILES-VIEW-001.implementation.json. Legacy-adapters в main,
 G3dReader, HostInfoReader и construction не получают этой атрибуции.
+
+BW-002: исследователь подготовил39 bounded Ghidra entries; отдельный review
+проверил80 hashes и численные fixtures. specs/resource-hand-observations-draft.md
+и .review.json одобряют только ограниченные static observations, не новый
+implementation packet. Следующий шаг — чистый API сбора/удержания/освобождения
+и pose/visual integration; неизвестные масштабы/anchors/PSys не выдавать за факты.
 
 ## Формат продолжения
 

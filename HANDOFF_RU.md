@@ -10,7 +10,46 @@
 TASK_CLAUDE_RU.md. Сначала CLEAN_ROOM_RU.md определяет роль/доступ: эта
 инструкция содержит legacy research и не передаётся чистому реализатору.
 
-## Текущий checkpoint: Preview 9.1
+## Текущий checkpoint: Preview 9.2
+
+Восстановлено видимое заполнение обоих складов первого острова: исходное зерно,
+пять моделей древесины, настоящие ExtraMetrics anchors и единый stock для
+склада, строителей и givewood-демонстрации. Уровень плавно меняется при расходе;
+пустые кучи скрываются. Начальные food20000/wood30000 сохраняются полностью,
+включая overflow сверх визуального номинала. Это промежуточный storage checkpoint,
+не завершённый Preview10: ручной сбор/возврат и жест броска ещё впереди.
+
+Source commit: cf74fad. Проверенный exe: GodotIsland-village-preview9.2.exe,
+SHA256 `7B7183ABCA04D81C9BA84884A5959B9D3C1D206F12790A6F441534A579C4FFE6`.
+Отчёт: development/preview9.2-verification.json. ResourceStore161 и
+StockPilesView149 synthetic PASS; actual storage22 headless/25 rendered PASS.
+Повторены construction38, workflow10/11, hand30/world18, key24, contacts12,
+scrolls27, port199. Старые key/scroll fixtures дают teardown ObjectDB warnings2/4;
+новых engine/script errors нет. Rendered opening на exported pack прошёл до
+первого ключа с temple/door/keeper/key true; он ускорен и пропускает media.
+Отдельно exact exe startup headless/rendered и fresh Git-source build/startup PASS.
+Это не ручное прохождение с обычной скоростью.
+
+Normal Launch-Story-Preview.cmd и локальный ярлык указывают9.2. Для быстрого
+попадания к деревне — build/story-preview/Launch-Village-Test.cmd, затем
+приблизить склад; нового ручного сбора в этой версии нет. Preview9/9.1 сохранены.
+
+```powershell
+& ./tools/build_preview.ps1 -Godot $godot -PreviewVersion 9.2 -OutputDirectory ./build/preview9.2-candidate
+& $godot --headless --path game --script res://tests/verify_storage_piles.gd -- "--bw=$bw"
+```
+
+Новое происхождение ограничено двумя модулями: exact approved packets,
+отдельные tool-less Claude requests и manifests в cleanroom/specs. Parser,
+main и construction adapters остаются coordinator/legacy-кодом; весь repo не
+сертифицирован clean-room. Граница remote-модели описана в CLEAN_ROOM_RU.md.
+Для BW-002 подготовлен resource-hand-observations-draft.md и отдельный research
+review; утверждены только bounded static observations. Нужен отдельный
+implementation packet и дальнейшая интеграция.
+
+## Предыдущий checkpoint: Preview 9.1 (история)
+
+Следующий блок описывает прежний checkpoint, а не текущий статус ресурсов.
 
 На 7 ноября origin/main и все удалённые ветки содержали только 7c7358f:
 новых изменений после передачи Claude в этом репозитории не было. Продолжена

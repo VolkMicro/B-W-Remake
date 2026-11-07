@@ -9,7 +9,7 @@ if not exist "%BW_GAME_DIR%\Data\AllMeshes.g3d" (
     pause
     exit /b 1
 )
-"%~dp0GodotIsland-village-preview9.1.exe" --log-file "%~dp0preview.log" -- "--bw=%BW_GAME_DIR%" --story-preview
+"%~dp0GodotIsland-village-preview9.2.exe" --log-file "%~dp0preview.log" -- "--bw=%BW_GAME_DIR%" --story-preview
 if errorlevel 1 (
     echo Preview stopped with an error. See preview.log in this folder.
     pause

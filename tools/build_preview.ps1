@@ -2,7 +2,7 @@
 param(
     [string]$Godot = 'godot_console.exe',
     [string]$OutputDirectory = '',
-    [ValidatePattern('^\d+(\.\d+)?$')][string]$PreviewVersion = '9.1'
+    [ValidatePattern('^\d+(\.\d+)?$')][string]$PreviewVersion = '9.2'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -27,7 +27,7 @@ Copy-Item -LiteralPath $decoder -Destination (Join-Path $releaseDirectory 'bw_au
 Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'preview') -File | Copy-Item -Destination $releaseDirectory
 foreach ($template in @('Launch-Story-Preview.cmd', 'TESTING_RU.txt')) {
     $destination = Join-Path $releaseDirectory $template
-    $content = (Get-Content -LiteralPath $destination -Raw).Replace('preview9.1', "preview$PreviewVersion")
+    $content = (Get-Content -LiteralPath $destination -Raw) -replace 'preview[0-9]+(?:\.[0-9]+)?', "preview$PreviewVersion"
     [IO.File]::WriteAllText($destination, $content, [Text.UTF8Encoding]::new($false))
 }
 
