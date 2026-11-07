@@ -53,11 +53,15 @@ func vertical_clearance(bounds: AABB) -> float:
 	return raise
 
 func sweep(from: Vector3, to: Vector3, body: Node3D) -> Dictionary:
+	if from.is_equal_approx(to): return {}
 	var offsets := body_offsets(body)
 	var radius := 0.0
 	for offset in offsets: radius = maxf(radius, offset.length())
 	var candidates: Array[Dictionary] = []
 	for entry in entries:
+		# A released object can remain registered as a visible solid. Its own
+		# triangles must never stop its first movement or make it bounce inside.
+		if entry["target"].get_ref() == body: continue
 		if not _prepare(entry): continue
 		var bounds: AABB = entry["world_bounds"]
 		if bounds.grow(radius + 0.02).intersects_segment(from, to) != null:

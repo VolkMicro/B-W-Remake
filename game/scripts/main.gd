@@ -254,7 +254,7 @@ func _load_world() -> void:
 	_update_camera()
 	loaded = true
 	if story_preview and DisplayServer.get_name() != "headless":
-		get_window().title = "Black & White — реставрация · Preview 9"
+		get_window().title = "Black & White — реставрация · Preview 9.1"
 		Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	_load_preservation()
 	var heights := PackedStringArray()
@@ -417,6 +417,7 @@ func _place_mesh(mesh_name: Variant, p: Vector3, yaw_rad: float, scale_f: float,
 	t.home = p
 	add_child(t)
 	if kind != "villager": world_geometry.register_node(t)
+	if kind in ["rock", "gate_key", "food", "toy"]: world_physics.register_node(t)
 	return t
 
 

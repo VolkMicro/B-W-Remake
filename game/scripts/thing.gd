@@ -36,6 +36,7 @@ var _flee_left := 0.0
 var _dead_time := 0.0
 var impact_velocity := Vector3.ZERO
 var _landed_notified := false
+var _terrain_mesh_points: Dictionary = {}
 var rig: L3dRig
 var animation_profile := "male"
 var animation_name := ""
@@ -244,10 +245,10 @@ func _fly(delta: float) -> void:
 	velocity = velocity.limit_length(float(cfg["max_speed"]))
 	var steps := clampi(int(ceil(velocity.length() * delta / float(cfg["sweep_spacing"]))), 1, int(cfg["max_sweep_steps"]))
 	var dt := delta / float(steps)
-	var support_points := preload("res://scripts/story_world_geometry.gd").body_offsets(self)
 	for step in steps:
 		var previous := position
 		position += velocity * dt
+		var resting_on_object := false
 		if world.has_method("story_gate_contact"):
 			var contact: Dictionary = world.story_gate_contact(previous, position, self)
 			if not contact.is_empty():
@@ -257,16 +258,11 @@ func _fly(delta: float) -> void:
 				velocity = velocity.bounce(normal) * float(profile["restitution"])
 				if normal.y > 0.6 and velocity.length() < float(cfg["settle_speed"]):
 					velocity = Vector3.ZERO
-					state = State.IDLE
-					if not _landed_notified:
-						_landed_notified = true
-						world.on_landed(self)
-					return
-				continue
+					resting_on_object = true
+		# A wall/platform contact can also overlap the ground during the same
+		# step. Resolve that support before accepting the final resting pose.
 		var g: float = world.ground_y(position)
-		var support_y := g
-		for offset in support_points:
-			support_y = maxf(support_y, world.ground_y(position + offset) - offset.y)
+		var support_y := _terrain_support_y()
 		if position.y <= world.sea_y and g <= world.sea_y + 0.05:
 			position.y = world.sea_y
 			velocity = Vector3.ZERO
@@ -293,6 +289,9 @@ func _fly(delta: float) -> void:
 				world.on_landed(self)
 			if not is_instance_valid(self) or state == State.DEAD or is_queued_for_deletion():
 				return
+			# Landing actions can alter the transform (a dropped tree is laid
+			# down). Re-evaluate support for the resulting visible pose as well.
+			position.y = maxf(position.y, _terrain_support_y())
 			var n: Vector3 = world.ground_normal(position)
 			var incoming := velocity.dot(n)
 			if incoming < 0.0:
@@ -301,10 +300,40 @@ func _fly(delta: float) -> void:
 			velocity = normal_v + (velocity - normal_v) * float(profile["friction"])
 			if bool(profile["roll"]):
 				rotation.z += position.distance_to(previous) / maxf(float(profile["radius"]), 0.1)
+				# Rotation changes every support corner. Correct the new pose even
+				# when this is the last flight step before entering IDLE.
+				position.y = maxf(position.y, _terrain_support_y())
 			if velocity.length() < float(cfg["settle_speed"]) or not bool(profile["roll"]):
 				velocity = Vector3.ZERO
 				state = State.IDLE
 				return
+		if resting_on_object:
+			state = State.IDLE
+			if not _landed_notified:
+				_landed_notified = true
+				world.on_landed(self)
+			return
+
+
+func _terrain_support_y() -> float:
+	var height: float = world.ground_y(position)
+	for offset in preload("res://scripts/story_world_geometry.gd").body_offsets(self):
+		height = maxf(height, world.ground_y(position + offset) - offset.y)
+	# LND is piecewise planar, so a rotated bounding box's corners alone can
+	# miss terrain underneath its interior. Include the actual mesh vertices.
+	# Cache local points, not transformed support: scale/rotation may change.
+	for child in get_children():
+		if not child is MeshInstance3D or child.mesh == null: continue
+		if not _terrain_mesh_points.has(child.mesh):
+			var points := PackedVector3Array()
+			for surface in child.mesh.get_surface_count():
+				points.append_array(child.mesh.surface_get_arrays(surface)[Mesh.ARRAY_VERTEX])
+			_terrain_mesh_points[child.mesh] = points
+		var transform: Transform3D = Transform3D(basis, position) * child.transform
+		for local in _terrain_mesh_points[child.mesh]:
+			var point: Vector3 = transform * local
+			height = maxf(height, world.ground_y(point) - (point.y - position.y))
+	return height
 
 
 func _walk(delta: float) -> void:

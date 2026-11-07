@@ -1,13 +1,14 @@
 [CmdletBinding()]
 param(
-    [string]$Godot = 'godot_console.exe'
+    [string]$Godot = 'godot_console.exe',
+    [string]$OutputDirectory = ''
 )
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $gamePath = Join-Path $projectRoot 'game'
-$releaseDirectory = Join-Path $projectRoot 'build/story-preview'
-$previewExe = Join-Path $releaseDirectory 'GodotIsland-village-preview9.exe'
+$releaseDirectory = if ($OutputDirectory) { $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputDirectory) } else { Join-Path $projectRoot 'build/story-preview' }
+$previewExe = Join-Path $releaseDirectory 'GodotIsland-village-preview9.1.exe'
 $decoder = Join-Path $gamePath 'bin/bw_audio_decode.exe'
 
 if (-not (Get-Command $Godot -ErrorAction SilentlyContinue)) {
@@ -35,7 +36,7 @@ if ($env:OS -eq 'Windows_NT') {
 }
 
 $record = [ordered]@{
-    preview = 9
+    preview = '9.1'
     executable = Split-Path -Leaf $previewExe
     sha256 = (Get-FileHash -LiteralPath $previewExe -Algorithm SHA256).Hash
     built_utc = [DateTime]::UtcNow.ToString('o')
