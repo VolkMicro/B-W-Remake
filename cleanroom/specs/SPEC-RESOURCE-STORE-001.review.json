@@ -1,0 +1,32 @@
+{
+  "specId": "SPEC-RESOURCE-STORE-001",
+  "specVersion": 1,
+  "reviewerRole": "specification reviewer",
+  "reviewerId": "/root/camera",
+  "reviewedAtUtc": "2026-11-07T12:06:50.6288207Z",
+  "reviewedSpecSha256": "FFAF3D6F8C23C3A1D26BEC75011344439F0AF3253D3230E0C6853152199B080E",
+  "status": "approved",
+  "scope": "new remake accounting policy, not legacy-source certification",
+  "passedReviewCriteria": [
+    "Public API types, resource indices, integer range and return values are explicit and compatible with Godot 4.",
+    "Owner metadata is the single canonical stock source and external writes are observable at call time.",
+    "Binding validates both resources and valid metadata identifiers before writes or replacement of an existing binding.",
+    "Missing initial metadata, preservation of existing valid stock, rebinding and caller key-array mutation are specified.",
+    "Existing over-limit stock is preserved and only future additions are constrained.",
+    "Invalid indices, invalid metadata, nonpositive amounts and freed owners have explicit nonmutating outcomes.",
+    "The integer ceiling and largest positive int offer have overflow-safe required outcomes.",
+    "Signal ordering commits metadata before observers and forbids overwriting reentrant observer results.",
+    "Synthetic acceptance cases A1-A14 and conservation sequences exercise observable behavior and relevant failure boundaries.",
+    "Scope and delivery exclude game parsing, assets, original implementation, rendering, input, networking, filesystem access, timers and threaded transactions."
+  ],
+  "resolvedReviewFinding": "The reviewed revision now requires String.is_valid_identifier() before metadata access and adds A14 for invalid keys without partial writes or engine errors.",
+  "documentationChecked": [
+    "https://docs.godotengine.org/en/stable/classes/class_object.html#class-object-method-set-meta"
+  ],
+  "unknownOriginalSemantics": "Out of scope. The review approves a new remake accounting policy and makes no claim that its limits, resource rules or events reproduce the original game.",
+  "limitations": [
+    "Reviewer has access to coordinator legacy context, which is allowed for this review role.",
+    "No product implementation was written or reviewed in this step.",
+    "Implementation isolation, runner canaries, module correctness and game integration are not certified by this approval."
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "recordedUtc": "2026-11-07T12:08:37.2403109Z",
+  "role": "toolchain/source-separation probe; not product implementation",
+  "cliVersion": "2.1.311",
+  "productionFlags": [
+    "--safe-mode",
+    "--restricted",
+    "--tools empty",
+    "--disallowed-tools *",
+    "--disable-slash-commands",
+    "--strict-mcp-config",
+    "empty MCP JSON",
+    "no-session-persistence",
+    "max-turns1",
+    "explicit system"
+  ],
+  "observedTools": [],
+  "observedMcpServers": [],
+  "builtinPluginNames": [
+    "cc-plugin-sec-default",
+    "cc-plugin-agents-md",
+    "cc-plugin-telemetry",
+    "cc-plugin-plugin-authoring"
+  ],
+  "builtinAgentNames": [
+    "claude",
+    "Explore",
+    "general-purpose",
+    "Plan"
+  ],
+  "negativeCanaryResult": "READY; no auto-loaded canary IDs",
+  "positiveControl": "normal Read-only mode detected exact user/project canaries",
+  "permittedEnvelopeFieldNames": [
+    "userEmail",
+    "environment"
+  ],
+  "modelHadNoFilesystemShellNetworkOrAgentTools": true,
+  "noNewProductModule": true,
+  "rawEvidence": "private JSONL only",
+  "authCopyProblem": "fixed: refreshed OAuth block restored atomically to original store, same account/org verified, other entries preserved; broker now never copies credentials",
+  "status": "production broker READY after atomic OAuth ownership repair and successful normal-auth tools0 probe",
+  "productionBrokerRun": "runs/d5d36ba09ab54bdcb4853d4bcfba6741"
+}

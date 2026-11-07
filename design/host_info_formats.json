@@ -38,6 +38,9 @@
     "villager_offset": 141200,
     "villager_record_size": 916,
     "villager_record_count": 84,
+    "storage_pile_offset": 285688,
+    "storage_pile_record_size": 308,
+    "storage_pile_record_count": 6,
     "verification": "validated on installed 1.2 data"
   }
 ]

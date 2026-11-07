@@ -1,14 +1,15 @@
 [CmdletBinding()]
 param(
     [string]$Godot = 'godot_console.exe',
-    [string]$OutputDirectory = ''
+    [string]$OutputDirectory = '',
+    [ValidatePattern('^\d+(\.\d+)?$')][string]$PreviewVersion = '9.1'
 )
 
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $gamePath = Join-Path $projectRoot 'game'
 $releaseDirectory = if ($OutputDirectory) { $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputDirectory) } else { Join-Path $projectRoot 'build/story-preview' }
-$previewExe = Join-Path $releaseDirectory 'GodotIsland-village-preview9.1.exe'
+$previewExe = Join-Path $releaseDirectory "GodotIsland-village-preview$PreviewVersion.exe"
 $decoder = Join-Path $gamePath 'bin/bw_audio_decode.exe'
 
 if (-not (Get-Command $Godot -ErrorAction SilentlyContinue)) {
@@ -24,6 +25,11 @@ if ($LASTEXITCODE -ne 0) {
 }
 Copy-Item -LiteralPath $decoder -Destination (Join-Path $releaseDirectory 'bw_audio_decode.exe')
 Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'preview') -File | Copy-Item -Destination $releaseDirectory
+foreach ($template in @('Launch-Story-Preview.cmd', 'TESTING_RU.txt')) {
+    $destination = Join-Path $releaseDirectory $template
+    $content = (Get-Content -LiteralPath $destination -Raw).Replace('preview9.1', "preview$PreviewVersion")
+    [IO.File]::WriteAllText($destination, $content, [Text.UTF8Encoding]::new($false))
+}
 
 # Shortcuts contain machine-specific absolute paths, so generate them locally.
 if ($env:OS -eq 'Windows_NT') {
@@ -36,7 +42,7 @@ if ($env:OS -eq 'Windows_NT') {
 }
 
 $record = [ordered]@{
-    preview = '9.1'
+    preview = $PreviewVersion
     executable = Split-Path -Leaf $previewExe
     sha256 = (Get-FileHash -LiteralPath $previewExe -Algorithm SHA256).Hash
     built_utc = [DateTime]::UtcNow.ToString('o')

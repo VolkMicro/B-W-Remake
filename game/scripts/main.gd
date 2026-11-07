@@ -32,6 +32,9 @@ const WoodHand := preload("res://scripts/story_wood_hand.gd")
 const StoryHighlight := preload("res://scripts/story_highlight.gd")
 const StoryCitadelSite := preload("res://scripts/story_citadel_site.gd")
 const CitadelConstruction := preload("res://scripts/story_citadel_construction.gd")
+const StockStore := preload("res://scripts/resource_store.gd")
+var resource_stores: Dictionary = {}
+var storage_views: Dictionary = {}
 const StoryAttachedMusic := preload("res://scripts/story_attached_music.gd")
 const StoryTempleInterior := preload("res://scripts/story_temple_interior.gd")
 var story_temple: StoryTempleInterior
@@ -254,7 +257,7 @@ func _load_world() -> void:
 	_update_camera()
 	loaded = true
 	if story_preview and DisplayServer.get_name() != "headless":
-		get_window().title = "Black & White — реставрация · Preview 9.1"
+		get_window().title = "Black & White — реставрация · Preview 9.2"
 		Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	_load_preservation()
 	var heights := PackedStringArray()
@@ -470,6 +473,8 @@ func _spawn_objects() -> void:
 				abode.town = int(a[0])
 				abode.set_meta("original_type", a[2])
 				abode.set_meta("story_type", 2)
+				if a[2].ends_with("STORAGE_PIT"):
+					story_bind_storage(abode, Vector2i(int(a[5]), int(a[6])))
 				story_landmarks.append(abode)
 	for c in island.all("CREATE_NEW_FEATURE"):
 		var a: PackedStringArray = c["args"]
@@ -936,6 +941,13 @@ func _move_player_camera(delta: float) -> void:
 
 func _update_world(delta: float) -> void:
 	_sync_adviser_view()
+	for id in storage_views.keys():
+		var view: Node3D = storage_views[id]
+		if not is_instance_valid(view):
+			storage_views.erase(id)
+			resource_stores.erase(id)
+			continue
+		view.advance(delta)
 	for highlight in story_highlights:
 		if is_instance_valid(highlight):
 			highlight.advance(delta, cam)
@@ -1930,6 +1942,9 @@ func _sync_adviser_view() -> void:
 
 
 func _spawn_food() -> void:
+	# The story uses the actual storage ledger/piles. These three loose items
+	# belong only to the earlier creature sandbox and have no source quantity.
+	if story_preview: return
 	# Grain is supplied at original storage pits, not copied into the port.
 	for c in island.all("CREATE_ABODE"):
 		var args: PackedStringArray = c["args"]
@@ -1942,6 +1957,59 @@ func _spawn_food() -> void:
 			var grain := _place_mesh("MSH_O_WHEAT_INHAND", pos, 0.0, 1.0, "food")
 			if grain:
 				things.append(grain)
+
+
+func story_bind_storage(owner: Node3D, initial: Vector2i) -> RefCounted:
+	if not is_instance_valid(owner): return null
+	var id := owner.get_instance_id()
+	var store: RefCounted = resource_stores.get(id)
+	if store == null: store = StockStore.new()
+	if not store.bind(owner, PackedStringArray(["story_food_stock", "story_wood_stock"]), initial):
+		push_error("Invalid source storage stocks")
+		return null
+	resource_stores[id] = store
+	if not storage_views.has(id) and not host_info.storage_piles.is_empty():
+		_create_storage_view(owner, store)
+	return store
+
+
+func story_resource_store(owner: Node3D) -> RefCounted:
+	if not is_instance_valid(owner): return null
+	return resource_stores.get(owner.get_instance_id())
+
+
+func story_storage_view(owner: Node3D) -> Node3D:
+	if not is_instance_valid(owner): return null
+	return storage_views.get(owner.get_instance_id())
+
+
+# Coordinator adapter: source parsing and coordinate conversion stay outside
+# the independent presentation module. ExtraMetrics 5 is food; 0..4 are wood.
+func _create_storage_view(owner: Node3D, store: RefCounted) -> void:
+	var type := str(owner.get_meta("original_type", ""))
+	if not Data.ABODES.has(type): return
+	var metrics := g3d.extra_metric_positions(Data.ABODES[type])
+	if metrics.size() < 6 or host_info.storage_piles.size() != 6:
+		push_error("Original storage resource anchors are unavailable: " + type)
+		return
+	var definitions: Array[Dictionary] = []
+	for i in 6:
+		var row: Dictionary = host_info.storage_piles[i]
+		var anchor: Vector3 = owner.global_transform * metrics[5 if i == 0 else i - 1]
+		anchor.y += ground_y(anchor) - ground_y(owner.global_position)
+		definitions.append({"resource":row["resource"],"mesh":g3d.mesh_index(row["mesh_id"]),
+			"nominal":row["nominal"],"anchor":to_local(anchor),"heading":owner.rotation.y,"scale":1.0})
+	var view := preload("res://scripts/stock_piles_view.gd").new()
+	if not view.configure(Callable(store, "snapshot"), definitions):
+		view.free()
+		push_error("Original storage pile presentation is invalid: " + type)
+		return
+	# Owned by its abode so deleting the abode cannot leave a rendered orphan.
+	owner.add_child(view)
+	view.top_level = true
+	view.global_transform = global_transform
+	storage_views[owner.get_instance_id()] = view
+	world_geometry.register_node(view, owner)
 
 
 func choose_creature(id: String, restored: Dictionary = {}) -> bool:

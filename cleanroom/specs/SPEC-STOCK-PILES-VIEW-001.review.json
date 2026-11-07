@@ -1,0 +1,63 @@
+{
+  "specId": "SPEC-STOCK-PILES-VIEW-001",
+  "specVersion": 1,
+  "reviewerRole": "specification reviewer",
+  "reviewerId": "/root/camera",
+  "reviewedAtUtc": "2026-11-07T16:00:47.0873508Z",
+  "reviewedSpecSha256": "79571CB80239DA6592E9D90E051043FDB544DE504F887C5913E13ED48A022ADD",
+  "status": "approved",
+  "scope": "bounded static pile presentation model and new aggregate remake presentation policy, not legacy-source certification",
+  "reviewedInputs": [
+    "cleanroom/specs/SPEC-STOCK-PILES-VIEW-001.md",
+    "cleanroom/specs/storage-observations-draft.md"
+  ],
+  "evidenceIds": [
+    "BW001-STATIC-20261107-A",
+    "BW001-STATIC-20261107-B",
+    "BW001-STATIC-20261107-C",
+    "BW001-DATA-20261107-A",
+    "BW001-DATA-20261107-B",
+    "BW001-SANITY-20261107-A"
+  ],
+  "passedReviewCriteria": [
+    "Read-only presentation API owns no resource ledger and has an explicit caller-supplied snapshot boundary.",
+    "Definition types, ordering, positive mesh height, material support, finite transforms and configure atomicity are specified.",
+    "Allocation preserves aggregate overflow and explicitly differs from persistent independent per-pile accounting.",
+    "Zero, quarter, half, full and overflow proportions agree with the bounded static evidence and independently recalculated numerical fixtures.",
+    "Food half-fill UV shift equals 0.05640625, H4 half-time descent equals -2.75, and private S09/S10 height fixtures independently recalculate within their tolerances.",
+    "Retarget equations preserve current position and velocity and have zero endpoint velocity and acceleration.",
+    "Caller definitions, original mesh resources and shared food materials are protected from view-local mutations.",
+    "Initial snapshot read, invalid later snapshots, no-op target updates, immediate sync and invalid delta behaviors are explicit.",
+    "Inspection fields distinguish clamped display from internal vertical velocity and additional UV displacement.",
+    "Synthetic acceptance checks cover transitions, resource overflow, material isolation, configuration rollback and invalid input."
+  ],
+  "resolvedReviewFindings": [
+    "Clarified initial snapshot is read once for validation and initialization.",
+    "Clarified surface material scope, shared resource mutation precondition, finite derived transforms and height/duration.",
+    "Clarified floating quantity ratios, interpolation velocity units, state velocity under display clamping and additional uv_v semantics."
+  ],
+  "adapterBoundaryReview": {
+    "verifiedStaticObservation": "Creation uses one resource0/index0 food pile and resource1/index0..4 wood piles. The position lookup adds five only for resource0. The metric reader uses the selected ExtraMetrics translation.",
+    "mapping": "Storage mesh ExtraMetrics translations 0..4 are the five created wood anchors and translation5 is the single created food anchor. Translation6 is an additional food position of unknown use, and 7..17 are not used by these six creation calls.",
+    "scope": "Only the external adapter uses this observation. The approved pure view receives anchors, heading and per-pile scale from its caller."
+  },
+  "numericalReview": {
+    "method": "Independent rational arithmetic calculation in Python, in memory only, plus review of private static evidence and numeric observations.",
+    "woodQuarter": 0.2875,
+    "woodHalf": 0.525,
+    "foodQuarter": 0.49234375,
+    "foodHalf": 0.774375,
+    "foodHalfUvV": 0.05640625,
+    "halfTimeProgress": 0.6875,
+    "fullToZeroHeight4HalfTimeOffset": -2.75,
+    "s09HeightOffset": -1.504070556275,
+    "s10HeightOffset": -1.496180439729375
+  },
+  "limitations": [
+    "Original running-game empty/partial/full and UV appearance were not observed in this review.",
+    "This approval does not certify the draft storage observations as a whole or implement resource selection, Hand transfers, terrain deformation or accounting.",
+    "The aggregate allocation and display clamp are explicit remake policies. Persistent per-pile stock semantics and unknown food1 use remain outside this view.",
+    "Reviewer has coordinator legacy context as permitted for evidence review. No implementation or raw source is included in the approved spec.",
+    "Implementation isolation, runner canaries, returned code, rendered adapter output and full game behavior require their separate checks."
+  ]
+}

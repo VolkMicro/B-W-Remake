@@ -11,6 +11,7 @@ var _tex_cache := {}
 var _mat_cache := {}
 var _mesh_cache := {}
 var _rig_cache: Dictionary = {}
+var _metric_cache: Dictionary = {}
 
 
 func open(g3d_path: String, header_path: String) -> bool:
@@ -120,6 +121,42 @@ func _mesh_cache_key(key: String, submesh_states: PackedInt32Array) -> String:
 	var states := submesh_states.duplicate()
 	states.sort()
 	return key + ":states=" + str(states)
+
+
+# ExtraMetrics are distinct from the two ordinary extra points on a storage
+# model. Read translations only; callers own their use and world transform.
+func extra_metric_positions(mesh_name: String) -> PackedVector3Array:
+	if not name_to_index.has(mesh_name): return PackedVector3Array()
+	var index: int = name_to_index[mesh_name]
+	if _metric_cache.has(index): return _metric_cache[index].duplicate()
+	var result := PackedVector3Array()
+	if index < 0 or index >= mesh_offsets.size(): return result
+	var start: int = meshes_base + mesh_offsets[index]
+	var end := data.size()
+	for offset in mesh_offsets:
+		if meshes_base + offset > start: end = mini(end, meshes_base + offset)
+	if start < 0 or start + 76 > end: return result
+	var flags := data.decode_u32(start + 4)
+	if (flags & 0x100000) == 0: return result
+	var footer := start + data.decode_u32(start + 72)
+	for block in [0x8000, 0x40000, 0x80000]:
+		if (flags & block) == 0: continue
+		var length_offset := 8 if block == 0x8000 else 0
+		if footer < start or footer + length_offset + 4 > end: return result
+		var length := data.decode_u32(footer + length_offset)
+		if length < 4 or length > end - footer: return result
+		footer += length
+	if footer < start or footer + 12 > end: return result
+	var count := data.decode_u32(footer + 4)
+	var table := start + data.decode_u32(footer + 8)
+	if count > 4096 or table < start or table + count * 48 > end: return result
+	for i in count:
+		var p := table + i * 48 + 36
+		var point := Vector3(data.decode_float(p), data.decode_float(p + 4), -data.decode_float(p + 8))
+		if not point.is_finite(): return PackedVector3Array()
+		result.append(point)
+	_metric_cache[index] = result
+	return result.duplicate()
 
 
 func rig(mesh_name: String) -> L3dRig:

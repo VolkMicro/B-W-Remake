@@ -11,6 +11,7 @@ var animals: Array[Dictionary] = []
 var influence_settings: Dictionary = {}
 var highlights: Array[Dictionary] = []
 var villagers: Array[Dictionary] = []
+var storage_piles: Array[Dictionary] = []
 
 
 func load_file(path: String, mesh_count: int) -> bool:
@@ -22,6 +23,7 @@ func load_file(path: String, mesh_count: int) -> bool:
 	influence_settings.clear()
 	highlights.clear()
 	villagers.clear()
+	storage_piles.clear()
 	var f := FileAccess.open(path, FileAccess.READ)
 	if f == null or f.get_buffer(8).get_string_from_ascii() != "LiOnHeAd":
 		return _fail("Original object information is unavailable")
@@ -134,6 +136,19 @@ func _read_info(bytes: PackedByteArray, mesh_count: int) -> bool:
 		for age in 20:
 			scales.append(bytes.decode_float(p + 0x2d4 + age * 4))
 		villagers.append({"mesh_id":mesh,"high_mesh_id":high,"child_mesh_id":bytes.decode_u32(p + 0x1f4),"sex":bytes.decode_u32(p + 0x1e8),"age_scales":scales})
+	var pot_start: int = format["storage_pile_offset"]
+	var pot_size: int = format["storage_pile_record_size"]
+	var pot_count: int = format["storage_pile_record_count"]
+	if pot_start < 0 or pot_size < 272 or pot_count != 6 or pot_start + pot_size * pot_count > bytes.size():
+		return _fail("Invalid original storage pile table")
+	for i in pot_count:
+		var p := pot_start + i * pot_size
+		var resource := bytes.decode_u32(p + 264)
+		var mesh := bytes.decode_u32(p + 248)
+		var nominal := bytes.decode_u32(p + 268)
+		if resource != (0 if i == 0 else 1) or mesh >= mesh_count or nominal < 1 or nominal > 2147483647:
+			return _fail("Invalid original storage pile record %d" % i)
+		storage_piles.append({"resource":resource,"mesh_id":mesh,"nominal":nominal})
 	version = format["id"]
 	return true
 
@@ -168,4 +183,5 @@ func _fail(message: String) -> bool:
 	influence_settings.clear()
 	highlights.clear()
 	villagers.clear()
+	storage_piles.clear()
 	return false

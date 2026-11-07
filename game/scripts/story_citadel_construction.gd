@@ -61,6 +61,10 @@ func configure(world: Node, site: Node3D, town: int) -> bool:
 		var point: Vector3 = world.to_world(IslandScript.pos(args[1]))
 		for landmark in world.story_landmarks:
 			if landmark is Node3D and landmark.get_meta("original_type", "") == args[2] and landmark.position.distance_to(point) < 0.1:
+				if world.has_method("story_bind_storage"):
+					if world.story_bind_storage(landmark, Vector2i(int(args[5]), int(args[6]))) == null:
+						error = "Invalid source storage resource ledger"
+						return false
 				if not landmark.has_meta("story_wood_stock"):
 					landmark.set_meta("story_wood_stock", int(args[6]))
 				_storages.append(landmark)
@@ -287,6 +291,9 @@ func diagnostics() -> Dictionary:
 func _take_from(storage: Node3D, amount: int) -> int:
 	if not is_instance_valid(storage) or amount <= 0:
 		return 0
+	if _world.has_method("story_resource_store"):
+		var store: RefCounted = _world.story_resource_store(storage)
+		if store != null: return store.take(1, amount)
 	var stock := int(storage.get_meta("story_wood_stock", 0))
 	var taken := mini(stock, amount)
 	storage.set_meta("story_wood_stock", stock - taken)
