@@ -310,6 +310,29 @@ Preview9 separately passes headless and rendered startup checks. The launcher
 and local shortcut select this executable. Full campaign and remaining quests
 are still pending.
 
+## Collision maintenance checkpoint: preview 9.1 (2026-11-07)
+
+An audit found no new remote code after the Claude handoff at7c7358f.
+The contact probe was extended to inspect flight frames and final roll,
+use an actual larger rotated rock, detect self-sweep, and drop onto a real
+nearby boulder. Against the original checkpoint it reports7PASS/5FAIL:
+the resting rock penetrates LND by0.1555m, another trajectory has three
+penetrating frames, self-sweep hits, and a drop passes through the boulder.
+
+Physics now recalculates support after rotation and landing actions, includes
+actual mesh vertices in terrain support, and resolves terrain after an object
+contact. Movable rocks/keys/food/toys participate in object contacts, with the
+swept body excluded from its own query. Headless and rendered contact checks
+now report12PASS; viewed captures show final ground support and the first
+actual boulder contact. These are legacy geometry repairs, not independent
+clean-room modules or a complete original/GJK/dynamic-pair solver.
+
+Checks repeated for this checkpoint: hand/world18, gate/key24, keeper/key27,
+port199, rendered opening through first key, exported headless/rendered
+startup and a fresh Git-source build. The original user-specific case still
+needs confirmation. Storage, resource transfer and gesture throwing remain
+open; this is not the complete Preview10 delivery. See its verification JSON.
+
 ## Optional standalone packaging
 
 The user now accepts requiring original files in the finished remake. A one-time

@@ -1,0 +1,53 @@
+{
+  "preview": "9.1",
+  "executable": "GodotIsland-village-preview9.1.exe",
+  "sha256": "C09461678DC4C68FF32AAD5F18479CBCFE9B7EE021DCE93CDB90BE4A21E357B2",
+  "source_revision": "a061205cd852cac5fb40cfacf87114ff52372a7a",
+  "verified_utc": "2026-11-07T10:47:00.9093123Z",
+  "status": "collision-maintenance-checkpoint",
+  "checks": {
+    "headless_contact_assertions": 12,
+    "rendered_contact_assertions": 12,
+    "baseline_source": "7c7358f",
+    "baseline_contact_passed": 7,
+    "baseline_contact_failed": 5,
+    "headless_hand_world_assertions": 18,
+    "gate_key_assertions": 24,
+    "keeper_key_assertions": 27,
+    "port_assertions": 199,
+    "rendered_opening_through_first_key": "passed",
+    "temple_door_30_second_wait": "stable",
+    "rehearsal_media": "skipped_by_test_fixture",
+    "release_headless_exit": 0,
+    "release_rendered_exit": 0,
+    "fresh_git_source_build": "passed",
+    "fresh_git_source_startup_exit": 0,
+    "final_engine_script_errors": 0
+  },
+  "visual_evidence": [
+    "build/story-preview/collision-9.1-roll.png",
+    "build/story-preview/collision-9.1-boulder.png"
+  ],
+  "original_user_collision_case": "awaiting_confirmation",
+  "open_user_bugs": [
+    "BW-001",
+    "BW-002",
+    "BW-004"
+  ],
+  "complete_preview10": false,
+  "complete_campaign": false,
+  "requires_original_install": true,
+  "standalone_importer": "optional",
+  "provenance": "legacy repair; not claimed as independent clean-room implementation",
+  "approximate_systems": [
+    "general_physics",
+    "simultaneous_flying_body_interactions",
+    "full_hand_controller",
+    "economy",
+    "bounded_land_routes"
+  ],
+  "visual_sha256": {
+    "build/story-preview/collision-9.1-roll.png": "4249FEB9EDDDE72E2CABFB0E04CD8B81ED41AD2F5F9BA7C964A956392E8D1C9B",
+    "build/story-preview/collision-9.1-boulder.png": "04FC180A7DD9B383FE7F874750910DA6E6717D1131EFC384A72A150D863D32EE"
+  }
+}

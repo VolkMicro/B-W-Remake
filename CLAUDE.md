@@ -22,8 +22,9 @@ clean-room protocol; do not give it this checkout or conversation history.
 ## Immediate assignment
 
 Deliver **Preview 10 fixing BW-001 through BW-004**, then continue the first
-island according to `TASK_CLAUDE_RU.md`. All four bugs are open. The existing
-contact probe does not reproduce the user's new penetration report.
+island according to `TASK_CLAUDE_RU.md`. BW-001/002/004 remain open. Preview9.1
+fixes five reproduced contact regressions; the user's exact case still needs
+verification. See current `BUGS_RU.md` and `cleanroom/STATUS.md`.
 
 Use Ghidra for the requested binary research, with its headless mode when a GUI
 is unavailable. Keep research, specification review and independent new

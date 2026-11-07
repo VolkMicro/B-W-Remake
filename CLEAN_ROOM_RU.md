@@ -130,9 +130,11 @@ PE loader/language, разрядность, image base и ABI проверь п�
 
 ## Учёт
 
-В `cleanroom/STATUS.md` отражается действительный прогресс. В этой передаче
-Ghidra ещё не запускалась, approved packets и новые независимые модули
-не созданы. Инструкции подготовлены; результаты анализа не выдумываются.
+В `cleanroom/STATUS.md` отражается действительный прогресс. При первоначальной
+передаче 6 ноября Ghidra ещё не запускалась. 7 ноября установлена portable
+toolchain и успешно импортирован настоящий exe; отчёт —
+`cleanroom/research-status-2026-11-07.md`. Import не означает восстановление
+механик; approved packets и новые независимые модули пока не созданы.
 
 Для Claude Code сверяй [проектные инструкции](https://code.claude.com/docs/en/memory)
 и [subagents](https://code.claude.com/docs/en/sub-agents). CLAUDE.md направляет
