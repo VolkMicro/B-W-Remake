@@ -1,0 +1,411 @@
+{
+  "date": "2026-11-11",
+  "preview": "9.3",
+  "sourceCommit": "9c3324e",
+  "status": "verified hand and interaction checkpoint; full Preview10 acceptance and campaign incomplete",
+  "engine": "Godot4.7.2 stable ed1daf0bf",
+  "executable": "build/story-preview/GodotIsland-village-preview9.3.exe",
+  "sha256": "05A67FEDE7EFE107BA7FFBD060270C750616AAB8FEECB4A4380F0EE7B4993FFE",
+  "requiresOriginalInstall": true,
+  "completeCampaign": false,
+  "changes": [
+    "Default LMB Move/RMB Action/MMB or Shift rotation; source temple Action entry and updated hints.",
+    "Actual HandFood/HandWood meshes, gather/retain/deposit/quantified ground piles and cosmetic transfer stream; one owner stock shared with construction.",
+    "Pure world-space momentum sampler; immediate physical launch from visible grip, slow placement without ground teleport, camera cancellation.",
+    "Source bounded normal hand depth/scale response, bind-bone span normalization, per-frame absolute cursor lag and linear state pose blending; no fixed pixel width or animated-tip pin.",
+    "Adviser normalized screen placement on aspect/size changes; actual authored poses and voice remain active at maximum zoom.",
+    "Claude static coordinator review found three integration bugs; fixed camera-dependent dropped size, keyboard/wheel-induced fling, and loose-pile near-miss object pickup."
+  ],
+  "provenance": {
+    "newModules": [
+      "ResourceHand",
+      "ResourceStream",
+      "HandMomentum",
+      "HandSurfaceMotion",
+      "HandPointerDynamics"
+    ],
+    "manifests": [
+      "SPEC-RESOURCE-HAND-001.implementation.json",
+      "SPEC-HAND-MOMENTUM-001.implementation.json",
+      "SPEC-HAND-SURFACE-MOTION-001.implementation.json",
+      "SPEC-HAND-POINTER-DYNAMICS-001.implementation.json"
+    ],
+    "boundary": "Fresh fixed remote Claude model requests with tools/MCP empty; approved input hashes and same CLI2.1.311 probe flags. Provider envelope names recorded. Not an OS sandbox or certification of legacy repository.",
+    "adapters": "Main, StoryHandPose, HostInfoReader, StoryResourceInteraction and geometry/adviser integration are coordinator/legacy scope.",
+    "research": "Bounded Ghidra12.1.4/JDK21 hand follow-up on installed exe SHA525a6a31ba208ebace5365a10f6afc76c7a76f138722e132b838a2c2c71f1054; original runtime not launched for frame comparison."
+  },
+  "checks": [
+    {
+      "test": "res://tests/verify_resource_store.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_resource_store.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 161,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/final-regression-resource-store.log"
+    },
+    {
+      "test": "res://tests/verify_stock_piles_view.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_stock_piles_view.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 149,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/final-regression-stock-piles-view.log"
+    },
+    {
+      "test": "res://tests/verify_resource_hand.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_resource_hand.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 353,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/final-regression-resource-hand.log"
+    },
+    {
+      "test": "res://tests/verify_hand_momentum.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_hand_momentum.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 133,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/final-regression-hand-momentum.log"
+    },
+    {
+      "test": "res://tests/verify_hand_surface_motion.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_hand_surface_motion.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 124,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/final-regression-hand-surface-motion.log"
+    },
+    {
+      "test": "res://tests/verify_hand_pointer_dynamics.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_hand_pointer_dynamics.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 74,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/final-regression-hand-pointer-dynamics.log"
+    },
+    {
+      "test": "res://tests/verify_hand_pose.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_hand_pose.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 30,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/final-regression-hand-pose.log"
+    },
+    {
+      "test": "res://tests/verify_gate_keys.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_gate_keys.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 24,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [
+        "WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details)."
+      ],
+      "log": "scratch/final-regression-gate-keys.log"
+    },
+    {
+      "test": "res://tests/verify_item_contacts.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_item_contacts.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 12,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/final-regression-item-contacts.log"
+    },
+    {
+      "test": "res://tests/verify_story_scrolls.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_story_scrolls.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection",
+        "--deliver-key"
+      ],
+      "passed": 27,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/final-regression-story-scrolls.log"
+    },
+    {
+      "test": "res://tests/verify_citadel_construction.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_citadel_construction.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 38,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/final-regression-citadel-construction.log"
+    },
+    {
+      "test": "res://tests/verify_citadel_workflow.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_citadel_workflow.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 10,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/final-regression-citadel-workflow.log"
+    },
+    {
+      "test": "res://tests/verify_citadel_workflow.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_citadel_workflow.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection",
+        "--source-tutorial"
+      ],
+      "passed": 11,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/final-regression-citadel-source-tutorial.log"
+    },
+    {
+      "test": "res://tests/verify_port.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--script",
+        "res://tests/verify_port.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 199,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/final-regression-port.log"
+    },
+    {
+      "test": "verify_resource_input.gd",
+      "passed": 55,
+      "exit": 0,
+      "mode": "headless native parsed input with installed data",
+      "log": "scratch/resource-source-final.log"
+    },
+    {
+      "test": "verify_hand_world.gd",
+      "passed": 20,
+      "exit": 0,
+      "mode": "headless installed data",
+      "log": "scratch/hand-world-source-final.log"
+    },
+    {
+      "test": "exact exported pack resource",
+      "passed": 57,
+      "exit": 0,
+      "mode": "rendered via matching Godot console engine and external diagnostic script",
+      "log": "scratch/preview9.3-pack-resource.log"
+    },
+    {
+      "test": "exact exported pack world",
+      "passed": 20,
+      "exit": 0,
+      "mode": "rendered via matching Godot console engine and external diagnostic script",
+      "log": "scratch/preview9.3-pack-world.log"
+    },
+    {
+      "test": "exact exported pack storage",
+      "passed": 25,
+      "exit": 0,
+      "mode": "rendered via matching Godot console engine and external diagnostic script",
+      "log": "scratch/preview9.3-pack-storage.log"
+    },
+    {
+      "test": "exact exported pack advisers",
+      "passed": 32,
+      "exit": 0,
+      "mode": "rendered via matching Godot console engine and external diagnostic script",
+      "log": "scratch/preview9.3-pack-advisers.log"
+    }
+  ],
+  "opening": {
+    "exit": 0,
+    "mode": "rendered exact exported pack; fixed-fps15, accelerated time and skipped media",
+    "command": "matching Godot console --main-pack <preview9.3.exe> --fixed-fps 15 --script <absolute verify_opening_runtime.gd> -- --story-preview --bw=<install> --runtime-automation --runtime-key --runtime-seconds=1300",
+    "result": "OPENING RESULT PASS",
+    "templeVisited": true,
+    "doorWaitStable": true,
+    "keeperIntro": true,
+    "firstKey": true,
+    "keyBits": 2,
+    "minimumCameraClearance": 0.5,
+    "minimumPlayerCameraClearance": 3.00000011835363,
+    "log": "scratch/preview9.3-pack-opening.log",
+    "limitation": "Does not establish a normal-speed manual campaign playthrough."
+  },
+  "startup": [
+    {
+      "mode": "headless",
+      "exit": 0,
+      "errors": [],
+      "frames": 180
+    },
+    {
+      "mode": "rendered",
+      "exit": 0,
+      "errors": [],
+      "frames": 180
+    }
+  ],
+  "freshGit": {
+    "commit": "9c3324e",
+    "source": "git archive into ignored build/interaction-fresh-source-9c3324e",
+    "exportExit": 0,
+    "resourceInputPassed": 55,
+    "startup": [
+      {
+        "mode": "headless",
+        "exit": 0,
+        "errors": []
+      },
+      {
+        "mode": "rendered",
+        "exit": 0,
+        "errors": []
+      }
+    ],
+    "sha256": "0699C51BB3B109C4A41EB02D56EB33B57558369B75C86C671462BE5C1EE33C8C",
+    "limitation": "No checkout build/cache/research copied. Tracked project decoder included; original installation read separately. Binary hashes need not be reproducible."
+  },
+  "commands": {
+    "build": "tools/build_preview.ps1 -Godot <godot_console.exe> -PreviewVersion 9.3 -OutputDirectory build/interaction-9.3-candidate",
+    "focused": "godot_console.exe --headless --path game --script res://tests/<test>.gd -- --bw=<install>",
+    "pack": "matching Godot4.7.2 GUI+console beside bw_audio_decode.exe; console --main-pack <preview9.3.exe> --script <absolute-test.gd> -- <args>",
+    "startup": "Start-Process <exported.exe> -WindowStyle Hidden -Wait -PassThru with --quit-after180, --log-file and --story-preview"
+  },
+  "manual": {
+    "normalSpeedDiagnosticWindowOpened": true,
+    "userConfirmedPickup": true,
+    "automatedDesktopInteraction": "Input guard detected user activity/focus changed; agent click sequence not completed. This is not a successful manual playthrough.",
+    "currentFinalHandFidelity": "Not manually compared with running original; source numeric laws and native parsed input/rendered tests only."
+  },
+  "verificationFindings": [
+    "Only matching engine pack harness executes external scene scripts; release exe direct --script is not diagnostic proof.",
+    "Failed Ghidra prototype attempts were corrected and bounded instruction/ABI evidence reviewed before facts were packetized.",
+    "HND field+28 has not been established as hand root/contact; production no longer treats it as one.",
+    "Earlier resource-hand generated fixture omitted a clock advance before a stream-progress assertion; coordinator fixed the test, modules copied unchanged."
+  ],
+  "finalEngineScriptErrors": 0,
+  "knownWarnings": [
+    "verify_gate_keys.gd: existing teardown warning2 ObjectDB instances leaked."
+  ],
+  "localEvidence": [
+    "scratch/preview9.3-*.log",
+    "scratch/final-regression-*.log",
+    "build/interaction-9.3-candidate/exported-hand-held0.png",
+    "build/interaction-9.3-candidate/exported-hand-held1.png",
+    "build/interaction-9.3-candidate/advisers-*.png",
+    "build/interaction-9.3-candidate/opening/*.png"
+  ],
+  "remaining": [
+    "BW-001 manual grain/wood roundtrip implemented; visual per-pile wood distribution is aggregate, not independent persistent pile stocks.",
+    "BW-002 original hand clips and actual resource models integrated; exact original PSys paths/hand-pot scale and all special states unknown.",
+    "BW-003 exact player collision episode not confirmed;12 existing regressions pass.",
+    "BW-004 gesture throw implemented with explicit new sampler policy; aftertouch and full original angular/physical behavior absent.",
+    "BW-005 bounded hand motion numerics restored; source normal gating/object branches, skeleton TRS representation, runtime FOV overrides and complete 1:1 feel not certified. Widescreen projection is aspect-correct70 horizontal, not original fixed4:3 raster stretch.",
+    "BW-006 same-aspect zoom freeze not reproduced; resize placement fixed, silent authored cling remains.",
+    "Other keys/quests, original creature choice/learning and later campaign remain unfinished."
+  ]
+}

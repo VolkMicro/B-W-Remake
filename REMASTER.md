@@ -352,6 +352,30 @@ Manual resource collection/return, animated transport and gesture throwing remai
 open. This is an intermediate checkpoint, not the complete Preview10 acceptance
 or a manual campaign playthrough. Prior9.1 collision work remains in place.
 
+## Preview 9.3: hand motion and real Action transfers
+
+Source9c3324e,11 November2026. The native hand now uses the reviewed bounded
+radial-depth/scale response, bind-bone normalization, frame-based absolute cursor
+lag and component-linear pose transitions. Fixed76px scaling and animated-tip
+compensation are removed. Original meshes/poses remain installation-supplied.
+The default physical Action is RMB; LMB moves the camera and MMB/Shift rotates.
+
+Real grain/wood collection, retain-on-release, deposit, quantified ground piles,
+regather and visible transfer are integrated with the single storage/construction
+stock. Gesture release launches the actual body from its visible grip. Camera
+movement cancels pending fling; dropped pile collision size is camera-independent.
+Adviser screen placement responds to aspect changes; the original silent cling
+remains and the reported same-aspect freeze was not reproduced.
+
+New pure ResourceHand/ResourceStream, HandMomentum, HandSurfaceMotion and
+HandPointerDynamics modules have reviewed packets and fixed tool-less remote
+Claude implementation manifests. Integration remains coordinator/legacy scope.
+Exact exported startup, rendered pack interaction/adviser/storage/world scenes,
+opening through the first key and fresh Git-source export/startup passed.
+See development/preview9.3-verification.json for counts, commands and limitations.
+This is an intermediate checkpoint: no full original-frame fidelity, normal-speed
+manual campaign playthrough, aftertouch or completed first-island claim.
+
 ## Optional standalone packaging
 
 The user now accepts requiring original files in the finished remake. A one-time

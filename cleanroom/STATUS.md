@@ -4,14 +4,47 @@
 
 - Некоммерческий фанатский ремейк на Godot; файлы оригинала допустимы
   и в готовой версии. Цель и этапы — PROJECT_RU.md.
-- Проверенная игровая основа — Preview9.2, storage source commit cf74fad.
+- Проверенная игровая основа — Preview9.3, source commit9c3324e.
+  Storage checkpoint9.2 — cf74fad.
   Collision checkpoint9.1 — a061205.
   Исторический checkpoint передачи — dce3b21 (Preview9).
 - Первое задание — Preview 10 по TASK_CLAUDE_RU.md.
 - Основной checkout/старые исследования — legacy, без заявления
   о доказанном clean-room происхождении.
 
-## Реальное состояние
+## Состояние 11 ноября: hand/interaction checkpoint
+
+Новые packets ResourceHand, HandMomentum, HandSurfaceMotion и HandPointerDynamics
+имеют exact-hash review и отдельные implementation manifests. ResourceHand и
+ResourceStream прошли353 synthetic checks, Momentum133, Surface124, Pointer74.
+Все получены свежими tool-less Claude CLI2.1.311 запросами без tools/MCP,
+resume, source checkout или raw research. Проверенный probe7 ноября применим
+к тем же CLI/flags; отдельный worker имеет служебную provider envelope с
+зафиксированными типами полей. Credentials не копировались. Это ограничение
+доступа модели, не изоляция broker/OS и не clean provenance всего репозитория.
+
+Координатор интегрировал source defaults мыши, реальные resource profiles/meshes,
+единый stock, потоки, обычный сбор/drop/regather/return и gesture release.
+Main/StoryHandPose/HostInfo/StoryResourceInteraction/geometry/adviser adapters
+остаются legacy/coordinator. Ghidra follow-up выполнялся portable12.1.4/JDK21
+на checked installed exe; reviewed drafts различают ordinary motion, bind span,
+cursor lag, frame-based scheduling, linear pose blend и неизвестные ветки.
+Проверки static/instruction/numeric — не исполнение оригинала.
+
+Exact9.3 exe прошёл headless/rendered startup, matching-engine exact-pack scenes
+resource57/world20/storage25/adviser32 и opening до установленного первого ключа.
+Fresh git archive9c3324e export/resource55/startup PASS. Подробности и SHA256 —
+development/preview9.3-verification.json. Preview9.2 сохранён. Кампания, полная
+приёмка Preview10, aftertouch, special hand/object states и точный BW-003 ещё
+не завершены. Переходы частиц и hand-pot presentation остаются remake policy.
+
+Raw evidence новых follow-up и manifests находятся в локальном Research вне Git.
+Часть старых private run/cache материалов7 ноября в снимке среды11 ноября
+отсутствует; публичные hashes/manifests сохраняются. Это не повод приписывать
+старые прогоны текущей сборке: в отчёт9.3 внесены выполненные здесь проверки.
+Не клонировать OAuth state и не передавать contaminated checkout реализатору.
+
+## Состояние 7 ноября до Preview9.3 (история)
 
 | Шаг | Состояние | Следующее действие |
 | --- | --- | --- |

@@ -10,7 +10,64 @@
 TASK_CLAUDE_RU.md. Сначала CLEAN_ROOM_RU.md определяет роль/доступ: эта
 инструкция содержит legacy research и не передаётся чистому реализатору.
 
-## Текущий checkpoint: Preview 9.2
+## Текущий checkpoint: Preview 9.3 — 11 ноября 2026
+
+Source commit 9c3324e. Exe: `build/story-preview/GodotIsland-village-preview9.3.exe`,
+SHA256 `05A67FEDE7EFE107BA7FFBD060270C750616AAB8FEECB4A4380F0EE7B4993FFE`.
+Отчёт с командами/ограничениями: `development/preview9.3-verification.json`.
+Normal launcher переключён только после startup и relevant exact-pack tests.
+Preview9.2 сохранён. Это следующий checkpoint, не полная приёмка Preview10.
+
+Перенесены Action-сбор/остановка/возврат зерна и дерева, реальные количественные
+кучки, исходные hand meshes/poses, видимый поток и бросок жестом. Склады,
+стройка, рука и кучки используют один stock. При медленном сбросе предмет
+падает из grip без переноса к отдельной точке земли. Масштаб упавшей кучки
+не зависит от камеры. Колесо/WASD/QE отменяют случайный бросок от движения камеры.
+
+Рука больше не имеет постоянной ширины76px и не компенсирует движение
+анимированного пальца. Bounded source laws: радиальная глубина, scale,
+нормализация по bind-bone span555.294372558594, absolute-cursor lag80px,
+gain20, pow(.03,dt), линейное смешивание поз за0.13с. FOV70 horizontal;
+aspect-correct widescreen — явная политика порта. HND+28 **не доказан** как
+hand root/contact, не возвращать прежнее присваивание этого поля положению руки.
+
+Новые independent модули: ResourceHand/ResourceStream353, HandMomentum133,
+HandSurfaceMotion124, HandPointerDynamics74 checks. Packets/reviews/manifests
+в cleanroom/specs. Tool-less Claude2.1.311 работал со свежими запросами,
+tools/MCP пустыми; это граница возможностей модели, не OS-sandbox и не
+сертификация main/StoryHandPose/geometry/resource/adviser adapters.
+Follow-up research использовал Ghidra12.1.4/JDK21; raw — вне Git.
+
+Проверено:14 focused прогонов1345 checks; native-input resource55 headless,
+57 rendered exact pack; hand-world20; actual storage25 rendered; advisers32
+при максимальном zoom и трёх пропорциях окна. Exported opening PASS:
+обучение, построенный храм, стабильное ожидание двери, вход, хранитель,
+первый ключ и его установка(bits2). Это ускоренный fixture с пропуском медиа,
+не обычное ручное прохождение. Exact exe startup headless/rendered PASS.
+Fresh Git archive9c3324e: export, resource55 и оба startup PASS, без копирования
+build/cache/research. Gate fixture имеет известный teardown warning2 objects;
+engine/script errors0.
+
+Пользователь подтвердил захват в обычной диагностической сцене до последнего
+исправления движения. Полный новый feel с запущенным оригиналом не сравнивался.
+Частицы, размер ресурса в руке, часть object/special-state paths, aftertouch
+и полная физика остаются приближёнными/неперенесёнными. Случай freeze помощников
+при zoom с тем же aspect не воспроизведён; исправлена screen placement при resize.
+
+Управление: ЛКМ — камера; ПКМ — Action/свиток/дверь; СКМ или Shift — rotation;
+колесо — zoom. Сбор: holdПКМ, release оставляет ресурс, следующий Action
+передаёт/сбрасывает. Бросок: второй holdПКМ, движение, release.
+Быстрая обычная сцена руки: `build/story-preview/Launch-Hand-Test.cmd`.
+Она диагностическая, не замена сюжету. `Launch-Village-Test.cmd` возвращает
+ручное управление у сюжетной деревни. Открытые старые окна не обновляются.
+
+Следующее: сравнить ordinary hand/camera/object feel с реальным оригиналом,
+не подменяя это численными PASS; уточнить source gating и additive reference.
+Проверить исходный пользовательский эпизод BW-003. Продолжать первый остров:
+остальные ключи/задания, ворота и настоящий выбор существа. Неперенесённый native
+должен оставлять bytecode pending и сообщать действительную операцию.
+
+## Предыдущий checkpoint: Preview 9.2 (история)
 
 Восстановлено видимое заполнение обоих складов первого острова: исходное зерно,
 пять моделей древесины, настоящие ExtraMetrics anchors и единый stock для
