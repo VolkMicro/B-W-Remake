@@ -175,7 +175,7 @@ func capture_frame(label: String) -> void:
 
 func drag(from: Vector2, to: Vector2, right := false) -> void:
 	var press := InputEventMouseButton.new()
-	press.button_index = MOUSE_BUTTON_RIGHT if right else MOUSE_BUTTON_LEFT
+	press.button_index = MOUSE_BUTTON_MIDDLE if right else MOUSE_BUTTON_LEFT
 	press.position = from
 	press.pressed = true
 	world._unhandled_input(press)
@@ -204,9 +204,9 @@ func drive_camera_input() -> void:
 		var sign := -1.0 if world.pitch > PI / 3.0 else 1.0
 		drag(center, center + Vector2(0, sign * 30), true)
 		return
-	if world._right_down:
+	if world._middle_down:
 		var release := InputEventMouseButton.new()
-		release.button_index = MOUSE_BUTTON_RIGHT
+		release.button_index = MOUSE_BUTTON_MIDDLE
 		release.pressed = false
 		release.position = center
 		world._unhandled_input(release)
@@ -231,7 +231,7 @@ func drive_camera_input() -> void:
 		var doorway: Vector3 = world.story_citadel.entrance_position()
 		if not world.cam.is_position_behind(doorway):
 			var click := InputEventMouseButton.new()
-			click.button_index = MOUSE_BUTTON_LEFT
+			click.button_index = MOUSE_BUTTON_RIGHT
 			click.pressed = true
 			click.double_click = true
 			click.position = world.cam.unproject_position(doorway)
@@ -272,7 +272,7 @@ func drive_camera_input() -> void:
 			var screen: Vector2 = world.cam.unproject_position(source_point)
 			if world.focus.distance_to(target.position) < 45.0 and not world.cam.is_position_behind(source_point) and world.get_viewport().get_visible_rect().has_point(screen):
 				var click := InputEventMouseButton.new()
-				click.button_index = MOUSE_BUTTON_LEFT
+				click.button_index = MOUSE_BUTTON_RIGHT
 				click.position = screen
 				click.pressed = true
 				world._unhandled_input(click)
@@ -311,7 +311,7 @@ func drive_camera_input() -> void:
 
 func click_at(screen: Vector2) -> void:
 	var event := InputEventMouseButton.new()
-	event.button_index = MOUSE_BUTTON_LEFT
+	event.button_index = MOUSE_BUTTON_RIGHT
 	event.position = screen
 	event.pressed = true
 	world._unhandled_input(event)

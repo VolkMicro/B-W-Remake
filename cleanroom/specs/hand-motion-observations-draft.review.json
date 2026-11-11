@@ -1,0 +1,52 @@
+{
+  "documentId": "hand-motion-observations-draft",
+  "documentVersion": "0.2",
+  "reviewerRole": "bounded static observations reviewer",
+  "reviewerId": "/root/camera",
+  "reviewedAtUtc": "2026-11-11T12:19:50.2117616Z",
+  "reviewedDocumentSha256": "8E75DBDC720111E2D17110E3EC49E951FC23AB0A3EE793783F2AD5A1B8975E28",
+  "status": "approved_bounded_static_observations",
+  "scope": "reviewed static ordinary-terrain depth, response, facing and installed single-submesh hand normalization observations; not original runtime or complete object behavior certification",
+  "implementationPacketApproved": false,
+  "productCodeWritten": false,
+  "passedReviewCriteria": [
+    "Ordinary depth is radial, uses previous depth scale and caller/user size in the initial radius offset, and separates visible depth cap from internal response.",
+    "Scale breakpoints and example values independently agree with the stated bounded arithmetic.",
+    "Following polynomial and derivative preserve initial velocity and settle with zero terminal velocity; repeated retarget fixtures independently agree.",
+    "Facing uses separate scalar components, later normalization, and a distinct scheduling input; normal path gates are not universalized.",
+    "Root placement precedes skeletal animation without inferred animated-tip subtraction in the bounded path.",
+    "Private constructor and matrix/load evidence supports checked default maximum1800, initial scales1 and later SetSize1 without universal lifetime claims.",
+    "Private bind-transform instructions compare Y translations with both extrema initially zero; current installed22-bone single-submesh data agrees with the independent reader measurement.",
+    "Normalization span555.294372558594 yields model factor0.005762709218996 at unit scales; AABB height and half-diagonal are correctly distinguished.",
+    "No raw disassembly, decompiler bodies, function addresses or original assets are included in this review."
+  ],
+  "independentlyCheckedFixtures": {
+    "firstDepth": 21.56871847378407,
+    "firstVelocity": 180.5092785413485,
+    "sixFrameDepth": 51.308837356448144,
+    "twelveFrameDepth": 82.86689845456883,
+    "bindBoneSpan": 555.294372558594,
+    "modelFactorAtUnitScale": 0.005762709218995987
+  },
+  "integrationReview": {
+    "ordinaryTerrainAdapter": "Static code review agrees with radial root placement, previous-output-scale response and zero-seeded bind span normalization.",
+    "cameraComment": "Accurately distinguishes independently verified horizontal70 software initialization from the remake decision to use aspect-correct widescreen rendering; original D3D fixed4:3 raster stretch is excluded explicitly.",
+    "remainingTestIssue": "The obsolete pixel-size assertion has been replaced in the current test source with the flat10..150 scale law and authored finger motion with fixed root; this reviewer did not rerun the scene test."
+  },
+  "recommendedIntegrationAssertions": [
+    "Use actual hand asset and assert zero-seeded bind span555.294372558594 and uniform basis magnitude3.2/span times independently computed depth scale.",
+    "On ordinary terrain, seed depth20 then sample distance103.2 at1/60s; assert root radius21.56871847378407 and velocity180.5092785413485, root collinear with currentray, then repeated6/12-frame golden radii.",
+    "A nearer sample distance23.2 at dt0 caps visible radius20 while internal state100 remains; follow with0.1s settling, using the actual adapter.",
+    "Hold camera, contact and orientation fixed while advancing authored hand animation; root staysfixed while actual skinned tip or body vertices move, catching animated-tip compensation.",
+    "Use synthetic camera-space points and4:3/16:9 resize to assert the stated horizontal-FOV ray/projection contract; compare actual mesh projections without requiring fixed pixel size.",
+    "Keep held grip attachment and real terrain/collider checks as independent integration behavior, without treating them as original object-path certification."
+  ],
+  "limitations": [
+    "Reviewer uses the contaminated coordinator checkout as explicitly permitted; this does not establish clean implementation provenance.",
+    "Original executable/input loop was not run; observations and decimal fixtures are static or derived, not frame captures or manual playthrough.",
+    "Selected/held-object, special-interface, slow-outward predicates, normal retarget gates, scheduling, HND28 identity and animation-slider equivalence remain incomplete.",
+    "Only the installed checked single-submesh hand normalization is supported; degenerate or different assets need explicit handling.",
+    "Actual runtime FOV overrides and rendering-path use are not established by this motion draft. Its camera unknown is scoped to this motion pass; separate bounded PE projection findings exist.",
+    "This review approves research facts only, not this entire draft as an isolated implementer packet and not the resulting product."
+  ]
+}

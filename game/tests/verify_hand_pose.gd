@@ -66,7 +66,7 @@ func run() -> void:
 		if state == "hold":
 			check(bounds.has_point(geometry["grip"]) and (geometry["grip"] as Vector3).distance_to(geometry["pointer"]) > 0.1, "holding uses a distinct pinch point between the actual thumb and index pads")
 		if state == "hover":
-			var tilted := controller.sample(0.0, Vector2(70, -60))
+			var tilted := controller.sample(0.0, Vector2(0.0625, 0.875))
 			check(difference(pose, tilted) > 0.01, "original mouse-lag LR/FB sliders animate hovering fingers and wrist")
 		if state == "point":
 			check(controller.bone_position(Hand.INDEX_TIP_BONE, pose).y > controller.bone_position(16, pose).y + 100.0, "source pointing clip leaves index finger extended while middle finger bends")

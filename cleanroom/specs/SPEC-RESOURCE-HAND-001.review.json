@@ -1,0 +1,66 @@
+{
+  "specId": "SPEC-RESOURCE-HAND-001",
+  "specVersion": 1,
+  "reviewerRole": "specification reviewer",
+  "reviewerId": "/root/hand_packet_review",
+  "reviewedAtUtc": "2026-11-07T16:38:20.6129574Z",
+  "reviewedSpecSha256": "B24083048FC39AD134786662BE84BAFA528CCEED19FE223F22418B88F2FDF52D",
+  "status": "approved",
+  "scope": "new two-component remake API; reviewed bounded static facts with explicitly separate robustness/cosmetic policies",
+  "reviewedInputs": [
+    "SPEC-RESOURCE-HAND-001.md",
+    "resource-hand-observations-draft.md",
+    "resource-hand-observations-draft.review.json"
+  ],
+  "reviewedObservationSha256": "6D007D37B82473DD949A8825D04B4EA0DA241D395031B6465B7D51F065AF348B",
+  "observationsSource": "Existing independently reviewed bounded static observations; this review rechecks their document identity and numerical fixtures, not the raw binary analysis again.",
+  "resolvedReviewFindings": [
+    "Explicit transfer resource in moved signal after an emptying putdown.",
+    "Begin which reaches capacity returns true but stops collection immediately; partial positive begin is not an exhaustion oracle.",
+    "Explicit numeric profile types, finite pre-int quotient, bounded rates and turn duration avoid overflow in contract-valid configurations.",
+    "Saturating accumulation occurs before huge elapsed arithmetic can overflow; timestep equivalence excludes deliberately discarded saturation time.",
+    "Floating turn ratio and tiny boundary-roundoff tolerance are explicit.",
+    "Stream argument avoids shadowing Node3D.scale; initial destination is sampled once and finite derived scale/distance/midpoint are required."
+  ],
+  "passedReviewCriteria": [
+    "Caller-supplied profiles and callbacks are the only accounting inputs; original parsing and input bindings are outside the module.",
+    "Initial25 and cumulative108/413/1746/4546 fixtures match independently recalculated exact rational arithmetic.",
+    "Synchronous source debit and hand credit are distinct from purely cosmetic stream nodes; no second particle wallet.",
+    "Retained hand quantity survives stop, empty/freed source, invalid receiver and partial acceptance.",
+    "Capacity, duplicate give and postcommit moved events have explicit outcomes.",
+    "Recursive mutation is rejected during callbacks and moved observers; snapshot remains permitted.",
+    "256-turn callback budget, retained backlog, bounded saturation and invalid-delta behavior are explicitly new policy.",
+    "Cosmetic arc, dynamic endpoint and64-node bound have observable synthetic acceptance cases and are explicitly not original PSys decoding.",
+    "No filesystem/network/original bytes/legacy implementation/decompiler layout is included in the implementation packet."
+  ],
+  "numericalReview": {
+    "firstTenPortions": [
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      8,
+      9,
+      9,
+      9
+    ],
+    "initial": 25,
+    "method": "Independent Python Fraction arithmetic, in memory only",
+    "totals": {
+      "n100": 4546,
+      "n60": 1746,
+      "n10": 108,
+      "n30": 413
+    },
+    "convention": "Begin initial25 at time0; continuation turns n=1 onward; sufficient source and capacity."
+  },
+  "limitations": [
+    "No product module written or executed during this review.",
+    "Reviewer has inherited coordinator/research context as allowed for specification review; is not a clean implementation worker.",
+    "This approval does not certify runner boundaries, resulting code correctness, physical Action mapping, original particle rendering or legacy provenance.",
+    "Actual data loading, poses, input, terrain, physics, temple entry and original gameplay comparison remain integrator checks.",
+    "Default mouse binding, hand-pot anchors/scale and original PSys trajectories are not established by this packet."
+  ]
+}

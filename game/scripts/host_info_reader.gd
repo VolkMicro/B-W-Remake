@@ -12,6 +12,7 @@ var influence_settings: Dictionary = {}
 var highlights: Array[Dictionary] = []
 var villagers: Array[Dictionary] = []
 var storage_piles: Array[Dictionary] = []
+var hand_resources: Array[Dictionary] = []
 
 
 func load_file(path: String, mesh_count: int) -> bool:
@@ -24,6 +25,7 @@ func load_file(path: String, mesh_count: int) -> bool:
 	highlights.clear()
 	villagers.clear()
 	storage_piles.clear()
+	hand_resources.clear()
 	var f := FileAccess.open(path, FileAccess.READ)
 	if f == null or f.get_buffer(8).get_string_from_ascii() != "LiOnHeAd":
 		return _fail("Original object information is unavailable")
@@ -149,6 +151,21 @@ func _read_info(bytes: PackedByteArray, mesh_count: int) -> bool:
 		if resource != (0 if i == 0 else 1) or mesh >= mesh_count or nominal < 1 or nominal > 2147483647:
 			return _fail("Invalid original storage pile record %d" % i)
 		storage_piles.append({"resource":resource,"mesh_id":mesh,"nominal":nominal})
+	# Original GPotInfo11/12 are HandWood/HandFood, not MagicFood10.
+	# This adapter only reads data; the new controller receives plain profiles.
+	hand_resources.resize(2)
+	for i in 2:
+		var p: int = int(format["hand_pile_offset"]) + i * pot_size
+		if p < 0 or p + 308 > bytes.size(): return _fail("Original hand resource settings are truncated")
+		var resource := bytes.decode_u32(p + 264)
+		var mesh := bytes.decode_u32(p + 248)
+		var row := {"mesh_id":mesh,"nominal":bytes.decode_u32(p + 268),
+			"initial":bytes.decode_u32(p + 288),"rate_start":bytes.decode_u32(p + 292),
+			"rate_end":bytes.decode_u32(p + 296),"maximum":bytes.decode_u32(p + 300),
+			"ramp_seconds":bytes.decode_float(p + 304)}
+		if resource != 1 - i or mesh >= mesh_count or int(row["nominal"]) < 1:
+			return _fail("Original hand resource record is invalid")
+		hand_resources[resource] = row
 	version = format["id"]
 	return true
 
@@ -184,4 +201,5 @@ func _fail(message: String) -> bool:
 	highlights.clear()
 	villagers.clear()
 	storage_piles.clear()
+	hand_resources.clear()
 	return false

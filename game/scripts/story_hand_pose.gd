@@ -81,21 +81,18 @@ func _state_clip(value: String) -> String:
 	return ""
 
 
-func sample(delta: float, motion := Vector2.ZERO) -> Array[Transform3D]:
+func sample(delta: float, sliders := Vector2(0.5, 0.5)) -> Array[Transform3D]:
 	if rig == null or animation.clips.is_empty(): return []
 	_clock += maxf(delta, 0.0)
 	_transition = minf(1.0, _transition + delta / 0.13)
 	var clip := _state_clip(state)
 	var result := animation.sample_adviser(clip, _clock, rig)
-	# Source HandStateNormal layers LR and FB as centred slider differences.
-	# The original smoothing offsets are limited to 80 screen pixels.
-	var sliders := motion.clamp(Vector2(-80, -80), Vector2(80, 80)) / 160.0 + Vector2(0.5, 0.5)
+	# Phases come from the frame-based pointer controller, not event deltas.
+	sliders = sliders.clamp(Vector2.ZERO, Vector2.ONE)
 	animation.apply_adviser_difference(clip + "_lr", sliders.x, 0.5, result, rig)
 	animation.apply_adviser_difference(clip + "_fb", sliders.y, 0.5, result, rig)
 	if _from.size() == result.size() and _transition < 1.0:
-		var blend := _transition * _transition * (3.0 - 2.0 * _transition)
-		for bone in result.size():
-			result[bone] = _from[bone].interpolate_with(result[bone], blend)
+		result = preload("res://scripts/hand_pointer_dynamics.gd").blend_pose(_from, result, _transition)
 	_pose = result
 	return result
 

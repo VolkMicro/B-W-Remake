@@ -1,0 +1,40 @@
+{
+  "timestampUtc": "2026-11-11T07:56:52.2384953Z",
+  "role": "fixed tool-less remote model request; not an OS sandbox certification",
+  "cliVersion": "2.1.311 (Claude Code)",
+  "model": "claude-fable-5-1",
+  "packetSHA256": "77A1C6FD3C9B461FC5112C326F976A4643C355C31D8E1049994DC58A37339DD2",
+  "systemSHA256": "6A895429D252F596CB5050D09F06BE7FB819AF82485518D1B3EDD1AFE6DEDFBF",
+  "auth": "normal single-owner CLI OAuth transport; no credential copying and no credential data in packet/model tools",
+  "safeMode": true,
+  "restrictedMode": true,
+  "tools": [],
+  "mcpServers": [],
+  "builtinPluginNames": [
+    "cc-plugin-sec-default",
+    "cc-plugin-agents-md",
+    "cc-plugin-telemetry",
+    "cc-plugin-plugin-authoring"
+  ],
+  "builtinAgentNames": [
+    "claude",
+    "Explore",
+    "general-purpose",
+    "Plan"
+  ],
+  "agentInvocationToolAvailable": false,
+  "observedToolUses": 0,
+  "permittedEnvelopeFieldNames": [
+    "userEmail",
+    "environment"
+  ],
+  "noSessionPersistence": true,
+  "processExit": 0,
+  "resultSubtype": "success",
+  "acceptedCapabilityBoundary": true,
+  "resultSHA256": "FF3FB87254E319647DECFAE9EF5C7E55A8E9E04056726F3C38C3A57F2752196A",
+  "evidence": "probe-20261107: negative safe-mode canaries absent; positive Read-only normal mode detects exact user/project canaries",
+  "specReview": "SPEC-HAND-SURFACE-MOTION-001.review.json",
+  "standaloneValidation": "Godot4.7.2:124 passed;0 engine/script errors",
+  "sourceSha256": "286D4227A6EEE406E9F40B65F8C99B70D4D758D7C15D281D51B41116E4835741"
+}

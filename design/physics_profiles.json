@@ -3,6 +3,7 @@
   {"id":"rock","radius":2.0,"restitution":0.25,"friction":0.75,"roll":true},
   {"id":"villager","radius":0.7,"restitution":0.0,"friction":0.9,"roll":false},
   {"id":"food","radius":1.0,"restitution":0.05,"friction":0.8,"roll":false},
+  {"id":"resource_pile","radius":1.0,"restitution":0.05,"friction":0.8,"roll":false},
   {"id":"toy","radius":1.0,"restitution":0.3,"friction":0.8,"roll":true},
   {"id":"gate_key","radius":2.0,"restitution":0.25,"friction":0.75,"roll":false}
 ]

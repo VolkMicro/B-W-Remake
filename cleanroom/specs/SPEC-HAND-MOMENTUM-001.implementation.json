@@ -1,0 +1,41 @@
+{
+  "timestampUtc": "2026-11-11T07:12:09.5743553Z",
+  "role": "fixed tool-less remote model request; not an OS sandbox certification",
+  "cliVersion": "2.1.311 (Claude Code)",
+  "model": "claude-opus-5-5",
+  "packetSHA256": "942D313B175EB8CF39B44FBBB387C0E36289B5095F424BE822C98ABF056D2D79",
+  "systemSHA256": "6A895429D252F596CB5050D09F06BE7FB819AF82485518D1B3EDD1AFE6DEDFBF",
+  "auth": "normal single-owner CLI OAuth transport; no credential copying and no credential data in packet/model tools",
+  "safeMode": true,
+  "restrictedMode": true,
+  "tools": [],
+  "mcpServers": [],
+  "builtinPluginNames": [
+    "cc-plugin-sec-default",
+    "cc-plugin-agents-md",
+    "cc-plugin-telemetry",
+    "cc-plugin-plugin-authoring"
+  ],
+  "builtinAgentNames": [
+    "claude",
+    "Explore",
+    "general-purpose",
+    "Plan"
+  ],
+  "agentInvocationToolAvailable": false,
+  "observedToolUses": 0,
+  "permittedEnvelopeFieldNames": [
+    "userEmail",
+    "environment"
+  ],
+  "noSessionPersistence": true,
+  "processExit": 0,
+  "resultSubtype": "success",
+  "acceptedCapabilityBoundary": true,
+  "resultSHA256": "EAD67A658FBB77242DD8BCCB8F82CFD63F98C1E33B2977689D9C5A4E0580F64B",
+  "evidence": "probe-20261107: negative safe-mode canaries absent; positive Read-only normal mode detects exact user/project canaries",
+  "specReview": "SPEC-HAND-MOMENTUM-001.review.json",
+  "standaloneValidation": "Godot4.7.2:133 checks;0 failures;0 engine/script errors",
+  "sourceSha256": "4BA19E1187D18C312A2DD980BB325ADA8B42EF2F990C48A2283994ADADD6DB98",
+  "note": "New tool-less run11Nov; earlier transient run output was unavailable after environment interruption and was not used."
+}

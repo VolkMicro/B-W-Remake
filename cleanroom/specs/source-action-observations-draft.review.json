@@ -1,0 +1,57 @@
+{
+  "document": "source-action-observations-draft.md",
+  "observationsVersion": "0.1",
+  "reviewerRole": "research observations reviewer",
+  "reviewerId": "/root/hand_packet_review",
+  "reviewedAtUtc": "2026-11-07T16:48:09.6742989Z",
+  "reviewedDocumentSha256": "B8611074E6622B915E3DBB744178C17038EEAB865189F6014FD9EF1B3ADA240F",
+  "status": "approved_bounded_static_observations",
+  "implementationPacketApproved": false,
+  "productCodeWritten": false,
+  "originalExecuted": false,
+  "researchManifestSha256": "E67CF24B38D809DEFA6401FB686AD8852BEFDEC6BA9D8AD79E0637BA0561A0B1",
+  "artifactHashesVerified": 39,
+  "artifactHashMismatches": 0,
+  "boundedPasses": [
+    {
+      "evidence": "ACTION-STATIC-20261107-A",
+      "exportedEntries": 8,
+      "failedEntries": 0,
+      "projectSaved": true
+    },
+    {
+      "evidence": "ACTION-STATIC-20261107-B",
+      "exportedEntries": 7,
+      "failedEntries": 0,
+      "projectSaved": true
+    },
+    {
+      "evidence": "ACTION-STATIC-20261107-C",
+      "exportedEntries": 4,
+      "failedEntries": 0,
+      "projectSaved": true
+    }
+  ],
+  "additionalReviewEvidence": {
+    "sha256": "2EAF679D5FC2189C567B95D92EF7A0F259CF6EA620BEB1B8E2AAFFBB93695B50",
+    "id": "ACTION-REVIEW-20261107-A",
+    "description": "Selected original executable mouse-code jump cases independently checked from hash-guarded source bytes;3 checks passed; private artifact outside Git."
+  },
+  "verifiedFacts": [
+    "Defaults associate Move label with mouse-code1 and Action label with mouse-code5 in the reviewed executable instructions.",
+    "Original language table enumeration has6974 ADD_TEXT rows; selected IDs identify Move,Action,LMB,RMB,MMB and the two Tilt/Rotate labels as stated.",
+    "Mouse-code1/2/5 map to held masks1/64/2; reviewed original case bytes independently confirm these masks. Win32 message handling supports ordinary physical LMB/MMB/RMB correspondence.",
+    "Default Tilt/Rotate On stores Shift scan code; key reader aliases both Shift sides. Around Mouse stores mouse-code2 when third-button condition is present, with a separate keyboard fallback branch.",
+    "Profile loading establishes defaults before applying per-action override triples; the installed Profiles tree has0 files. This does not establish a running user profile or left-handed system setting.",
+    "The reviewed temple entrance callback checks context/ownership and starts an interior transition without a local double-click counter. Original help instructs Action on entrance.",
+    "A single Action tap is a supported remake semantic choice; full original dispatcher press/release timing and every external double-click branch are not proved absent."
+  ],
+  "preservedLimits": [
+    "No original executable/input loop was run or manually clicked.",
+    "Whole camera solver and both-primary-button chord behavior derive from separately labelled legacy/text observations, not complete independent current-binary verification.",
+    "No claim of full source camera reproduction, original profile-import support or left-handed mapping.",
+    "Temple hit geometry, held-object priority and temporal tap boundary still require native integration/input tests.",
+    "Research approval does not certify any implementation packet, legacy adapter code or clean-room worker boundary."
+  ],
+  "requiredDraftCorrections": []
+}

@@ -35,6 +35,7 @@ const CitadelConstruction := preload("res://scripts/story_citadel_construction.g
 const StockStore := preload("res://scripts/resource_store.gd")
 var resource_stores: Dictionary = {}
 var storage_views: Dictionary = {}
+var resource_interaction := preload("res://scripts/story_resource_interaction.gd").new()
 const StoryAttachedMusic := preload("res://scripts/story_attached_music.gd")
 const StoryTempleInterior := preload("res://scripts/story_temple_interior.gd")
 var story_temple: StoryTempleInterior
@@ -45,6 +46,7 @@ var _story_demo_holding_wood := false
 var _story_demo_name := ""
 var _story_wood_hand: RefCounted
 var _story_demo_wood_delivered := 0
+var _story_demo_wood_source := Vector3.ZERO
 var story_intro_movie: StoryIntroMovie
 var story_fire_trail: StoryFireTrail
 var story_rescue_hand: StoryRescueHand
@@ -76,6 +78,13 @@ var sun: DirectionalLight3D
 
 var _left_down := false
 var _right_down := false
+var _middle_down := false
+var _shift_camera := false
+var _action_acquired := false
+var _action_release := false
+var _hand_momentum: RefCounted
+var _hand_motion_clock := 0.0
+var _hand_release_time := 0.0
 var _dragging := false
 var _press_pos := Vector2.ZERO
 var _grab_point := Vector3.ZERO
@@ -109,9 +118,15 @@ var _hand_surface := Vector3.ZERO
 var _hand_action := "hover"
 var hand_pose := preload("res://scripts/story_hand_pose.gd").new()
 var _hand_motion := Vector2.ZERO
+var _hand_pointer_dynamics := preload("res://scripts/hand_pointer_dynamics.gd").new()
+var _hand_pointer_phases := Vector2(0.5, 0.5)
 var _hand_zoom_time := 0.0
 var _hand_facing := Vector3.UP
 var _hand_facing_started := false
+var _hand_surface_motion: RefCounted
+var _hand_surface_initialized := false
+var _hand_bind_span := 1.0
+var _hand_render_state: Dictionary = {}
 var _messages: Array[String] = []
 var _msg_timer := 0.0
 
@@ -159,6 +174,8 @@ const ADVISER_LAYER := 1 << 19
 var _adviser_viewport: SubViewport
 var _adviser_view_camera: Camera3D
 var _adviser_targets: Dictionary = {}
+var _adviser_screen_positions: Dictionary = {}
+var _adviser_screen_targets: Dictionary = {}
 var _adviser_tweens: Dictionary = {}
 var _adviser_clinging: Dictionary = {}
 var _adviser_time := 0.0
@@ -174,6 +191,14 @@ const HAND_LENGTH := 16.0 # world units at the default camera distance
 const HAND_HOVER := 7.0
 var _port_tests := false
 var showcase_mode := false
+
+
+func _init() -> void:
+	# Original software projection initializes a horizontal70-degree FOV.
+	# Keep native aspect-correct rendering on wide windows; the original D3D
+	# fixed4:3 raster stretch is not reproduced here.
+	cam.keep_aspect = Camera3D.KEEP_WIDTH
+	cam.fov = 70.0
 
 
 func _ready() -> void:
@@ -232,6 +257,9 @@ func _load_world() -> void:
 	if not host_info.load_file(_p(Data.SOURCES["object_info"]), g3d.mesh_offsets.size()):
 		_say("Не удалось прочитать предметы оригинала: " + host_info.error)
 		return
+	if not resource_interaction.configure(self):
+		_say("Не удалось прочитать управление ресурсами оригинала.")
+		return
 	island.load_file(_p(Data.SOURCES["island_script"]))
 	_build_environment()
 	_build_terrain()
@@ -257,7 +285,7 @@ func _load_world() -> void:
 	_update_camera()
 	loaded = true
 	if story_preview and DisplayServer.get_name() != "headless":
-		get_window().title = "Black & White — реставрация · Preview 9.2"
+		get_window().title = "Black & White — реставрация · Preview 9.3"
 		Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	_load_preservation()
 	var heights := PackedStringArray()
@@ -737,6 +765,11 @@ func _resume_player_camera() -> void:
 		pitch = atan2(offset.y, Vector2(offset.x, offset.z).length())
 	_left_down = false
 	_right_down = false
+	_middle_down = false
+	resource_interaction.stop()
+	_action_release = false
+	if _hand_momentum != null: _hand_momentum.cancel()
+	_hand_surface_initialized = false
 	_dragging = false
 
 
@@ -773,7 +806,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouse:
 		_cursor_screen = event.position
 		if event is InputEventMouseMotion: _hand_motion = event.relative
-		if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]: _hand_zoom_time = 0.25
+		if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+			_hand_zoom_time = 0.25
+			_cancel_pending_fling()
 	if story_inside_temple():
 		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 			story_temple.close()
@@ -787,10 +822,19 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 			get_tree().quit()
 		return
+	if event is InputEventKey and event.keycode == KEY_SHIFT:
+		_shift_camera = event.pressed
+		if event.pressed:
+			_action_release = false
+			resource_interaction.stop()
+			if _hand_momentum != null: _hand_momentum.cancel()
+		return
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
 		if mb.button_index == MOUSE_BUTTON_LEFT:
 			if mb.pressed:
+				if _hand_momentum != null: _hand_momentum.cancel()
+				_action_release = false
 				if mb.double_click and story_citadel_interface and story_citadel != null and story_citadel.progress >= 1.0:
 					if story_citadel.entrance_hit(cam.project_ray_origin(mb.position), cam.project_ray_normal(mb.position)):
 						story_enter_temple()
@@ -804,17 +848,58 @@ func _unhandled_input(event: InputEvent) -> void:
 				_grab_point = ground_point(mb.position)
 			else:
 				_left_down = false
-				if not _dragging and story_interface_level == 0:
-					_click(mb.position)
 		elif mb.button_index == MOUSE_BUTTON_RIGHT:
 			if mb.pressed:
 				_right_down = true
 				_right_moved = 0.0
+				_action_acquired = false
+				_action_release = false
+				if story_interface_level == 0 and not _middle_down and not _shift_camera:
+					var selection := hand_target(mb.position)
+					if held != null or resource_interaction.amount() > 0:
+						_action_release = true
+						_position_carried_at(mb.position)
+						if _hand_momentum == null:
+							_hand_momentum = load("res://scripts/hand_momentum.gd").new()
+							_hand_momentum.configure()
+						_hand_momentum.begin(_carried_position(), _hand_motion_clock)
+					elif story_citadel_interface and story_citadel != null and story_citadel.entrance_hit(cam.project_ray_origin(mb.position), cam.project_ray_normal(mb.position)):
+						story_enter_temple()
+						_right_down = false
+					elif resource_interaction.begin(selection):
+						_action_acquired = true
+					else:
+						_click(mb.position)
+						_action_acquired = held != null
 			else:
 				_right_down = false
-				story_camera_input.set_hand_state(0)
-				if _right_moved < 6.0 and held and story_interface_level == 0:
-					_throw(hand_target(mb.position)["point"])
+				resource_interaction.stop()
+				if _action_release and story_interface_level == 0:
+					_position_carried_at(mb.position)
+					var velocity := Vector3.ZERO
+					if _hand_momentum != null:
+						_hand_momentum.sample(_carried_position(), _hand_motion_clock)
+						velocity = _hand_momentum.finish(_hand_motion_clock)
+					if resource_interaction.amount() > 0: resource_interaction.release(hand_target(mb.position), velocity)
+					elif held != null:
+						if velocity.is_zero_approx(): _click(mb.position)
+						else:
+							var item := held
+							held = null
+							item.velocity = velocity
+							item.launch_from = item.position
+							item.thrown = true
+							item._landed_notified = false
+							item.state = Thing.State.FLYING
+					_hand_release_time = 0.3
+				_action_release = false
+		elif mb.button_index == MOUSE_BUTTON_MIDDLE:
+			_middle_down = mb.pressed
+			if mb.pressed:
+				resource_interaction.stop()
+				_action_release = false
+				if _hand_momentum != null: _hand_momentum.cancel()
+			else: story_camera_input.set_hand_state(0)
 		elif mb.button_index == MOUSE_BUTTON_WHEEL_UP and mb.pressed and story_interface_level in [0, 15]:
 			var previous := dist
 			dist = maxf(dist * 0.88, _camera_min_distance())
@@ -827,16 +912,16 @@ func _unhandled_input(event: InputEvent) -> void:
 			_camera_input_idle = 0.2
 	elif event is InputEventMouseMotion:
 		var mm := event as InputEventMouseMotion
-		if _left_down:
+		if _left_down and not _middle_down and not _shift_camera:
 			if mm.position.distance_to(_press_pos) > 6.0:
 				_dragging = true
 			if _dragging:
 				var now := ground_point(mm.position)
 				focus += Vector3(_grab_point.x - now.x, 0, _grab_point.z - now.z)
 				_update_camera()
-		if _right_down:
+		if _right_down: _right_moved += mm.relative.length()
+		if _middle_down or _shift_camera:
 			_camera_input_idle = 0.2
-			_right_moved += mm.relative.length()
 			if story_interface_level in [0, 13, 14, 15]:
 				var turn := -mm.relative.x * 0.006
 				yaw += turn
@@ -886,7 +971,7 @@ func _process(delta: float) -> void:
 		campaign_status.text = story_intro_movie.error
 	story_camera.advance(delta)
 	_camera_input_idle = maxf(0.0, _camera_input_idle - delta)
-	if _camera_input_idle == 0.0 and not _right_down:
+	if _camera_input_idle == 0.0 and not _middle_down and not _shift_camera:
 		story_camera_input.set_hand_state(0)
 	story_camera_input.advance(delta)
 	story_advance_hand_demo(delta)
@@ -937,10 +1022,20 @@ func _move_player_camera(delta: float) -> void:
 		var fwd := Vector3(-sin(yaw), 0, -cos(yaw))
 		var right := Vector3(cos(yaw), 0, -sin(yaw))
 		focus += (fwd * -mv.y + right * mv.x) * dist * 0.9 * delta
+	if mv != Vector2.ZERO or rotation_delta != 0.0: _cancel_pending_fling()
+
+
+func _cancel_pending_fling() -> void:
+	_action_release = false
+	resource_interaction.stop()
+	if _hand_momentum != null: _hand_momentum.cancel()
 
 
 func _update_world(delta: float) -> void:
 	_sync_adviser_view()
+	_hand_motion_clock += maxf(delta, 0.0)
+	_hand_release_time = maxf(0.0, _hand_release_time - maxf(delta, 0.0))
+	resource_interaction.advance(delta)
 	for id in storage_views.keys():
 		var view: Node3D = storage_views[id]
 		if not is_instance_valid(view):
@@ -956,6 +1051,7 @@ func _update_world(delta: float) -> void:
 	if story_hand_demo.playing:
 		mouse = story_hand_demo.pose()["cursor"] * get_viewport().get_visible_rect().size
 	var hand_active := story_camera.owner_task == 0 or story_hand_demo.playing
+	if hand_active: _sample_hand_pointer(delta, mouse)
 	var selection: Dictionary = hand_target(mouse) if hand_active else {"point":ground_point(mouse),"normal":Vector3.UP,"target":null}
 	var gp: Vector3 = selection["point"]
 	_hand_surface = gp
@@ -963,10 +1059,14 @@ func _update_world(delta: float) -> void:
 	_hovered_scroll = selection.get("scroll") as Node3D
 	if _hovered_scroll != null: _hovered_scroll.set_hovered(true)
 	_hand_action = "hold" if held != null else ("point" if _hovered_scroll != null else "hover")
-	if held == null and _hovered_scroll == null and selection.get("target") is Thing:
+	if _hand_release_time > 0.0: _hand_action = "release"
+	var resource_action := resource_interaction.action()
+	if not resource_action.is_empty(): _hand_action = resource_action
+	if _story_demo_holding_wood: _hand_action = "hold_side"
+	if held == null and resource_interaction.amount() == 0 and not _story_demo_holding_wood and _hovered_scroll == null and selection.get("target") is Thing:
 		_hand_action = "pickup" if selection.has("pickup") and selection["target"].story_pickup_allowed else "point"
 	if _dragging: _hand_action = "drag"
-	if _right_down: _hand_action = "pitch" if absf(_hand_motion.y) > absf(_hand_motion.x) else "rotate"
+	if _middle_down or _shift_camera: _hand_action = "pitch" if absf(_hand_motion.y) > absf(_hand_motion.x) else "rotate"
 	_hand_zoom_time = maxf(0.0, _hand_zoom_time - delta)
 	if _hand_zoom_time > 0.0: _hand_action = "zoom"
 	hand_ring.visible = hand_active
@@ -975,6 +1075,12 @@ func _update_world(delta: float) -> void:
 		held.position = gp + Vector3(0, float(cfg_hand["hold_height"]), 0)
 	if hand_ring.visible and hand_rig != null:
 		_update_hand_pose(delta, selection)
+	if _story_demo_holding_wood and is_instance_valid(_story_demo_wood):
+		_story_demo_wood.position = resource_interaction.grip_point()
+		_story_demo_wood.scale = Vector3.ONE * resource_interaction.model_scale(1, _story_demo_wood.mesh, _story_wood_hand.amount)
+	resource_interaction.advance_visuals(delta)
+	if _right_down and _action_release and _hand_momentum != null:
+		_hand_momentum.sample(_carried_position(), _hand_motion_clock)
 	_hand_motion = _hand_motion.lerp(Vector2.ZERO, 1.0 - exp(-delta * 15.0))
 	for i in towns.size():
 		if not towns[i]["mine"]:
@@ -984,36 +1090,33 @@ func _update_world(delta: float) -> void:
 	_update_story_input_hint(delta)
 	if is_instance_valid(original_music):
 		original_music.set_alignment(alignment)
-	_adviser_time += delta
-	for id in story_adviser_objects.keys():
-		var target: Object = story_adviser_objects[id].get_ref()
-		if is_instance_valid(target):
-			story_adviser_points[id] = target.global_position if target.is_inside_tree() else target.position
-		else:
-			story_adviser_objects.erase(id)
-			story_adviser_points.erase(id)
-	for adviser in adviser_animations:
-		var rig: L3dRig = adviser["rig"]
-		var animation: MorphReader = adviser["animation"]
-		var id: String = adviser["id"]
-		var anchor: Node3D = rig.root.get_parent()
-		var size := get_viewport().get_visible_rect().size
-		var screen := cam.unproject_position(anchor.global_position) / size
-		var point := Vector2.INF
-		var look := Vector2.INF
-		if story_adviser_points.has(id):
-			point = cam.unproject_position(story_adviser_points[id]) / size
-		if story_adviser_looks.has(id):
-			look = cam.unproject_position(story_adviser_looks[id]) / size
-		var voice: AudioStreamPlayer = dialogue._player if id == _speaking_adviser and is_instance_valid(dialogue) else null
-		var pose: RefCounted = adviser["pose"]
-		pose.camera = cam
-		anchor.rotation.y = pose.facing_yaw(screen, _adviser_clinging.get(id, false))
-		rig.apply_local_pose(pose.sample(animation, rig, id, delta, screen, point, look, voice, _adviser_clinging.get(id, false)))
+	_advance_advisers(delta)
 	_save_clock += delta
 	if _save_clock >= float(Data.PORT_RULES["save"]["autosave_seconds"]):
 		_save_clock = 0.0
 		_save_preservation(false)
+
+
+func _carried_position() -> Vector3:
+	return held.position if held != null else resource_interaction.grip_point()
+
+
+func _sample_hand_pointer(delta: float, mouse: Vector2) -> void:
+	# The original lag is sampled once per frame from absolute cursor pixels.
+	# It is independent of how many mouse events arrived during that frame.
+	if _hand_pointer_dynamics.state().is_empty() or delta > 0.25:
+		_hand_pointer_dynamics.reset(mouse)
+	var state: Dictionary = _hand_pointer_dynamics.step(minf(delta, 0.25), mouse)
+	if not state.is_empty(): _hand_pointer_phases = state["sliders"]
+
+
+func _position_carried_at(screen: Vector2) -> void:
+	var selection := hand_target(screen)
+	if held != null: held.position = selection["point"] + Vector3.UP * float(cfg_hand["hold_height"])
+	if hand_rig != null:
+		_hand_action = "hold" if held != null else "hold_side"
+		_update_hand_pose(0.0, selection)
+	resource_interaction.update_visual()
 
 
 func _click(screen: Vector2) -> void:
@@ -1039,7 +1142,8 @@ func _click(screen: Vector2) -> void:
 		if not has_influence(gp):
 			_say("Это вне вашего влияния.")
 			return
-		held.position = gp + Vector3(0, 5, 0)
+		# Release from the visible grip, just as a fling does. The body must
+		# fall through physics rather than jump to a second ground anchor.
 		held.velocity = Vector3.ZERO
 		held.thrown = false
 		held.state = Thing.State.FLYING
@@ -1101,6 +1205,14 @@ func hand_target(screen: Vector2) -> Dictionary:
 	if not hit.is_empty():
 		result = hit
 		distance = origin.distance_to(hit["point"])
+	var source_node := result.get("target") as Node3D
+	var source_visual := result.get("visual") as MeshInstance3D
+	if source_node != null and story_resource_store(source_node) != null:
+		var resource_index := int(source_visual.get_meta("resource_index", -1)) if source_visual != null else -1
+		if source_node.get_meta("loose_resource", false): resource_index = int(source_node.get_meta("resource_index", -1))
+		if resource_index in [0, 1]:
+			result["resource"] = resource_index
+			return result
 	if held != null and story_gate_plinth != null and result.get("target") != story_gate_plinth.landmark:
 		var record := host_info.record(int(held.get_meta("story_mobile_subtype", -1)))
 		if story_gate_plinth.can_accept(record):
@@ -1125,67 +1237,66 @@ func hand_target(screen: Vector2) -> Dictionary:
 			if pickup != null:
 				if result.get("target") == pickup: result["pickup"] = pickup
 				else: result = {"point":pickup.position + Vector3(0, 1.5, 0),"normal":Vector3.UP,"target":pickup,"pickup":pickup,"cursor_plane":true}
+				if pickup.get_meta("loose_resource", false):
+					result["resource"] = int(pickup.get_meta("resource_index", -1))
+					result.erase("pickup")
 	return result
 
 
 func _update_hand_pose(delta: float, selection: Dictionary) -> void:
 	hand_pose.set_state(_hand_action)
-	var pose: Array[Transform3D] = hand_pose.sample(delta, _hand_motion)
+	var pose: Array[Transform3D] = hand_pose.sample(delta, _hand_pointer_phases)
 	if pose.is_empty(): return
 	var contact: Vector3 = selection["point"]
 	var normal: Vector3 = selection["normal"]
+	if resource_interaction.amount() > 0 or _story_demo_holding_wood:
+		contact += Vector3.UP * float(cfg_hand["hold_height"])
+		normal = Vector3.UP
 	if held != null:
 		var top := Vector3.ZERO
 		for offset in world_geometry.body_offsets(held):
 			if offset.y > top.y: top = offset
-		contact = held.position + Vector3(0, top.y, 0)
+		contact = selection["point"] + Vector3.UP * (float(cfg_hand["hold_height"]) + top.y)
 		normal = Vector3.UP
-	var towards_eye := (cam.position - contact).normalized()
+	var towards_eye := (cam.global_position - contact).normalized()
+	# Object-specific source clearance predicates are not all restored. Keep
+	# their existing selection-normal adapter separate from the verified scalar law.
 	if held == null and selection.get("target") != null:
 		if selection.has("scroll") or selection.has("cursor_plane"): normal = towards_eye
-		# Original ObtainRequiredHandPosition, 0x5B6808: its normal points
-		# along the ray, opposite our BVH's normal. Bias toward viewer and up.
 		normal = (normal + towards_eye * 0.25 + Vector3.UP * 0.5).normalized()
-	if not _hand_facing_started:
-		_hand_facing = normal
-		_hand_facing_started = true
-	else:
-		# Source smooths three normal components independently. Normalized lerp
-		# also avoids an unstable axis-angle for almost parallel float32 normals.
-		var smoothed := _hand_facing.lerp(normal, 1.0 - exp(-maxf(delta, 0.0) / 0.13))
-		_hand_facing = smoothed.normalized() if smoothed.length_squared() > 0.000001 else normal
-	var depth := maxf(0.5, -cam.to_local(contact).z)
-	var pixels := get_viewport().get_visible_rect().size.y / 900.0 * 76.0
-	var units := cam.project_position(Vector2(1, 1), depth).distance_to(cam.project_position(Vector2(1, 2), depth))
-	var scale := pixels * units / maxf(hand_rig.bounds.get_longest_axis_size(), 1.0)
+	var distance := cam.global_position.distance_to(contact)
+	if distance <= 0.00001 or not normal.is_finite(): return
+	if _hand_surface_motion == null:
+		_hand_surface_motion = preload("res://scripts/hand_surface_motion.gd").new()
+		_hand_surface_motion.configure(1800.0, 1.0)
+		var low := 0.0
+		var high := 0.0
+		for rest in hand_rig.global_rests:
+			low = minf(low, rest.origin.y)
+			high = maxf(high, rest.origin.y)
+		_hand_bind_span = maxf(high - low, 0.0001)
+	if not _hand_surface_initialized:
+		_hand_surface_motion.reset(distance, Vector3.UP)
+		_hand_surface_initialized = true
+	_hand_render_state = _hand_surface_motion.step(maxf(delta, 0.0), maxf(delta, 0.0), distance, normal)
+	if _hand_render_state.is_empty(): return
+	_hand_facing = _hand_render_state["normal"]
+	_hand_facing_started = true
 	var cursor_ray := -towards_eye
 	var orientation: Basis = hand_pose.source_orientation(atan2(cursor_ray.x, cursor_ray.z), _hand_facing, true)
-	var geometry: Dictionary = hand_pose.geometry(orientation, pose)
-	var anchor: Vector3 = geometry["grip"] if held != null else geometry["anchor"]
-	var origin := Vector3.ZERO
-	# Move toward the eye along the cursor ray to clear surfaces. Raising only
-	# world Y shifts the visible fingertip away from the place a click will hit.
-	for iteration in 4:
-		origin = contact - anchor * scale
-		var source_bounds: AABB = geometry["bounds"]
-		var bounds := AABB(source_bounds.position * scale, source_bounds.size * scale)
-		var raise := maxf(0.04, bounds.get_longest_axis_size() * 0.025)
-		for i in 8:
-			var point := origin + bounds.get_endpoint(i)
-			raise = maxf(raise, maxf(ground_y(point), sea_y) + 0.04 - point.y)
-		raise = maxf(raise, world_geometry.vertical_clearance(AABB(origin + bounds.position, bounds.size)))
-		if towards_eye.y > 0.1:
-			origin += towards_eye * minf(raise / towards_eye.y, contact.distance_to(cam.position) * 0.75)
-		else: origin.y += raise
-		var actual_depth := maxf(0.5, -cam.to_local(origin + anchor * scale).z)
-		# units are proportional to depth. Iterate the clearance/size solution,
-		# then retain the scale used to compute this final placement.
-		var corrected := pixels * units * actual_depth / depth / maxf(hand_rig.bounds.get_longest_axis_size(), 1.0)
-		if iteration == 3 or absf(corrected - scale) < scale * 0.005: break
-		scale = corrected
-	var basis := orientation.scaled_local(Vector3.ONE * scale)
+	# Source matrix translation is the radial root point. Do not subtract the
+	# animated fingertip each frame: that cancels the authored hand displacement.
+	var origin := cam.global_position + cursor_ray * float(_hand_render_state["render_depth"])
+	# Native model normalization comes from the vertical bind-bone span,
+	# including zero, rather than AABB radius, raw mesh height or pixel size.
+	var scale := 3.2 / _hand_bind_span * float(_hand_render_state["scale"])
 	hand_rig.apply_local_pose(pose)
-	hand_rig.root.transform = Transform3D(basis, origin)
+	hand_rig.root.global_transform = Transform3D(orientation.scaled_local(Vector3.ONE * scale), origin)
+	if held != null:
+		var top_y := 0.0
+		for offset in world_geometry.body_offsets(held): top_y = maxf(top_y, offset.y)
+		var grip := hand_rig.root.global_transform * hand_pose.grip_position(pose)
+		held.position = grip - Vector3.UP * top_y
 	for visual in hand_rig.root.get_children():
 		if visual is MeshInstance3D: visual.transparency = 0.0 if has_influence(contact) else 0.5
 
@@ -1395,8 +1506,7 @@ func _build_hud() -> void:
 	dialogue_caption.add_theme_color_override("font_outline_color", Color.BLACK)
 	dialogue_caption.add_theme_constant_override("outline_size", 6)
 	hud.add_child(dialogue_caption)
-	help_label.text = "Left click: pick up / put down   Left drag: move the land   Right click: throw   Right drag or Q/E: turn   Wheel: zoom   Space: home"
-	help_label.text = "ЛКМ: взять / положить · тянуть: камера · ПКМ: бросить / вращать · колесо: масштаб · C: следовать · R/F: похвала/наказание · F5/F9: сохранить/загрузить"
+	help_label.text = "ПКМ: действие / взять / положить · удерживать на ресурсе: собирать · ЛКМ: камера · СКМ или Shift: поворот · колесо: масштаб"
 	help_label.add_theme_font_size_override("font_size", 20)
 	help_label.anchor_top = 1.0
 	help_label.anchor_bottom = 1.0
@@ -1773,16 +1883,17 @@ func story_appear_adviser(spirit: int, fly := false) -> bool:
 	if adviser == null:
 		return false
 	var id := "good" if spirit == 1 else "evil"
-	var target: Vector3 = _adviser_targets.get(id, adviser.position)
+	var target: Vector2 = _adviser_screen_targets.get(id, story_adviser_screen_position(adviser.position))
 	if _adviser_tweens.has(id) and _adviser_tweens[id].is_valid():
 		_adviser_tweens[id].kill()
 	if fly:
 		if not adviser.visible:
-			adviser.position = target + Vector3(-8.0 if target.x < 0.0 else 8.0, 0.0, 0.0)
+			var outside := story_adviser_local_position(target) + Vector3(-8.0 if target.x < 0.5 else 8.0, 0.0, 0.0)
+			story_set_adviser_screen(story_adviser_screen_position(outside), id)
 		_adviser_tweens[id] = create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
-		_adviser_tweens[id].tween_property(adviser, "position", target, 0.6)
+		_adviser_tweens[id].tween_method(story_set_adviser_screen.bind(id), _adviser_screen_positions[id], target, 0.6)
 	else:
-		adviser.position = target
+		story_set_adviser_screen(target, id)
 	adviser.show()
 	return true
 
@@ -1800,7 +1911,7 @@ func story_hide_adviser(spirit: int, fly := false) -> bool:
 		var destination := adviser.position + Vector3(-8.0 if adviser.position.x < 0.0 else 8.0, 0.0, 0.0)
 		var tween := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN)
 		_adviser_tweens[id] = tween
-		tween.tween_property(adviser, "position", destination, 0.6)
+		tween.tween_method(story_set_adviser_screen.bind(id), _adviser_screen_positions[id], story_adviser_screen_position(destination), 0.6)
 		tween.tween_callback(adviser.hide)
 	else:
 		adviser.hide()
@@ -1817,16 +1928,17 @@ func story_move_adviser(spirit: int, screen: Vector2, clinging := false) -> bool
 		return false
 	if not screen.is_finite():
 		return story_hide_adviser(spirit)
-	var target := cam.to_local(cam.project_position(screen * get_viewport().get_visible_rect().size, 10.0))
+	var target := story_adviser_local_position(screen)
 	_adviser_targets[id] = target
+	_adviser_screen_targets[id] = screen
 	if _adviser_tweens.has(id) and _adviser_tweens[id].is_valid():
 		_adviser_tweens[id].kill()
 	if not adviser.visible:
-		adviser.position = Vector3(target.x * 2.0, target.y, target.z)
+		story_set_adviser_screen(story_adviser_screen_position(Vector3(target.x * 2.0, target.y, target.z)), id)
 	adviser.show()
 	var tween := create_tween().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	_adviser_tweens[id] = tween
-	tween.tween_property(adviser, "position", target, 0.6)
+	tween.tween_method(story_set_adviser_screen.bind(id), _adviser_screen_positions[id], screen, 0.6)
 	return true
 
 
@@ -1891,6 +2003,8 @@ func _build_advisers() -> void:
 		visual.position.y = -reader.bounds.position.y * scale_f
 		anchor.position = Vector3(float(row["side"]) * 5.7, -3.1, -10)
 		_adviser_targets[id] = anchor.position
+		_adviser_screen_positions[id] = story_adviser_screen_position(anchor.position)
+		_adviser_screen_targets[id] = _adviser_screen_positions[id]
 		cam.add_child(anchor)
 		anchor.visible = not story_preview
 		adviser_nodes.append(anchor)
@@ -1939,6 +2053,74 @@ func _sync_adviser_view() -> void:
 	_adviser_viewport.size = Vector2i(get_viewport().get_visible_rect().size)
 	_adviser_view_camera.global_transform = cam.global_transform
 	_adviser_view_camera.fov = cam.fov
+	_adviser_view_camera.projection = cam.projection
+	_adviser_view_camera.keep_aspect = cam.keep_aspect
+	_adviser_view_camera.size = cam.size
+	_adviser_view_camera.frustum_offset = cam.frustum_offset
+	_adviser_view_camera.h_offset = cam.h_offset
+	_adviser_view_camera.v_offset = cam.v_offset
+	for id in _adviser_screen_positions:
+		story_set_adviser_screen(_adviser_screen_positions[id], id)
+		_adviser_targets[id] = story_adviser_local_position(_adviser_screen_targets[id])
+
+
+func story_adviser_half_extents(depth: float) -> Vector2:
+	# Use the current viewport dimensions directly. Camera3D's cached projection
+	# can still describe the previous aspect during startup or a resize callback.
+	var viewport_size := get_viewport().get_visible_rect().size
+	var aspect := viewport_size.x / maxf(viewport_size.y, 1.0)
+	var half := tan(deg_to_rad(cam.fov) * 0.5) * depth if cam.projection == Camera3D.PROJECTION_PERSPECTIVE else cam.size * 0.5
+	return Vector2(half * aspect, half) if cam.keep_aspect == Camera3D.KEEP_HEIGHT else Vector2(half, half / aspect)
+
+
+func story_adviser_local_position(screen: Vector2) -> Vector3:
+	if cam.projection == Camera3D.PROJECTION_FRUSTUM:
+		return cam.to_local(cam.project_position(screen * get_viewport().get_visible_rect().size, 10.0))
+	var half := story_adviser_half_extents(10.0)
+	return Vector3((screen.x * 2.0 - 1.0) * half.x + cam.h_offset, (1.0 - screen.y * 2.0) * half.y + cam.v_offset, -10.0)
+
+
+func story_adviser_screen_position(local: Vector3) -> Vector2:
+	if cam.projection == Camera3D.PROJECTION_FRUSTUM:
+		return cam.unproject_position(cam.to_global(local)) / get_viewport().get_visible_rect().size
+	var half := story_adviser_half_extents(-local.z)
+	return Vector2(0.5 + (local.x - cam.h_offset) / (2.0 * half.x), 0.5 - (local.y - cam.v_offset) / (2.0 * half.y))
+
+
+func story_set_adviser_screen(screen: Vector2, id: String) -> void:
+	_adviser_screen_positions[id] = screen
+	var adviser := cam.get_node_or_null("Adviser_" + id) as Node3D
+	if adviser != null:
+		adviser.position = story_adviser_local_position(screen)
+
+
+func _advance_advisers(delta: float) -> void:
+	_adviser_time += delta
+	for id in story_adviser_objects.keys():
+		var target: Object = story_adviser_objects[id].get_ref()
+		if is_instance_valid(target):
+			story_adviser_points[id] = target.global_position if target.is_inside_tree() else target.position
+		else:
+			story_adviser_objects.erase(id)
+			story_adviser_points.erase(id)
+	for adviser in adviser_animations:
+		var rig: L3dRig = adviser["rig"]
+		var animation: MorphReader = adviser["animation"]
+		var id: String = adviser["id"]
+		var anchor: Node3D = rig.root.get_parent()
+		var size := get_viewport().get_visible_rect().size
+		var screen := cam.unproject_position(anchor.global_position) / size
+		var point := Vector2.INF
+		var look := Vector2.INF
+		if story_adviser_points.has(id):
+			point = cam.unproject_position(story_adviser_points[id]) / size
+		if story_adviser_looks.has(id):
+			look = cam.unproject_position(story_adviser_looks[id]) / size
+		var voice: AudioStreamPlayer = dialogue._player if id == _speaking_adviser and is_instance_valid(dialogue) else null
+		var pose: RefCounted = adviser["pose"]
+		pose.camera = cam
+		anchor.rotation.y = pose.facing_yaw(screen, _adviser_clinging.get(id, false))
+		rig.apply_local_pose(pose.sample(animation, rig, id, delta, screen, point, look, voice, _adviser_clinging.get(id, false)))
 
 
 func _spawn_food() -> void:
@@ -2069,7 +2251,7 @@ func _update_story_input_hint(delta: float) -> void:
 		# Display that same counter; the HUD never advances the objective itself.
 		var required := StoryVm.as_float(task["locals"][3])
 		var completed := clampf(story_camera_input.total(event) - (required - needed), 0.0, needed + 1.0) if required > 0.0 else 0.0
-		instructions = "Зажмите ПКМ и двигайте мышь влево / вправо" if event == 25 else ("Зажмите ПКМ и двигайте мышь вверх / вниз" if event == 28 else "Крутите колесо мыши — приближение / отдаление")
+		instructions = "Зажмите СКМ или Shift и двигайте мышь влево / вправо" if event == 25 else ("Зажмите СКМ или Shift и двигайте мышь вверх / вниз" if event == 28 else "Крутите колесо мыши — приближение / отдаление")
 		instructions += " · %d%%" % int(completed / (needed + 1.0) * 100.0)
 		break
 	if not _tutorial_last.is_empty() and current != _tutorial_last:
@@ -2087,9 +2269,9 @@ func _update_story_input_hint(delta: float) -> void:
 	elif _tutorial_hint_time > 0.0:
 		help_label.text = _tutorial_completed_hint
 	elif story_citadel_interface and story_citadel != null and story_citadel.progress >= 1.0:
-		help_label.text = "Дважды нажмите ЛКМ на дверь храма, чтобы войти · ПКМ: поворот · колесо: масштаб"
+		help_label.text = "Нажмите ПКМ на дверь храма, чтобы войти · СКМ или Shift: поворот · колесо: масштаб"
 	else:
-		help_label.text = "Тяните землю с зажатой ЛКМ · ПКМ: поворот и наклон · колесо: масштаб"
+		help_label.text = "ПКМ: действие · тяните землю с ЛКМ · СКМ или Shift: поворот и наклон · колесо: масштаб"
 
 
 func _save_preservation(announce := true) -> bool:
@@ -2281,7 +2463,7 @@ func story_advance_hand_demo(delta: float) -> void:
 	story_camera.focus = pose["focus"]
 	if _story_demo_name == "givewood" and is_inside_tree():
 		for action in story_hand_demo.take_actions():
-			_story_wood_hand.advance(maxf(float(action["time"]) - interval_start, 0.0))
+			_advance_demo_wood(maxf(float(action["time"]) - interval_start, 0.0))
 			interval_start = float(action["time"])
 			if action["event"] == "action_pressed":
 				if _story_wood_hand.amount == 0:
@@ -2289,31 +2471,38 @@ func story_advance_hand_demo(delta: float) -> void:
 					if story_construction == null or binding.get("type", 0) != 16 or binding.get("subtype", -1) != 5:
 						continue
 					var source_point: Vector3 = binding["position"]
+					_story_demo_wood_source = source_point
 					if not _story_wood_hand.begin(func(requested: int) -> int: return story_construction.take_storage_wood(source_point, requested)):
 						continue
-					var mesh := g3d.mesh("MSH_O_WOOD_INHAND")
+					var mesh := g3d.mesh_index(host_info.hand_resources[1]["mesh_id"]) if host_info.hand_resources.size() == 2 else g3d.mesh("MSH_O_WOOD_INHAND")
 					if mesh != null:
 						_story_demo_wood = MeshInstance3D.new()
 						_story_demo_wood.mesh = mesh
 						_story_demo_wood.scale = Vector3.ONE * (6.0 / maxf(mesh.get_aabb().get_longest_axis_size(), 0.001))
 						add_child(_story_demo_wood)
+						resource_interaction.show_transfer(1, source_point, func() -> Vector3: return resource_interaction.grip_point())
 				else:
 					var carried: int = _story_wood_hand.take_all()
 					_story_demo_wood_delivered += story_construction.add_wood(carried)
 					_log_test("wood_demo", "delivered %d actual wood to the building site" % carried)
 					if is_instance_valid(_story_demo_wood):
-						var dropped := _story_demo_wood
-						var tween := create_tween()
-						tween.tween_property(dropped, "position:y", ground_y(dropped.position) + 1.0, 0.4)
-						tween.tween_callback(dropped.queue_free)
+						resource_interaction.show_transfer(1, _story_demo_wood.global_position, func() -> Vector3: return story_citadel.position + Vector3.UP * 2.0)
+						_story_demo_wood.queue_free()
 			else:
 				# Releasing stops collection; it does not release the held resource.
 				_story_wood_hand.release()
-		_story_wood_hand.advance(maxf(story_hand_demo.elapsed - interval_start, 0.0))
+		_advance_demo_wood(maxf(story_hand_demo.elapsed - interval_start, 0.0))
 		_story_demo_holding_wood = _story_wood_hand.amount > 0
 		if _story_demo_holding_wood and is_instance_valid(_story_demo_wood):
-			var hand: Vector3 = pose["hand"]
-			_story_demo_wood.position = hand if hand.is_finite() else ground_point(pose["cursor"] * get_viewport().get_visible_rect().size) + Vector3.UP * 8.0
+			if hand_rig != null:
+				_story_demo_wood.position = resource_interaction.grip_point()
+
+
+func _advance_demo_wood(delta: float) -> void:
+	var before: int = _story_wood_hand.amount
+	_story_wood_hand.advance(delta)
+	if _story_wood_hand.amount > before:
+		resource_interaction.show_transfer(1, _story_demo_wood_source, func() -> Vector3: return resource_interaction.grip_point())
 
 
 func story_intro_effect(command: int) -> bool:

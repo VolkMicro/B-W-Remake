@@ -1,0 +1,70 @@
+{
+  "specId": "SPEC-HAND-POINTER-DYNAMICS-001",
+  "specVersion": 1,
+  "reviewerRole": "specification reviewer",
+  "reviewerId": "/root/camera",
+  "reviewedAtUtc": "2026-11-11T12:23:38.0061065Z",
+  "reviewedSpecSha256": "62329DA4C396696D2D35096BF8BB0FC8E9A8E4DD9641D180244F7F351F247579",
+  "status": "approved",
+  "scope": "bounded pure cursor-lag, returned animation slider phases and component-linear pose blending; explicit new remake defensive API policies; not full original input/state scheduling certification",
+  "productCodeWritten": false,
+  "specificationEdited": false,
+  "passedReviewCriteria": [
+    "Caller supplies current cursor and one frame delta; event count and raw event-relative motion do not enter the component.",
+    "Private cursor constants and bounded instruction evidence establish position advance then clamp, gain20, damping pow(.03,dt), opposite LR/FB signs and returned normalized phases.",
+    "Private damping-call shim confirms pow argument order rather than exponential rate substitution.",
+    "Private blend loop uses12 scalar components per transform with elapsed/.13 phase; no smoothstep, quaternion conversion or normalization.",
+    "Reset, initial empty state, repeated replacement, detached snapshots and invalid atomic rejection are unambiguous.",
+    "Cursor component bounds and dt>.25 rejection are explicitly new pause/stall defensive policy, not original constants.",
+    "Independent first and second frame fixtures, zero-delta clamp, rotation columns, determinant and translated origin agree.",
+    "State gating, clock advance, clip selection and returned-phase integration remain caller responsibilities."
+  ],
+  "independentNumericalFixtures": {
+    "firstLag": [
+      420.0,
+      300.0
+    ],
+    "firstVelocity": [
+      29.832689186132864,
+      14.916344593066432
+    ],
+    "firstSliders": [
+      0.0,
+      0.75
+    ],
+    "secondLag": [
+      420.5966537837227,
+      300.29832689186134
+    ],
+    "secondVelocity": [
+      57.42235885250153,
+      28.711179426250766
+    ],
+    "secondSliders": [
+      0.0037290861482667027,
+      0.7481354569258667
+    ],
+    "quarterBlendDeterminant": 0.625,
+    "quarterBlendOrigin": [
+      1.0,
+      2.0,
+      3.0
+    ]
+  },
+  "recommendedBoundaryChecks": [
+    "dt=.25 accepted, dt justabove.25 rejected with unchanged state.",
+    "dt0 still clamps both lag axes and recomputes phases without acceleration.",
+    "Blend progress endpoints remain exact for finite input, including large opposite-sign finite components without intermediate overflow.",
+    "Scaled, sheared and reflected bases are mixed componentwise and are not silently orthonormalized.",
+    "Mutating returned snapshots or blended array does not mutate the component or input arrays."
+  ],
+  "limitations": [
+    "Reviewer has contaminated coordinator/research context and is not the clean implementation worker.",
+    "Approval applies only to this exact packet, not resulting implementation, runner isolation or original runtime fidelity.",
+    "Original executable/input loop was not run; fixtures are independent arithmetic, not original recorded frames.",
+    "The original state gates, frozen-period transitions and runtime scheduling remain caller scope.",
+    "The main adapter must feed returned slider phases directly with the stated signs; existing raw per-event motion is not equivalent.",
+    "Normal-hand surface response, geometry, camera projection and model normalization are separate reviewed integration concerns.",
+    "No raw source, decompiler code, function addresses or private asset bytes are included in this review."
+  ]
+}

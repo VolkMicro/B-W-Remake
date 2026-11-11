@@ -1,0 +1,40 @@
+{
+  "timestampUtc": "2026-11-11T12:25:46.0400648Z",
+  "role": "fixed tool-less remote model request; not an OS sandbox certification",
+  "cliVersion": "2.1.311 (Claude Code)",
+  "model": "claude-fable-5-2",
+  "packetSHA256": "62329DA4C396696D2D35096BF8BB0FC8E9A8E4DD9641D180244F7F351F247579",
+  "systemSHA256": "6A895429D252F596CB5050D09F06BE7FB819AF82485518D1B3EDD1AFE6DEDFBF",
+  "auth": "normal single-owner CLI OAuth transport; no credential copying",
+  "safeMode": true,
+  "restrictedMode": true,
+  "tools": [],
+  "mcpServers": [],
+  "builtinPluginNames": [
+    "cc-plugin-sec-default",
+    "cc-plugin-agents-md",
+    "cc-plugin-telemetry",
+    "cc-plugin-plugin-authoring"
+  ],
+  "builtinAgentNames": [
+    "claude",
+    "Explore",
+    "general-purpose",
+    "Plan"
+  ],
+  "observedToolUses": 0,
+  "permittedEnvelopeFieldNames": [
+    "userEmail",
+    "environment"
+  ],
+  "noSessionPersistence": true,
+  "processExit": 0,
+  "resultSubtype": "success",
+  "acceptedCapabilityBoundary": true,
+  "resultSHA256": "B758F8704376FB2E869910BE2436F4E087BF21E6DB84628E44731F7D3D386089",
+  "evidence": "runner-probe-2026-11-07.json; same CLI/flags; no credentials cloned",
+  "specReview": "SPEC-HAND-POINTER-DYNAMICS-001.review.json",
+  "standaloneValidation": "Godot4.7.2:74 checks passed;0 engine/script errors",
+  "sourceSha256": "F3D78505034472042F0B071C309E5D7F998A93FB69734FC66C4BB1EC8BCC0720",
+  "coordinatorChanges": "Module copied unchanged; test preload path changed from minimal-project root to scripts/."
+}

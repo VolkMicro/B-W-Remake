@@ -88,8 +88,10 @@ func run() -> void:
 	check(target.get("target") == plinth and target["point"].y > world.ground_y(target["point"]) + 3.0, "hand cursor lands on the visible pedestal rather than the ground beneath it")
 	world._hand_action = "point"
 	for i in 30: world._update_hand_pose(1.0 / 60.0, target)
-	var pointer := world.hand_rig.root.global_transform * world.hand_pose.pointer_position()
-	check(world.cam.unproject_position(pointer).distance_to(world.cam.unproject_position(target["point"])) < 0.5, "animated fingertip stays aligned with the selectable surface after clearance")
+	var source_ray: Vector3 = (target["point"] - world.cam.global_position).normalized()
+	var rendered_root := world.hand_rig.root.global_position - world.cam.global_position
+	check(rendered_root.cross(source_ray).length() < 0.001 and rendered_root.length() < world.cam.global_position.distance_to(target["point"]), "source hand root follows the current ray with radial surface clearance")
+	check(absf(world._hand_bind_span - 555.294372558594) < 0.001, "actual hand normalization uses bind-bone vertical span")
 	check(world.hand_rig.root.basis.determinant() < 0.0, "ordinary cursor uses the original right-hand reflection")
 	var ground_key := world.to_world(Vector2(1652.78, 2323.02))
 	# Isolate the mobile surface above the original trees, whose real triangles
@@ -111,12 +113,22 @@ func run() -> void:
 	world.cam.position = centre + Vector3(12, 20, 30)
 	world.cam.look_at(centre)
 	await process_frame
-	var near_size := hand_screen_size(world)
+	world._hand_surface_initialized = false
+	for i in 180: world._update_hand_pose(1.0 / 60.0, target)
+	var near_depth: float = world._hand_render_state["render_depth"]
+	var near_scale: float = world.hand_rig.root.basis.get_scale().abs().x
 	world.cam.position = centre + Vector3(36, 60, 90)
 	world.cam.look_at(centre)
-	world._update_hand_pose(0.0, target)
-	var far_size := hand_screen_size(world)
-	check(near_size > 30.0 and far_size > near_size * 0.8 and far_size < near_size * 1.2, "hand maintains its cursor size after clearance at three times the camera distance")
+	for i in 180: world._update_hand_pose(1.0 / 60.0, target)
+	var far_depth: float = world._hand_render_state["render_depth"]
+	var far_scale: float = world.hand_rig.root.basis.get_scale().abs().x
+	check(far_depth > near_depth * 2.0 and is_equal_approx(near_scale, 3.2 / world._hand_bind_span) and is_equal_approx(far_scale, near_scale), "source hand keeps its world scale throughout the ordinary ten-to-150 metre depth band")
+	var root_before: Vector3 = world.hand_rig.root.global_position
+	var pointer_before: Vector3 = world.hand_rig.root.global_transform * world.hand_pose.pointer_position()
+	world._hand_action = "hold_fingers"
+	for i in 15: world._update_hand_pose(1.0 / 60.0, target)
+	var pointer_after: Vector3 = world.hand_rig.root.global_transform * world.hand_pose.pointer_position()
+	check(world.hand_rig.root.global_position.distance_to(root_before) < 0.001 and pointer_after.distance_to(pointer_before) > 0.001, "authored finger animation can move without pinning its tip to the cursor surface")
 	world.cam.position = centre + Vector3(12, 20, 30)
 	world.cam.look_at(centre)
 	world._hand_action = "rotate"
@@ -147,7 +159,7 @@ func run() -> void:
 	for i in 30: world._update_hand_pose(1.0 / 60.0, world.hand_target(padded))
 	var click := InputEventMouseButton.new()
 	click.position = padded
-	click.button_index = MOUSE_BUTTON_LEFT
+	click.button_index = MOUSE_BUTTON_RIGHT
 	world.loaded = true
 	click.pressed = true
 	world._unhandled_input(click)

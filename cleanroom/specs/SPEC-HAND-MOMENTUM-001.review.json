@@ -1,0 +1,38 @@
+{
+  "specId": "SPEC-HAND-MOMENTUM-001",
+  "specVersion": 1,
+  "reviewerRole": "specification reviewer",
+  "reviewerId": "/root/hand_packet_review",
+  "reviewedAtUtc": "2026-11-07T16:57:57.1911247Z",
+  "reviewedSpecSha256": "942D313B175EB8CF39B44FBBB387C0E36289B5095F424BE822C98ABF056D2D79",
+  "status": "approved",
+  "scope": "explicit new remake world-space release-velocity estimator policy; not an original-engine constant or behavior certification",
+  "productCodeWritten": false,
+  "resolvedReviewFindings": [
+    "Require max_speed representable as a finite nonzero Vector3 component.",
+    "State inclusive sample window boundary and FIFO newest64 retention.",
+    "Finish performs validity/staleness checks without inventing a still sample or re-windowing; exact stale boundary remains valid.",
+    "Specify float32 comparison tolerance and a large finite diagonal stable-norm acceptance fixture."
+  ],
+  "passedReviewCriteria": [
+    "Only caller world positions and game-time samples enter the pure RefCounted API.",
+    "Configure, valid begin replacement, invalid begin preservation, timestamp ordering and replacement are explicit.",
+    "Invalid finish always consumes a gesture, and repeated finish/cancel cannot replay momentum.",
+    "Derived nonfinite displacement/velocity returns zero; finite large vectors require stable magnitude clamping.",
+    "Threshold, cap, stale interval,64-sample retention and finite-input outcomes are observable and testable.",
+    "No target point, auto-aim, gravity, physics, scene clock, delayed launch, filesystem or network is provided.",
+    "All constants and window policy are labelled new remake choices; original smoothing and aftertouch remain outside scope."
+  ],
+  "numericalFixture": {
+    "raw": "Vector3(1e30,1e30,0) over1s",
+    "cap": 180,
+    "expectedComponent": 127.27922061357856,
+    "method": "180/sqrt(2), scalar arithmetic; implementation output subject to stated float32 tolerance."
+  },
+  "limitations": [
+    "Reviewer inherits coordinator/research context as allowed for specification review, not clean implementation.",
+    "No product code or test execution in this review.",
+    "Approval does not certify runner isolation, resulting code, original input mapping, original physics or aftertouch.",
+    "Integrator must preserve camera/scene-handoff cancellation and apply release velocity immediately to the held body."
+  ]
+}

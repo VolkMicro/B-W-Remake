@@ -1,0 +1,51 @@
+{
+  "specId": "SPEC-HAND-SURFACE-MOTION-001",
+  "specVersion": 1,
+  "reviewerRole": "specification reviewer",
+  "reviewerId": "/root/camera",
+  "reviewedAtUtc": "2026-11-11T07:52:43.0170848Z",
+  "reviewedSpecSha256": "77A1C6FD3C9B461FC5112C326F976A4643C355C31D8E1049994DC58A37339DD2",
+  "status": "approved",
+  "scope": "bounded pure ordinary-terrain hand surface response and explicit remake robustness policies; not full original hand behavior or runtime fidelity certification",
+  "productCodeWritten": false,
+  "sourceResearchDraftSha256AtReview": "D1605B52E4FEB2A04526EA5DC6D892984A66248905318B37EFF97523D0014192",
+  "sourceResearchDraftIsImplementationInput": false,
+  "resolvedReviewFindings": [
+    "Clarified terminal velocity v=0 rather than ambiguous v0.",
+    "Specified radial Euclidean surface_distance, not camera-forward depth.",
+    "Specified finite large normal normalization without length overflow.",
+    "Specified state before successful reset and exact two-file JSON response shape.",
+    "Made repeated-facing and previous-output-scale fixtures numerically explicit."
+  ],
+  "passedReviewCriteria": [
+    "Pure caller-supplied scalar/vector API has no scenes, animation, meshes, input, assets, filesystem or network.",
+    "Configure/reset/step validation, replacement, unchanged invalid state, and fresh snapshots are defined.",
+    "Every-step retarget preserves raw internal scalar positions and velocities; normalized output is not fed back into facing controllers.",
+    "Depth and facing scheduling inputs remain separate; no unsupported FPS invariance claim.",
+    "Previous-output scale clearance and immediate visible cap are distinct from internal trajectory.",
+    "Maximum1800 is a supported input range, not an original default maximum claim; base scale is caller supplied.",
+    "Independently recomputed scale, derivative, repeated-frame, facing, and cached-scale fixtures from the equations.",
+    "Huge finite durations settle in bounded work; clipping and zero-vector fallback are explicitly new defensive policies."
+  ],
+  "independentNumericalFixtures": {
+    "firstDepth": 21.56871847378407,
+    "firstVelocity": 180.5092785413485,
+    "sixFrameDepth": 51.308837356448144,
+    "twelveFrameDepth": 82.86689845456883,
+    "secondFacingRaw": [
+      0.99609375,
+      0.00390625,
+      0.0
+    ],
+    "firstCachedScaleLimit": 393.77454545454543,
+    "firstCachedScaleOutput": 2.508809441418482,
+    "nextCachedScaleLimit": 391.97180978746087
+  },
+  "limitations": [
+    "Reviewer has coordinator and research context as allowed for review; this is not clean implementer provenance.",
+    "Approval covers this exact specification, not isolation of the implementation runner or resulting code quality.",
+    "Source raw mesh unit normalization, camera projection, object predicates, exceptional states, HND28 identity, input mapping and animation are outside this API.",
+    "Original executable gameplay was not run; derived arithmetic is not a rendered frame comparison or manual playthrough.",
+    "Research draft hash is review context only and may change independently; implementer receives only the approved packet."
+  ]
+}

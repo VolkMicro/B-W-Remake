@@ -90,7 +90,7 @@ func run() -> void:
 	var handle := StoryVm.integer(world.story_bridge.register_object(gold, 37), StoryVm.OBJECT)
 	check(StoryVm.as_int(world.story_bridge.invoke(16, [handle], {})["push"][0]) == 0, "a visible scroll is not considered clicked merely by entering its trigger")
 	var click := InputEventMouseButton.new()
-	click.button_index = MOUSE_BUTTON_LEFT
+	click.button_index = MOUSE_BUTTON_RIGHT
 	click.position = world.cam.unproject_position(gold.visual.global_transform * gold.visual.mesh.get_aabb().get_center())
 	world.loaded = true
 	click.pressed = true
@@ -175,7 +175,7 @@ func source_step(world: Node) -> void:
 func mouse_click(world: Node, screen: Vector2) -> void:
 	var event := InputEventMouseButton.new()
 	event.position = screen
-	event.button_index = MOUSE_BUTTON_LEFT
+	event.button_index = MOUSE_BUTTON_RIGHT
 	world.loaded = true
 	event.pressed = true
 	world._unhandled_input(event)

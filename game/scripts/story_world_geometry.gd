@@ -104,7 +104,7 @@ func _cast(candidates: Array[Dictionary], from: Vector3, to: Vector3, prepared :
 				closest = distance
 				var normal: Vector3 = (transform.basis.inverse().transposed() * hit["normal"]).normalized()
 				if normal.dot(to - from) > 0.0: normal = -normal
-				result = {"target":entry["target"].get_ref(),"point":point,"normal":normal}
+				result = {"target":entry["target"].get_ref(),"visual":entry["visual"].get_ref(),"point":point,"normal":normal}
 			break
 	return result
 

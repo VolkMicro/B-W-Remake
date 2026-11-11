@@ -41,6 +41,7 @@
     "storage_pile_offset": 285688,
     "storage_pile_record_size": 308,
     "storage_pile_record_count": 6,
+    "hand_pile_offset": 288460,
     "verification": "validated on installed 1.2 data"
   }
 ]
