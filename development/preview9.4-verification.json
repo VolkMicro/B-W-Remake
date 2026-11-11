@@ -1,0 +1,452 @@
+{
+  "date": "2026-11-11",
+  "preview": "9.4",
+  "sourceCommit": "4d2460db8d966000a7fdb796d07f0b94b9ea2a18",
+  "status": "verified second-stone checkpoint; first island and campaign incomplete",
+  "engine": "Godot4.7.2 stable ed1daf0bf",
+  "executable": "build/story-preview/GodotIsland-village-preview9.4.exe",
+  "sha256": "BA4AC5D63F015FDB8DA37FC06D71E8D3D1EEDE5123766967B775B96B7AB213A5",
+  "requiresOriginalInstall": true,
+  "completeCampaign": false,
+  "changes": [
+    "Original LostBrother scroll19, injured living brother, authored animation253, rescue/reunion, source GiveReward and physical delivery of existing subtype49.",
+    "Ten additional bounded native bindings (145 total), health/indestructible and drowning state, source wander parameters, script-camera Track39 and source cue59.",
+    "Independent reviewed WeatherZone presentation, with original source configuration and caller-clocked lifetime; new precipitation, shading and falloff policies.",
+    "Animated actor highlight uses live mesh overlay; influence follows moving actors; mode1 actor deletion invalidates handles before a bounded two-second fade.",
+    "Verified NULL GetProperty/Attach/Release cleanup; unsupported deletion modes, nonzero lightning and next-quest native51 remain pending.",
+    "Input route validates actual hand targets and includes bounded failure reporting; no quest flags or actor positions are written by full-route automation."
+  ],
+  "provenance": {
+    "newModule": "WeatherZone",
+    "packet": "cleanroom/specs/SPEC-WEATHER-ZONE-001.md v3",
+    "packetSHA256": "AAD817882322A3BE30E20C1B84C277575C30E8A49FBFD7E9C80C71A2EF5A9B42",
+    "manifest": "cleanroom/specs/SPEC-WEATHER-ZONE-001.implementation.json",
+    "boundary": "Fresh fixed Claude CLI2.1.311 remote request, tools/MCP empty, observed tool calls0; same negative/positive canary probe flags; provider envelope documented. Not OS sandboxing or certification of legacy code.",
+    "adapters": "Main, native, camera, actor, highlight and influence repairs are coordinator/legacy. Claude routine test maintenance received the legacy checkout and has no clean-room claim.",
+    "research": "Ghidra12.1.4/JDK21 static research on installed exe SHA525a6a31ba208ebace5365a10f6afc76c7a76f138722e132b838a2c2c71f1054. Private SecondStone proof-hashes.json covers167 files; no raw exports or assets committed.",
+    "notes": "cleanroom/second-stone-observations-2026-11-11.md"
+  },
+  "checks": [
+    {
+      "test": "verify_camera_path.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_camera_path.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 23,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/second-stone-pack-camera-path.log"
+    },
+    {
+      "test": "verify_story_camera.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_story_camera.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 37,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/second-stone-pack-story-camera.log"
+    },
+    {
+      "test": "verify_story.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_story.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 100,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/second-stone-pack-story.log"
+    },
+    {
+      "test": "verify_influence.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_influence.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 45,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/second-stone-pack-influence.log"
+    },
+    {
+      "test": "verify_item_contacts.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_item_contacts.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 12,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/second-stone-pack-contacts.log"
+    },
+    {
+      "test": "verify_hand_world.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_hand_world.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 20,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/second-stone-pack-hand-world.log"
+    },
+    {
+      "test": "verify_resource_input.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_resource_input.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 55,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/second-stone-pack-resource-input.log"
+    },
+    {
+      "test": "verify_gate_keys.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_gate_keys.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 24,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [
+        "WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details)."
+      ],
+      "log": "scratch/second-stone-pack-gate-keys.log"
+    },
+    {
+      "test": "verify_story_scrolls.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_story_scrolls.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection",
+        "--deliver-key"
+      ],
+      "passed": 27,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [
+        "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details)."
+      ],
+      "log": "scratch/second-stone-pack-scrolls.log"
+    },
+    {
+      "test": "verify_citadel_construction.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_citadel_construction.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 38,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/second-stone-pack-construction.log"
+    },
+    {
+      "test": "verify_citadel_workflow.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_citadel_workflow.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection",
+        "--source-tutorial"
+      ],
+      "passed": 11,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/second-stone-pack-workflow.log"
+    },
+    {
+      "test": "verify_weather_zone.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_weather_zone.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 279,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/second-stone-pack-weather.log"
+    },
+    {
+      "test": "verify_landmark_spawn.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_landmark_spawn.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 54,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/second-stone-pack-landmark.log"
+    },
+    {
+      "test": "verify_port.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_port.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 199,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/second-stone-pack-port.log"
+    },
+    {
+      "test": "verify_lost_brother.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-9.4-candidate\\GodotIsland-village-preview9.4.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_lost_brother.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 58,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/second-stone-pack-lost-brother.log"
+    }
+  ],
+  "focusedHeadlessPassed": 982,
+  "renderedChecks": [
+    {
+      "test": "verify_weather_zone.gd",
+      "mode": "rendered Compatibility, exact exported pack",
+      "passed": 284,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "log": "scratch/second-stone-pack-weather-rendered.log"
+    },
+    {
+      "test": "verify_lost_brother.gd",
+      "mode": "rendered Compatibility, exact exported pack",
+      "passed": 58,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "log": "scratch/second-stone-pack-lost-rendered.log"
+    }
+  ],
+  "opening": {
+    "mode": "rendered Compatibility, exact exported pack; fixed-fps15, time_scale4, media skipped",
+    "result": "PASS",
+    "templeVisited": true,
+    "doorWaitStable": true,
+    "keeperIntro": true,
+    "firstKey": true,
+    "livingBrotherRescued": true,
+    "secondRewardDelivered": true,
+    "plinthBits": 3,
+    "installedStones": 2,
+    "sourceJournal55": 0.5,
+    "cameraOwner": 0,
+    "unexpectedPickups": 0,
+    "nextQuestStarted": "TheSculptor/SetupSculptor",
+    "nextUnsupported": {
+      "script": "SetupSculptor",
+      "nativeId": 51,
+      "address": 34914,
+      "line": 35
+    },
+    "minimumCameraClearance": 0.49999818522482,
+    "minimumPlayerCameraClearance": 2.99999543074503,
+    "log": "scratch/second-key-pack-render-verified.log",
+    "limitation": "Real game handlers receive synthetic mouse/key input. Accelerated automation with skipped media, not OS clicks or a normal-speed manual playthrough."
+  },
+  "startup": [
+    {
+      "mode": "headless",
+      "exit": 0,
+      "errors": [],
+      "warnings": [
+        "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details)."
+      ],
+      "frames": 180,
+      "log": "scratch/preview9.4-startup-headless.log"
+    },
+    {
+      "mode": "rendered",
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "frames": 180,
+      "log": "scratch/preview9.4-startup-rendered.log"
+    }
+  ],
+  "freshGit": {
+    "commit": "4d2460db8d966000a7fdb796d07f0b94b9ea2a18",
+    "source": "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\second-stone-fresh-4d2460d",
+    "exportExit": 0,
+    "lostBrotherPassed": 58,
+    "testExit": 0,
+    "testErrors": [],
+    "startup": [
+      {
+        "mode": "headless",
+        "exit": 0,
+        "errors": [],
+        "warnings": [
+          "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details)."
+        ]
+      },
+      {
+        "mode": "rendered",
+        "exit": 0,
+        "errors": [],
+        "warnings": []
+      }
+    ],
+    "sha256": "43903E7D2462F1CBBA365DE632494DB299AADCDF349D867BF0A84DF3E60212A5",
+    "limitation": "git archive only; no existing build/cache/research copied; matching engine used for pack test, tracked decoder included; original installation read separately"
+  },
+  "commands": {
+    "build": "tools/build_preview.ps1 -Godot <godot_console.exe> -PreviewVersion 9.4 -OutputDirectory build/second-stone-9.4-candidate",
+    "pack": "matching engine console --path game --main-pack <absolute-preview9.4.exe> --script <absolute-test.gd> -- --bw=<install>",
+    "opening": "same pack command with verify_opening_runtime.gd, --fixed-fps15 before --; --runtime-automation --runtime-second-key --runtime-seconds=1600 after --",
+    "influence": "tools/verify_host_influence.py reads installed executable into an isolated x86 emulator; JSON supplied in BW_INFLUENCE_ORACLE; pefile/unicorn optional research dependencies",
+    "startup": "Start-Process <exact exported.exe> -WindowStyle Hidden -Wait -PassThru --quit-after180 --log-file <absolute-log> -- --bw=<install> --story-preview"
+  },
+  "capturesViewed": [
+    "focused-storm.png",
+    "focused-second-stone.png",
+    "full-route-final/SecondKeyInstalled.png"
+  ],
+  "verificationFindings": [
+    "An early flock regression exposed direct weather-array access on a minimal non-weather host; nullable capability lookup fixed it, and story100 plus full exact-pack route repeated successfully.",
+    "An early influence run omitted its required oracle; final independent-emulator45 checks supplied it and passed.",
+    "An early focused fixture omitted source ProtectGateKey1 and froze the recorded zoom reminder clock. Fixture corrected; natural source influence and normal camera return now checked.",
+    "Initial weather test ran before SceneTree entry; only fixture timing/preload path changed, the approved module was copied unchanged.",
+    "Relative pack paths after --path and exported-exe --path to source are invalid test invocations. Final pack tests use absolute paths; exact-exe startup uses embedded project.",
+    "Claude routine CLI Bash Godot calls were not authorised by its tool allowlist; coordinator ran all recorded checks independently. No bypass or model-executed-tests claim."
+  ],
+  "finalEngineScriptErrors": 0,
+  "knownWarnings": [
+    "Gate/scroll fixtures sometimes report2/4 ObjectDB instances at teardown.",
+    "Candidate and fresh headless180-frame startup reported4 ObjectDB instances at forced exit; rendered startups and verbose diagnostic did not reproduce this warning. It remains open."
+  ],
+  "limitations": [
+    "No normal-speed manual playthrough or frame comparison with running original.",
+    "Track interpolation linear; original Bezier timing/curves not fully restored.",
+    "Wander solver, actor fade2s, health range0..1, weather visuals/falloff/update units and physics contain explicit port policies.",
+    "Nonzero lightning and delete modes2/3 unsupported.",
+    "Third stone, gates, creature choice, first island and complete campaign incomplete."
+  ],
+  "manualTestHandoff": {
+    "result": "FIRST_KEY_TEST_READY observed after actual first stone bits2/journal0.25 and original keeper camera release",
+    "script": "verify_opening_runtime.gd --headless --runtime-automation --runtime-stop-after-first --runtime-seconds=1600",
+    "log": "scratch/second-stone-handoff-stdout.log",
+    "errors": [],
+    "cleanup": "Coordinator stopped only its own headless helper after observing handoff; no manual second-quest playthrough claimed"
+  }
+}

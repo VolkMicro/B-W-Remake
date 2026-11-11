@@ -1,6 +1,6 @@
 # Продолжение Black & White на Godot
 
-Дата состояния: 7 ноября 2026. Цель пользователя — пройти исходную кампанию
+Дата состояния: 11 ноября 2026. Цель пользователя — пройти исходную кампанию
 на новом движке, сохранив ощущение оригинала. Работа идёт в **native Godot**,
 оригинальный exe во время игры не запускается. Полная реставрация не закончена.
 
@@ -10,7 +10,46 @@
 TASK_CLAUDE_RU.md. Сначала CLEAN_ROOM_RU.md определяет роль/доступ: эта
 инструкция содержит legacy research и не передаётся чистому реализатору.
 
-## Текущий checkpoint: Preview 9.3 — 11 ноября 2026
+## Текущий checkpoint: Preview 9.4 — 11 ноября 2026
+
+Source commit4d2460d. Exe: `build/story-preview/GodotIsland-village-preview9.4.exe`,
+SHA256 `BA4AC5D63F015FDB8DA37FC06D71E8D3D1EEDE5123766967B775B96B7AB213A5`.
+Отчёт: `development/preview9.4-verification.json`. Preview9.3 сохранён.
+
+Пройден исходный путь до **второго установленного камня**: scroll19 LostBrother,
+раненый живой брат, animation253, перенос к сестре, воссоединение, GiveReward,
+получение существующего subtype49 и доставка рукой на пьедестал. Итог:
+bits3, два физических камня, journal55=0.5, flags91/92=1 и93=0, камера0.
+Награда не засчитывается до доставки; quest flags не подменяются.
+
+Добавлены10 bounded native bindings (всего145), Track39, здоровье/защита,
+source wander parameters, исходная музыкальная тема59. Исправлены подсветка
+анимированного брата, следование influence за актёром, NULL cleanup и fade
+удаляемых персонажей. Новая погода получена от tool-less Claude по reviewed
+v3 packet; модуль не менялся, адаптеры остаются coordinator/legacy.
+Разбор Ghidra и границы точности — cleanroom/second-stone-observations-2026-11-11.md.
+
+Exact exported pack:15 focused headless прогонов982 checks, rendered weather284
+и LostBrother58, полный opening до второго камня PASS. Ускорение4x, fixed-fps15,
+медиа пропускается; это **не ручное прохождение**. Exact exe startup headless/
+rendered PASS. Fresh git archive4d2460d: export, LostBrother58 и оба startup PASS.
+Engine/script errors0. В headless forced-exit startup встречается предупреждение
+о4 ObjectDB instances; gate/scroll teardown тоже иногда сообщает2/4, не скрывать.
+
+Обычный запуск — Launch-Story-Preview.cmd. Новый Launch-Second-Stone-Test.cmd
+автоматически проходит первый камень и передаёт обычное управление для спасения
+брата. Он использует исходники/установленный Godot, без искусственного checkpoint.
+Далее: золотой свиток у дома → ПКМ поднять брата → медленно опустить рядом с
+сестрой → дождаться награды → доставить камень на пьедестал.
+
+Точная граница продолжения: TheSculptor стартует, SetupSculptor останавливается
+на native51 (bytecode34914, line35). Стек и bytecode остаются pending. Третий
+камень, ворота и выбор существа не завершены. Следующий координатор продолжает
+эту реальную операцию; новый independent worker получает только approved packet.
+Bezier camera, wander, погода/частицы/ветер, fade2s и часть физики приближены.
+Остальные ограничения Preview9.3, включая aftertouch/feel, сохраняются.
+
+## Предыдущий checkpoint: Preview 9.3 — 11 ноября 2026 (история)
 
 Source commit 9c3324e. Exe: `build/story-preview/GodotIsland-village-preview9.3.exe`,
 SHA256 `05A67FEDE7EFE107BA7FFBD060270C750616AAB8FEECB4A4380F0EE7B4993FFE`.

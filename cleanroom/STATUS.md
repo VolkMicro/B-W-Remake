@@ -4,7 +4,8 @@
 
 - Некоммерческий фанатский ремейк на Godot; файлы оригинала допустимы
   и в готовой версии. Цель и этапы — PROJECT_RU.md.
-- Проверенная игровая основа — Preview9.3, source commit9c3324e.
+- Проверенная игровая основа — Preview9.4, source commit4d2460d.
+  Hand checkpoint9.3 —9c3324e.
   Storage checkpoint9.2 — cf74fad.
   Collision checkpoint9.1 — a061205.
   Исторический checkpoint передачи — dce3b21 (Preview9).
@@ -12,7 +13,27 @@
 - Основной checkout/старые исследования — legacy, без заявления
   о доказанном clean-room происхождении.
 
-## Состояние 11 ноября: hand/interaction checkpoint
+## Состояние 11 ноября: второй камень
+
+Исходный LostBrother/GiveReward проходит до физической доставки второй награды,
+bits3, journal55=0.5 и возврата камеры. Новый WeatherZone получен от свежего
+tool-less Claude по reviewed v3 packet; manifest содержит exact input/result
+hashes и observed tool uses0. Модуль не менялся; test fixture перенесён после
+входа в SceneTree, как требует API. Headless279/rendered284 checks PASS.
+Legacy-native/health/camera/highlight/influence/fade adapters не имеют новой
+clean-room сертификации. Routine Claude редактировал тест в legacy checkout;
+не смешивать его роль с independent weather worker.
+
+Ghidra static exports и167-file hash manifest остаются вне Git. Проверены
+weather setter/lifetime, native NULL/cleanup, property1/6, animation253/state200
+и cue59. Публичные границы — second-stone-observations-2026-11-11.md.
+Полный exact-pack opening,15 focused982, rendered LostBrother58, exact startup,
+fresh Git export/LostBrother58/startup PASS; отчёт development/preview9.4-verification.json.
+Это ускоренный тест с пропуском медиа, не manual playthrough. Иногда forced-exit
+headless/старые fixtures дают ObjectDB warnings2/4. Следующий настоящий блокер:
+SetupSculptor native51; bytecode pending. Третий камень и полная кампания не готовы.
+
+## Предыдущий checkpoint 11 ноября: hand/interaction
 
 Новые packets ResourceHand, HandMomentum, HandSurfaceMotion и HandPointerDynamics
 имеют exact-hash review и отдельные implementation manifests. ResourceHand и

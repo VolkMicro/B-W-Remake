@@ -2,7 +2,7 @@
 param(
     [string]$Godot = 'godot_console.exe',
     [string]$OutputDirectory = '',
-    [ValidatePattern('^\d+(\.\d+)?$')][string]$PreviewVersion = '9.3'
+    [ValidatePattern('^\d+(\.\d+)?$')][string]$PreviewVersion = '9.4'
 )
 
 $ErrorActionPreference = 'Stop'

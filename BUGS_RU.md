@@ -1,7 +1,7 @@
 # Открытые замечания пользователя
 
-Обновлено: 11 ноября 2026. Preview9.3, source9c3324e.
-Текущие результаты — development/preview9.3-verification.json.
+Обновлено: 11 ноября 2026. Preview9.4, source4d2460d.
+Текущие результаты — development/preview9.4-verification.json.
 Ниже прежние формулировки и требования сохранены как история воспроизведения;
 они не означают, что уже добавленные tests или механики отсутствуют.
 
@@ -11,6 +11,26 @@
 | BW-002, перенос | Обычный сбор hold/release/return, настоящие HandFood/HandWood, исходные позы, видимый поток, количественный drop/regather;55 native-input/57 rendered exact-pack checks | Точные исходные PSys trajectories, размер в ладони, все специальные состояния не восстановлены |
 | BW-003, проваливание | Прежние12 collision regressions PASS; key/plinth/hand-world20 PASS | Точный пользовательский эпизод без координат/траектории ещё не подтверждён |
 | BW-004, бросок | Второй holdAction + движение + release передаёт скорость body сразу; slow release идёт из grip; camera gestures отменяют fling | Estimator/параметры — явная политика ремейка; source angular response и aftertouch отсутствуют |
+
+## BW-007 — путь ко второму камню
+
+Исправлены блокировки LostBrother: исходная camera track119, создание/config
+погоды, здоровье/защита и animation253 брата, подсветка rigged mesh, влияние,
+следующее за движущимся объектом, source reward placement, cleanup NULL и
+удалениеmode1. Награда49 выдаётся исходным GiveReward; доставка рукой даёт
+bits3/два камня/journal55=0.5 и возвращает камеру. Focused fixture58 и полный
+rendered input-only opening на exact exported pack PASS. Fixture отдельно
+задаёт post-keeper preconditions; полный маршрут их получает естественно.
+Ни один из этих прогонов не является ручным прохождением.
+
+Воспроизведение: Launch-Second-Stone-Test.cmd → дождаться ручного управления
+после первого камня → свиток19 у дома → перенести живого брата к сестре →
+награду принести на пьедестал. Не засчитывать простое получение награды.
+После второго камня **открыто**: SetupSculptor/native51/address34914/line35;
+третьего камня, ворот и выбора существа ещё нет. Погода и fade — новая
+визуализация, Bezier camera/wander/physics не сертифицированы как точный оригинал.
+В headless180-frame forced-exit startup и старых key/scroll fixtures бывает
+ObjectDB warning2/4; engine/script errors в итоговой матрице0.
 
 ## BW-005 — рука движется не как в оригинале
 

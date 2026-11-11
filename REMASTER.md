@@ -376,6 +376,27 @@ See development/preview9.3-verification.json for counts, commands and limitation
 This is an intermediate checkpoint: no full original-frame fidelity, normal-speed
 manual campaign playthrough, aftertouch or completed first-island claim.
 
+## Preview 9.4: authentic second-stone route
+
+11 November2026, source4d2460d. The original LostBrother scroll now introduces
+an injured living actor with its authored animation, camera and music. Real
+hand pickup, physical release near the sister, source reunion/GiveReward and
+delivery of the existing reward produce plinthbits3, two stones, journal55=.5
+and released camera ownership. No fabricated quest completion is used.
+
+Ten bounded native bindings, nullable cleanup, moving influence and live actor
+highlight repairs support the route. Independent WeatherZone has reviewed v3
+packet/implementation manifests; adapter, wander, fade and camera interpolation
+remain explicitly bounded coordinator/legacy work. Static Ghidra evidence is
+private; the public observation note states what was checked and what is new.
+
+Exact-pack input-driven opening,15 focused982 headless checks, rendered weather284
+and rescue58, exact exported startup and fresh Git export/rescue/startup passed.
+See development/preview9.4-verification.json. These are accelerated tests with
+skipped media, not a normal-speed manual campaign playthrough. Third-key work
+starts but SetupSculptor remains suspended at native51, address34914, line35.
+The first island, gates and creature choice remain incomplete.
+
 ## Optional standalone packaging
 
 The user now accepts requiring original files in the finished remake. A one-time
