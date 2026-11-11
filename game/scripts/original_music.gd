@@ -4,7 +4,7 @@ class_name OriginalMusic
 extends Node
 
 const Data := preload("res://scripts/data.gd")
-const STORY_CUES := {2: "Audio/Music/align/Neutral.sad", 54: "Audio/Music/Intro/intro.sad", 61: "Audio/Music/script/Epic01.sad", 65: "Audio/Music/script/CreatureChosen.sad", 67: "Audio/Music/script/CreatureGuide.sad"}
+const STORY_CUES := {2: "Audio/Music/align/Neutral.sad", 54: "Audio/Music/Intro/intro.sad", 59: "Audio/Music/script/Script03.sad", 61: "Audio/Music/script/Epic01.sad", 65: "Audio/Music/script/CreatureChosen.sad", 67: "Audio/Music/script/CreatureGuide.sad"}
 # The cinematic recordings are quieter than the voices. Keep the original
 # dynamics while making the score audible over the island ambience.
 const STORY_VOLUME_DB := -10.0

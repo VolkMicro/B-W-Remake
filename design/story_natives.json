@@ -133,5 +133,15 @@
   {"id":194,"name":"game_thing_hit","arguments":1,"returns":1,"handler":"hit_object","scope":"read_actual_contact_record"},
   {"id":320,"name":"object_info_bits","arguments":1,"returns":1,"handler":"object_info_bits","scope":"actual_animated_static_gate_stone_mesh_slots"},
   {"id":238,"name":"update_snapshot","arguments":2,"returns":0,"handler":"update_snapshot","scope":"counted_storybook_update_without_replacing_picture"},
-  {"id":252,"name":"create_with_angle_and_scale","arguments":7,"returns":1,"handler":"create_mobile_with_transform","scope":"installed_mobile_static_records"}
+  {"id":252,"name":"create_with_angle_and_scale","arguments":7,"returns":1,"handler":"create_mobile_with_transform","scope":"installed_mobile_static_records"},
+  {"id":119,"name":"run_camera_path","arguments":1,"returns":0,"handler":"script_camera_path","scope":"installed_camera_editor_paired_track"},
+  {"id":298,"name":"set_indestructable","arguments":2,"returns":0,"handler":"indestructible","scope":"registered_physical_thing_damage_protection"},
+  {"id":52,"name":"special_effect_position","arguments":5,"returns":1,"handler":"position_sparkles","scope":"command_succeed_at_requested_source_position"},
+  {"id":123,"name":"change_weather_properties","arguments":6,"returns":0,"handler":"weather_properties","scope":"visible_remake_weather_zone_parameters"},
+  {"id":124,"name":"change_lightning_properties","arguments":5,"returns":0,"handler":"weather_properties","scope":"explicit_zero_sheet_and_fork_lightning_only"},
+  {"id":125,"name":"change_time_fade_properties","arguments":3,"returns":0,"handler":"weather_properties","scope":"weather_lifetime_and_fade_without_age_reset"},
+  {"id":126,"name":"change_cloud_properties","arguments":4,"returns":0,"handler":"weather_properties","scope":"weather_cloud_count_shade_height"},
+  {"id":131,"name":"set_affected_by_wind","arguments":2,"returns":0,"handler":"weather_wind","scope":"weather_presentation_wind_response"},
+  {"id":18,"name":"set_script_state_pos","arguments":4,"returns":0,"handler":"villager_script_animation","scope":"registered_villager_script_position_parameter"},
+  {"id":19,"name":"set_script_float","arguments":2,"returns":0,"handler":"villager_script_animation","scope":"registered_villager_script_float_parameter"}
 ]

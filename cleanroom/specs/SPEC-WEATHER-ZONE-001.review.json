@@ -1,0 +1,117 @@
+{
+  "specId": "SPEC-WEATHER-ZONE-001",
+  "specVersion": "v3",
+  "reviewerRole": "independent-specification-reviewer",
+  "reviewerId": "claude-cli-fixed-weather-v3",
+  "reviewedSpecSha256": "AAD817882322A3BE30E20C1B84C277575C30E8A49FBFD7E9C80C71A2EF5A9B42",
+  "status": "approved",
+  "checks": [
+    {
+      "id": "boundary-original-vs-new",
+      "result": "pass",
+      "note": "The table separates the bounded observations (WZ-20261111-A) from new policy. Seconds, method shapes, initial values and presentation are declared new, and no engine-time equivalence is claimed. The byte-percentage observation is reconciled with the exact float [0,1] API."
+    },
+    {
+      "id": "api-failure-semantics",
+      "result": "pass",
+      "note": "Bool methods return false without mutation. advance returns {} atomically on invalid input. set_wind_affected is a silent no-op before configure or outside the domain. snapshot is read-only, needs no tree, and returns {} before configure. Repeated configure fails atomically."
+    },
+    {
+      "id": "supported-transform-domain",
+      "result": "pass",
+      "note": "The node must be in the tree. Its global basis and every Node3D ancestor global basis must be identity within 1e-6 per component; translations are allowed. Out-of-domain behavior is specified per method. Recovery after the supported transform is restored is explicitly permitted. This resolves the v2 request for tree-domain validation."
+    },
+    {
+      "id": "coordinate-frames",
+      "result": "pass",
+      "note": "center and viewer are world-space. The stored center is immutable after configure and independent of later node translation. Spatial distance uses world XZ (Y-up). precipitation_position is the world-space last valid viewer. Clouds.global_position is re-synced to the stored center, and Rain/Snow.global_position to the retained viewer, on configure and on each successful mutating call only. There is no _process resync, and this is stated explicitly. With identity bases, global and local offsets coincide, so the anchors are unambiguous."
+    },
+    {
+      "id": "input-domains-finite",
+      "result": "pass",
+      "note": "Every scalar has a finite closed or half-open range with endpoints stated. Vector bounds are abs<=100000 per component, and any nonfinite component rejects the whole request. fade<=total/2 is validated against the total in the same call. outer>0 excludes the degenerate 0/0 radius case. Age saturates at 36000, which is >= the maximum total, so expiry is always reachable."
+    },
+    {
+      "id": "lifetime-semantics",
+      "result": "pass",
+      "note": "The fade>0 formula is clamp(min(age/fade,(total-age)/fade,1),0,1), which is well-defined for age>total. For fade=0 the value is 1 when age<total and 0 when age>=total. expired is age>=total and is recomputed when total changes. Setters never reset age and recompute strengths at the retained viewer. Only advance changes age."
+    },
+    {
+      "id": "spatial-semantics",
+      "result": "pass",
+      "note": "The inclusive inner test is applied first, which gives a hard cutoff when inner==outer. Strength is 0 at distance>=outer and linear between. Y is ignored. strength=temporal*spatial. rain_strength=rain*strength and snow_strength=snow*strength. Overcast and shade are excluded from strength."
+    },
+    {
+      "id": "snapshot-keys-and-counts",
+      "result": "pass",
+      "note": "Exactly 24 keys are enumerated, and they are consistent with the 'all scalar parameters' sentence. cloud_count is the configured count. rain_instances and snow_instances are allocated counts, constant after configure, within 128..1024 and 64..512, and explicitly not visible counts. The dictionary is fresh and isolated from state. The successful advance return value equals the snapshot."
+    },
+    {
+      "id": "initial-state",
+      "result": "pass",
+      "note": "After configure: age 0, total 120, fade 40, radii 600/1000, weather (15,1,0,1,2), clouds (8,.8,130), wind false, viewer equal to center. This gives temporal 0, spatial 1, strength 0, expired false, and all three children existing. Clouds, Rain and Snow are all initially hidden, which is consistent with the hide rules and the 'even when initially hidden' clause."
+    },
+    {
+      "id": "visibility-rules",
+      "result": "pass",
+      "note": "Clouds hide at temporal 0 or count 0. Rain and Snow hide at their own strength 0, and so are spatially gated through strength. All hide at expiry because temporal is 0. 'Visible when positive' is implied by the age-40 and weather-switch fixtures."
+    },
+    {
+      "id": "boundedness",
+      "result": "pass",
+      "note": "Clouds are capped at 32 and allocated precipitation counts are bounded. Positions are deterministic in index and age. There are no per-time loops, no random timers and no GPUParticles dependence. A large delta is O(1)."
+    },
+    {
+      "id": "scope",
+      "result": "pass",
+      "note": "The spec excludes Environment, Light and Camera mutation, assets, gameplay, collisions, shadows and self-freeing. All visuals are owned children."
+    }
+  ],
+  "numericFixtures": [
+    {
+      "fixture": "lifetime ramp at viewer ZERO, total120 fade40",
+      "recomputed": "age20: min(0.5,2.5,1)=0.5, so strength 0.5 and rain 0.5. age40: 1. age80: min(2,1,1)=1. age100: 20/40=0.5. age120: 0 and expired true.",
+      "result": "pass"
+    },
+    {
+      "fixture": "spatial at age40, radii 600/1000, viewer (800,500,0)",
+      "recomputed": "XZ distance 800, giving spatial (1000-800)/400=0.5 and strength 1*0.5=0.5. Y=500 is ignored. Viewer (1000,0,0): 1000<=600 is false and 1000>=1000, so spatial 0.",
+      "result": "pass"
+    },
+    {
+      "fixture": "fresh configure, set_lifetime(100,0)",
+      "recomputed": "fade 0<=50 is valid. age0: temporal 1. advance(100): age 100>=100, so temporal 0 and expired true.",
+      "result": "pass"
+    },
+    {
+      "fixture": "equal radii (10,10)",
+      "recomputed": "Distance 10: 10<=10, so spatial 1. Distance 10.01: >=10, so spatial 0. Spatial is independent of the temporal value.",
+      "result": "pass"
+    },
+    {
+      "fixture": "advance(0, Vector3(30,0,-40))",
+      "recomputed": "delta 0 is valid and age is unchanged. precipitation_position=(30,0,-40) and Rain/Snow.global_position=(30,0,-40). center and Clouds.global_position are unchanged.",
+      "result": "pass"
+    },
+    {
+      "fixture": "weather (15,0,1,1,2) at age40, viewer at center",
+      "recomputed": "rain_strength 0, so Rain is hidden. snow_strength 1, so Snow is visible. Clouds remain visible with temporal 1 and count 8.",
+      "result": "pass"
+    },
+    {
+      "fixture": "translated identity parent, then node translate plus advance(0)",
+      "recomputed": "The stored center stays at its world value. After advance(0), Clouds.global_position is the stored center and Rain/Snow.global_position is the retained viewer, regardless of the new node translation.",
+      "result": "pass"
+    }
+  ],
+  "limitations": [
+    "The SHA256 could not be computed without tools. The value is echoed from the caller, and the coordinator must recheck it.",
+    "The original observations (WZ-20261111-A) were not independently re-verified. They are accepted as stated by the prior review and the caller.",
+    "Cloud height is presentation-only. Whether it is measured relative to the center anchor or as absolute world Y is left to the flexible visual design, and no fixture depends on it.",
+    "Visibility for positive strengths is inferred from the fixtures rather than stated as an explicit 'visible iff' rule. This is low risk given the fixtures.",
+    "Rain streak width and Compatibility-renderer rendering cannot be confirmed in a headless test. Only geometry presence and visibility are checkable."
+  ],
+  "requiredFixes": [],
+  "reviewedAtUtc": "2026-11-11T17:30:08.4604566Z",
+  "reviewCapabilityManifestSHA256": "1B0DE120DD1C61DECC34EB81D0FB38BF74F0B2DCEED73A46A0F7E971FA2F19F5"
+}

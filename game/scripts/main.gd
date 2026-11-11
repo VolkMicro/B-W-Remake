@@ -108,6 +108,7 @@ var story_sfx_bank := SoundBank.new()
 var story_game_sfx_bank := SoundBank.new()
 var story_sfx_streams: Dictionary = {}
 var story_effects: Array[Node3D] = []
+var story_weather: Array[Node3D] = []
 var story_gate_plinth: Node3D
 var world_geometry := preload("res://scripts/story_world_geometry.gd").new()
 var world_physics := preload("res://scripts/story_world_geometry.gd").new()
@@ -285,7 +286,7 @@ func _load_world() -> void:
 	_update_camera()
 	loaded = true
 	if story_preview and DisplayServer.get_name() != "headless":
-		get_window().title = "Black & White — реставрация · Preview 9.3"
+		get_window().title = "Black & White — реставрация · Preview 9.4"
 		Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	_load_preservation()
 	var heights := PackedStringArray()
@@ -1033,6 +1034,7 @@ func _cancel_pending_fling() -> void:
 
 func _update_world(delta: float) -> void:
 	_sync_adviser_view()
+	_advance_story_weather(delta)
 	_hand_motion_clock += maxf(delta, 0.0)
 	_hand_release_time = maxf(0.0, _hand_release_time - maxf(delta, 0.0))
 	resource_interaction.advance(delta)
@@ -2578,12 +2580,14 @@ func story_town_villagers(town: int) -> Array[Thing]:
 	return villagers
 
 
-func story_delete_object(object: Node3D) -> bool:
+func story_delete_object(object: Node3D, fade := false) -> bool:
 	var influence_index := -1
 	for i in influence_sources.size():
 		if influence_sources[i]["node"] == object: influence_index = i
 	if influence_index >= 0:
 		influence_sources.remove_at(influence_index)
+	elif story_weather.has(object):
+		story_weather.erase(object)
 	elif story_effects.has(object):
 		story_effects.erase(object)
 	elif object is Thing:
@@ -2599,8 +2603,40 @@ func story_delete_object(object: Node3D) -> bool:
 		story_highlights.erase(object)
 	else:
 		return false
-	object.free()
+	if fade and object is Thing and object.kind == "villager":
+		object.set_meta("story_deleted", true)
+		object.set_process(false)
+		object.set_physics_process(false)
+		_fade_story_actor(object)
+	else:
+		object.free()
 	return true
+
+
+func _fade_story_actor(actor: Thing) -> void:
+	# Mode1 invalidates the script handle immediately and fades a visible
+	# actor. This uses a bounded two-second presentation, not the source shader.
+	for child in actor.get_children():
+		if child.get_script() == preload("res://scripts/story_object_highlight.gd"):
+			story_effects.erase(child)
+			child.free()
+	var tween := create_tween().set_parallel(true)
+	var visuals := 0
+	for visual in actor.find_children("*", "MeshInstance3D", true, false):
+		if visual.mesh == null: continue
+		for surface in visual.mesh.get_surface_count():
+			var original: Material = visual.get_active_material(surface)
+			if not original is StandardMaterial3D: continue
+			var material := original.duplicate() as StandardMaterial3D
+			material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			visual.set_surface_override_material(surface, material)
+			tween.tween_property(material, "albedo_color:a", 0.0, 2.0)
+			visuals += 1
+	if visuals == 0:
+		tween.kill()
+		actor.queue_free()
+	else:
+		tween.chain().tween_callback(actor.queue_free)
 
 
 func story_build_citadel(request: Vector3, amount: float) -> Node3D:
@@ -2746,16 +2782,56 @@ func story_create_singing_stone(subtype: int, position: Vector3) -> Thing:
 
 
 func story_spawn_stone_sparkles(stone: Thing, seconds: float) -> Node3D:
+	return story_spawn_position_sparkles(stone.global_position if stone.is_inside_tree() else stone.position, seconds)
+
+
+func story_spawn_position_sparkles(point: Vector3, seconds: float) -> Node3D:
 	if story_stone_sparkle_frames.is_empty():
 		story_stone_sparkle_frames = StoneSparkles.load_frames(_p("Data/Textures"))
 		if story_stone_sparkle_frames.is_empty():
 			return null
 	var sparkles := StoneSparkles.new()
-	sparkles.position = to_local(stone.global_position) if stone.is_inside_tree() else stone.position
+	sparkles.position = to_local(point)
 	sparkles.start(story_stone_sparkle_frames, seconds)
 	add_child(sparkles)
 	story_effects.append(sparkles)
 	return sparkles
+
+
+func story_create_weather(point: Vector3) -> Node3D:
+	# Visible remake presentation with reviewed lifetime/parameter API. The
+	# source still owns creation, configuration and removal of the zone.
+	if not ResourceLoader.exists("res://scripts/weather_zone.gd"): return null
+	var zone: Node3D = load("res://scripts/weather_zone.gd").new()
+	add_child(zone)
+	if not zone.configure(point):
+		zone.free()
+		return null
+	zone.set_meta("story_weather_zone", true)
+	story_weather.append(zone)
+	return zone
+
+
+func _advance_story_weather(delta: float) -> void:
+	var overcast := 0.0
+	for zone in story_weather.duplicate():
+		if not is_instance_valid(zone):
+			story_weather.erase(zone)
+			continue
+		var state: Dictionary = zone.advance(delta, cam.global_position)
+		if not state.is_empty(): overcast = maxf(overcast, float(state["strength"]) * float(state["overcast"]))
+	if not is_instance_valid(sun): return
+	# Atmospheric shading is an explicit presentation approximation. Rebuild
+	# from daylight each frame so it neither accumulates nor persists on exit.
+	var daylight := 1.0
+	if story_time.daylight_started:
+		daylight = smoothstep(-0.12, 0.35, sin((story_time.hour - 6.0) * TAU / 24.0))
+	sun.light_energy = 1.2 * daylight * (1.0 - 0.6 * overcast)
+	env.ambient_light_energy = lerpf(0.12, 0.6, daylight) * (1.0 - 0.4 * overcast)
+	env.fog_density = lerpf(0.00012, 0.0012, overcast)
+	env.fog_light_color = Color(0.7, 0.78, 0.88).lerp(Color(0.3, 0.34, 0.4), overcast)
+	sky_mat.sky_top_color = Color(0.25, 0.45, 0.8).lerp(Color(0.12, 0.15, 0.2), overcast)
+	sky_mat.sky_horizon_color = Color(0.75, 0.82, 0.9).lerp(Color(0.32, 0.36, 0.42), overcast)
 
 
 func story_landmark_info_bits(landmark: OriginalLandmark) -> int:
@@ -2835,16 +2911,16 @@ func story_influence_strength(p: Vector3, anti := false) -> float:
 	for source in influence_sources:
 		if source["anti"] != anti:
 			continue
-		var node: Node3D = source["node"]
-		if is_instance_valid(node):
-			strength = maxf(strength, InfluenceMath.strength_at(node.position, p, float(source["radius"]), host_info.influence_settings))
+		var origin := _story_influence_position(source)
+		if origin.is_finite():
+			strength = maxf(strength, InfluenceMath.strength_at(origin, p, float(source["radius"]), host_info.influence_settings))
 	return strength
 
 
 func has_influence(p: Vector3) -> bool:
 	for source in influence_sources:
-		var node: Node3D = source["node"]
-		if source["anti"] and Vector2(p.x - node.position.x, p.z - node.position.z).length() < float(source["radius"]):
+		var origin := _story_influence_position(source)
+		if source["anti"] and origin.is_finite() and Vector2(p.x - origin.x, p.z - origin.z).length() < float(source["radius"]):
 			return false
 	if virtual_influence or story_vm == null:
 		return true
@@ -2854,15 +2930,28 @@ func has_influence(p: Vector3) -> bool:
 			return true
 	var settings: Dictionary = host_info.influence_settings
 	for source in influence_sources:
-		var node: Node3D = source["node"]
+		var origin := _story_influence_position(source)
+		if not origin.is_finite(): continue
 		if source["anti"]:
 			continue
 		if settings.is_empty():
-			if Vector2(p.x - node.position.x, p.z - node.position.z).length() < float(source["radius"]):
+			if Vector2(p.x - origin.x, p.z - origin.z).length() < float(source["radius"]):
 				return true
-		elif InfluenceMath.strength_at(node.position, p, float(source["radius"]), settings) > 0.0:
+		elif InfluenceMath.strength_at(origin, p, float(source["radius"]), settings) > 0.0:
 			return true
 	return false
+
+
+func _story_influence_position(source: Dictionary) -> Vector3:
+	var node: Node3D = source["node"]
+	if not is_instance_valid(node): return Vector3.INF
+	var follow: WeakRef = node.get_meta("follow_target") as WeakRef if node.has_meta("follow_target") else null
+	if follow != null:
+		var target := follow.get_ref() as Node3D
+		if not is_instance_valid(target): return Vector3.INF
+		var point := target.global_position if target.is_inside_tree() else target.position
+		node.position = to_local(point) if is_inside_tree() else point
+	return node.position
 
 
 # Close views of walking villagers and the advisers, so a test recording shows their animation.

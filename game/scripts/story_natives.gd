@@ -368,12 +368,19 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 				return {"ok":false}
 			return {"ok":true,"pop":count,"push":result,"yield_task":true}
 		"delete_script_actor":
+			var actor_handle := StoryVm.as_int(stack[stack.size() - count])
 			var actor := _object(stack[stack.size() - count]) as Node3D
+			var mode := StoryVm.as_int(stack.back())
 			var world: Object = terrain.get_ref() if terrain else null
-			if not is_instance_valid(actor) or StoryVm.as_int(stack.back()) != 0 or not is_instance_valid(world) or not world.has_method("story_delete_object"):
+			if mode not in [0, 1] or not is_instance_valid(world):
 				return {"ok":false}
-			if not world.story_delete_object(actor):
+			# The native consumes an already-invalid handle without another delete.
+			if actor == null: return {"ok":true,"pop":count,"push":[]}
+			if mode == 1 and (not actor is Thing or actor.kind != "villager"): return {"ok":false}
+			if not world.story_delete_object(actor, mode == 1):
 				return {"ok":false}
+			_objects.erase(actor_handle)
+			_object_types.erase(actor_handle)
 		"shark_walk_path":
 			var p := stack.size() - count
 			var actor := _object(stack[p])
@@ -426,6 +433,16 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 			if effect == null:
 				return {"ok":false}
 			result.append(StoryVm.integer(register_object(effect), StoryVm.OBJECT))
+		"position_sparkles":
+			var p := stack.size() - count
+			var point := _vector(stack, p + 1)
+			var seconds := StoryVm.as_float(stack.back())
+			var world: Object = terrain.get_ref() if terrain else null
+			if StoryVm.as_int(stack[p]) != 10 or not point.is_finite() or not is_finite(seconds) or seconds <= 0.0 or not is_instance_valid(world):
+				return {"ok":false}
+			var effect: Node3D = world.story_spawn_position_sparkles(point, seconds)
+			if effect == null: return {"ok":false}
+			result.append(StoryVm.integer(register_object(effect), StoryVm.OBJECT))
 		"intro_actor":
 			var p := stack.size() - count
 			var actor := _object(stack.back()) as Thing
@@ -466,16 +483,30 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 			if not is_instance_valid(villager) or villager.kind != "villager":
 				return {"ok":false}
 			match id:
-				17: # SET_SCRIPT_STATE, ScriptPlayAnim
-					if StoryVm.as_int(stack[p + 1]) != 200 or not villager.play_script_animation():
-						return {"ok":false}
+				17: # ScriptPlayAnim or bounded ScriptWanderAroundPos adapter.
+					var parameters: Vector2i = villager.get_meta("script_unsigned", Vector2i(-1, -1))
+					match StoryVm.as_int(stack[p + 1]):
+						200:
+							if (parameters.y < 1 and parameters.y != -1) or not _ensure_villager_script_animation(parameters.x): return {"ok":false}
+							if not villager.prepare_script_animation(_villager_script_animations, parameters.x, parameters.y) or not villager.play_script_animation(): return {"ok":false}
+						199:
+							if not villager.set_script_wander(villager.get_meta("script_position", Vector3.INF), float(villager.get_meta("script_float", -1.0)), parameters.x, parameters.y): return {"ok":false}
+						_:
+							return {"ok":false}
+				18:
+					var point := _vector(stack, p + 1)
+					if not point.is_finite(): return {"ok":false}
+					villager.set_meta("script_position", point)
+				19:
+					var value := StoryVm.as_float(stack[p + 1])
+					if not is_finite(value): return {"ok":false}
+					villager.set_meta("script_float", value)
 				20: # SET_SCRIPT_ULONG, animation ID and repeat count
 					var animation := StoryVm.as_int(stack[p + 1])
 					var repeats := StoryVm.as_int(stack[p + 2])
-					if (repeats < 1 and repeats != -1) or not _ensure_villager_script_animation(animation):
+					if animation < 0 or repeats < -1:
 						return {"ok":false}
-					if not villager.prepare_script_animation(_villager_script_animations, animation, repeats):
-						return {"ok":false}
+					villager.set_meta("script_unsigned", Vector2i(animation, repeats))
 				64: # PLAYED
 					result.append(StoryVm.integer(int(not villager.is_script_animation_playing()), StoryVm.BOOL))
 				68: # OVERRIDE_STATE_ANIMATION
@@ -584,6 +615,40 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 				stone.story_pickup_allowed = allowed
 		"script_camera":
 			return camera.invoke(id, stack, context) if camera != null else {"ok":false}
+		"script_camera_path":
+			if camera == null or not camera.run_path(camera_editor, StoryVm.as_int(stack.back()), int(context.get("task", 0))):
+				return {"ok":false}
+		"indestructible":
+			var actor := _object(stack.back()) as Thing
+			if actor == null: return {"ok":false}
+			actor.story_indestructible = StoryVm.as_int(stack[stack.size() - count]) != 0
+		"weather_properties":
+			var p := stack.size() - count
+			var zone := _object(stack[p]) as Node3D
+			var world: Object = terrain.get_ref() if terrain else null
+			if zone == null or not is_instance_valid(world) or not world.story_weather.has(zone): return {"ok":false}
+			match id:
+				123:
+					if not zone.set_weather(StoryVm.as_float(stack[p + 1]), StoryVm.as_float(stack[p + 2]), StoryVm.as_float(stack[p + 3]), StoryVm.as_float(stack[p + 4]), StoryVm.as_float(stack[p + 5])): return {"ok":false}
+				124:
+					# This episode explicitly disables both kinds of lightning.
+					# Nonzero lightning requests remain unsupported, not swallowed.
+					for i in range(p + 1, stack.size()):
+						if StoryVm.as_float(stack[i]) != 0.0: return {"ok":false}
+					zone.set_meta("lightning_disabled", true)
+				125:
+					if not zone.set_lifetime(StoryVm.as_float(stack[p + 1]), StoryVm.as_float(stack[p + 2])): return {"ok":false}
+				126:
+					var clouds := StoryVm.as_float(stack[p + 1])
+					if not is_finite(clouds) or clouds < 0.0 or clouds > 32.0: return {"ok":false}
+					if not zone.set_clouds(int(clouds), StoryVm.as_float(stack[p + 2]), StoryVm.as_float(stack[p + 3])): return {"ok":false}
+				131:
+					return {"ok":false}
+		"weather_wind":
+			var zone := _object(stack.back()) as Node3D
+			var world: Object = terrain.get_ref() if terrain else null
+			if zone == null or not is_instance_valid(world) or not world.story_weather.has(zone): return {"ok":false}
+			zone.set_wind_affected(StoryVm.as_int(stack[stack.size() - count]) != 0)
 		"follow_camera_object":
 			var target := _object(stack[stack.size() - count]) as Thing
 			if camera == null or not is_instance_valid(target) or target.kind != "villager" or target.rig == null:
@@ -626,6 +691,11 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 			var p := stack.size() - count
 			var villager := _object(stack[p]) as Thing
 			var container := _object(stack[p + 1])
+			if count == 3 and (not is_instance_valid(villager) or not is_instance_valid(container)):
+				# Original FLOCK_ATTACH pushes an empty object on either null
+				# handle. HeadingHome can reach this after the source deletes an actor.
+				result.append(StoryVm.integer(0, StoryVm.OBJECT))
+				return {"ok":true,"pop":count,"push":result}
 			if not is_instance_valid(villager) or villager.kind != "villager" or not is_instance_valid(container):
 				return {"ok":false}
 			if count == 3 and container is Node3D and container.has_meta("town_index"):
@@ -656,10 +726,16 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 			flock.free()
 		"flock_spacing":
 			var p := stack.size() - count
-			var flock := _object(stack[p]) as StoryFlock
+			var target := _object(stack[p])
 			var inner := StoryVm.as_float(stack[p + 1])
 			var outer := StoryVm.as_float(stack[p + 2])
 			var mode := StoryVm.as_float(stack[p + 3])
+			var world: Object = terrain.get_ref() if terrain else null
+			var weather: Variant = world.get("story_weather") if is_instance_valid(world) else null
+			if weather is Array and weather.has(target):
+				if mode != 0.0 or not target.set_radii(inner, outer): return {"ok":false}
+				return {"ok":true,"pop":count,"push":[]}
+			var flock := target as StoryFlock
 			if not is_instance_valid(flock) or not is_finite(inner) or not is_finite(outer) or mode != 0.0:
 				return {"ok":false}
 			if inner < 0.0 or inner > 65535.0 or outer < 0.0 or outer > 65535.0:
@@ -691,7 +767,7 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 			var p := stack.size() - count
 			var actor := _object(stack[p]) as Thing
 			var point := _vector(stack, p + 1)
-			if not is_instance_valid(actor) or actor.kind != "villager" or not point.is_finite():
+			if not is_instance_valid(actor) or actor.kind not in ["villager", "gate_key"] or not point.is_finite():
 				return {"ok":false}
 			actor.position = point
 		"distance":
@@ -743,6 +819,13 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 			var position := Vector3(StoryVm.as_float(stack[p + 2]), StoryVm.as_float(stack[p + 3]), -StoryVm.as_float(stack[p + 4]))
 			if not position.is_finite():
 				return {"ok":false}
+			if object_type == 15 and subtype == 2:
+				var world: Object = terrain.get_ref() if terrain else null
+				if not is_instance_valid(world): return {"ok":false}
+				var zone: Node3D = world.story_create_weather(position)
+				if zone == null: return {"ok":false}
+				result.append(StoryVm.integer(register_object(zone, 15), StoryVm.OBJECT))
+				return {"ok":true,"pop":count,"push":result}
 			if object_type == 26 and subtype == 5000:
 				var world: Object = terrain.get_ref() if terrain else null
 				if not is_instance_valid(world) or not world.has_method("story_create_shark"):
@@ -843,6 +926,7 @@ func _invoke_world(handler: String, stack: Array, p: int) -> Dictionary:
 			if not object is Node3D or not is_finite(radius) or radius <= 0.0 or StoryVm.as_int(stack[p + 2]) != 0:
 				return {}
 			var handle: Node3D = world.story_add_influence(object.global_position if object.is_inside_tree() else object.position, radius, StoryVm.as_int(stack[p + 3]) != 0)
+			handle.set_meta("follow_target", weakref(object))
 			result.append(StoryVm.integer(register_object(handle, -2), StoryVm.OBJECT))
 		"influence_position":
 			var position := _vector(stack, p)
@@ -927,6 +1011,17 @@ func _invoke_world(handler: String, stack: Array, p: int) -> Dictionary:
 		"get_property", "set_property":
 			var property := StoryVm.as_int(stack[p])
 			var target := _object(stack[p + 1])
+			# Checked GET_PROPERTY returns a numeric zero for a missing/deleted
+			# handle before dispatching the property. Writes remain unsupported.
+			if handler == "get_property" and target == null:
+				result.append(StoryVm.number(0.0))
+				return {"result":result}
+			if target is Thing and property == 1:
+				if handler == "get_property":
+					result.append(StoryVm.number(0.0 if target.state == Thing.State.DEAD else target.story_health))
+				elif target.kind != "villager" or not target.set_story_health(StoryVm.as_float(stack[p + 2])):
+					return {}
+				return {"result":result}
 			if handler == "set_property" and target is Thing and property == 24:
 				var altitude := StoryVm.as_float(stack[p + 2])
 				if not is_finite(altitude): return {}
@@ -938,8 +1033,9 @@ func _invoke_world(handler: String, stack: Array, p: int) -> Dictionary:
 				return {"result":result}
 			# ScriptEnums.h: FLYING=5, IN_HAND=9. Gate-key protection observes
 			# actual physical state instead of assuming the keys remain on the ground.
-			if handler == "get_property" and target is Thing and property in [5, 9]:
-				result.append(StoryVm.number(float(target.state == (Thing.State.FLYING if property == 5 else Thing.State.HELD))))
+			if handler == "get_property" and target is Thing and property in [5, 6, 9]:
+				var active: bool = target.story_drowning if property == 6 else target.state == (Thing.State.FLYING if property == 5 else Thing.State.HELD)
+				result.append(StoryVm.number(float(active)))
 				return {"result":result}
 			if is_instance_valid(target) and target.has_meta("story_citadel") and property == 22:
 				if handler == "get_property":
@@ -983,9 +1079,9 @@ func _invoke_world(handler: String, stack: Array, p: int) -> Dictionary:
 		"release_from_script":
 			var object := _object(stack[p])
 			if object == null:
-				return {}
+				return {"result":result}
 			if object is Thing:
-				object.story_hold_position = false
+				object.release_script_control()
 		_:
 			return {}
 	return {"result":result}
@@ -996,6 +1092,7 @@ func _object(value: Dictionary) -> Object:
 	if not _objects.has(object_id):
 		return null
 	var object: Object = _objects[object_id].get_ref()
+	if is_instance_valid(object) and object is Node and object.get_meta("story_deleted", false): return null
 	return object if is_instance_valid(object) else null
 
 

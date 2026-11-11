@@ -112,6 +112,7 @@ func _prepare(entry: Dictionary) -> bool:
 	var visual := entry["visual"].get_ref() as MeshInstance3D
 	var target := entry["target"].get_ref() as Node3D
 	if not is_instance_valid(visual) or not is_instance_valid(target): return false
+	if target.get_meta("story_deleted", false): return false
 	if target is Thing and target.state in [Thing.State.HELD, Thing.State.DEAD]: return false
 	if not entry["include_hidden"] and visual.is_inside_tree() and not visual.is_visible_in_tree(): return false
 	if target.is_inside_tree() and not target.is_visible_in_tree(): return false

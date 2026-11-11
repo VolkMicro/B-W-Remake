@@ -1,0 +1,41 @@
+{
+  "timestampUtc": "2026-11-11T17:36:24.8291121Z",
+  "role": "fixed tool-less remote model request; not an OS sandbox certification",
+  "cliVersion": "2.1.311 (Claude Code)",
+  "model": "claude-opus-5-5",
+  "packetSHA256": "AAD817882322A3BE30E20C1B84C277575C30E8A49FBFD7E9C80C71A2EF5A9B42",
+  "systemSHA256": "6A895429D252F596CB5050D09F06BE7FB819AF82485518D1B3EDD1AFE6DEDFBF",
+  "auth": "normal single-owner CLI OAuth transport; no credential copying",
+  "safeMode": true,
+  "restrictedMode": true,
+  "tools": [],
+  "mcpServers": [],
+  "builtinPluginNames": [
+    "cc-plugin-sec-default",
+    "cc-plugin-agents-md",
+    "cc-plugin-telemetry",
+    "cc-plugin-plugin-authoring"
+  ],
+  "builtinAgentNames": [
+    "claude",
+    "Explore",
+    "general-purpose",
+    "Plan"
+  ],
+  "observedToolUses": 0,
+  "permittedEnvelopeFieldNames": [
+    "userEmail",
+    "environment"
+  ],
+  "noSessionPersistence": true,
+  "processExit": 0,
+  "resultSubtype": "success",
+  "acceptedCapabilityBoundary": true,
+  "resultSHA256": "6F3843FD32975136A0C6BCB3AD20CE4ED374FBB449CCA79131B418B371D5818C",
+  "evidence": "runner-probe-2026-11-07.json; same CLI/flags; no credentials cloned",
+  "specReview": "SPEC-WEATHER-ZONE-001.review.json",
+  "standaloneValidation": "Godot4.7.2:279 checks passed headless; no engine/script errors after fixture lifecycle correction",
+  "sourceSha256": "A351DAE160B1118973F0E946DB9FC3B17B57131896305CEE2E3B998EAC256324",
+  "coordinatorChanges": "Module copied unchanged. Test deferred from SceneTree._initialize until tree entry, preserving all assertions; test preload path adjusted for scripts/. Initial undeferred fixture violated the explicit in-tree precondition and failed.",
+  "rendererLimitation": "Headless renderer cannot read back MultiMesh transforms; matching-engine exported-pack Compatibility rendering separately passed284 checks with no engine/script errors. Visual comparison with the original remains unverified."
+}

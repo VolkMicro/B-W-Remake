@@ -1,5 +1,8 @@
-# Construct the island objects without entering the scene tree or running a game.
+# Construct island objects without starting the game's scene or frame loop.
 extends SceneTree
+
+class SpawnFixture extends "res://scripts/main.gd":
+	func _ready() -> void: pass
 
 var source := ""
 var failures: Array[String] = []
@@ -35,7 +38,9 @@ func check(ok: bool, name: String) -> void:
 
 
 func run_test() -> void:
-	var world = load("res://scripts/main.gd").new()
+	var world = SpawnFixture.new()
+	root.add_child(world)
+	world.set_process(false)
 	var data = preload("res://scripts/data.gd")
 	world.bw_dir = source
 	var opened: bool = source != "" and world.lnd.load_file(source.path_join(data.SOURCES["landscape"]))
@@ -192,7 +197,7 @@ func run_test() -> void:
 			verify_original_welcome_dance(world)
 			verify_hand_demo_and_citadel(world)
 			verify_village_membership_and_keys(world)
-		check(not world.is_inside_tree(), "the game scene was never entered or started")
+		check(not world.loaded and not world.is_processing(), "the fixture supplies valid transforms without starting the game scene or frame loop")
 	finish(world)
 
 
@@ -244,13 +249,17 @@ func verify_hand_demo_and_citadel(world: Node) -> void:
 	check(loaded and world.story_hand_demo.frames.size() == 484, "GiveFood resolves its original givewood recording and all frames")
 	if loaded:
 		check(not world.story_hand_demo.pose()["hand"].is_finite(), "uninitialised recorded hand coordinates never become a world position")
+		# Test the recording parser directly: the live scene adapter consumes
+		# actions to move real resources and therefore does not retain a queue.
+		var recording := preload("res://scripts/story_hand_demo.gd").new()
+		recording.start(FileAccess.get_file_as_bytes(source.path_join("Data/HandDemo/givewood.hnd")))
 		var cues := 0
 		for ignored in 1200:
-			world.story_advance_hand_demo(0.1)
-			if world.story_hand_demo.consume_trigger(): cues += 1
-			if not world.story_hand_demo.playing: break
-		var actions: Array = world.story_hand_demo.take_actions()
-		check(not world.story_hand_demo.playing and cues == 4 and actions.size() == 4, "resource tutorial plays all four original speech cues and recorded pickup/drop actions")
+			recording.advance(0.1)
+			if recording.consume_trigger(): cues += 1
+			if not recording.playing: break
+		var actions: Array = recording.take_actions()
+		check(not recording.playing and cues == 4 and actions.size() == 4, "resource tutorial recording preserves all four speech cues and pickup/drop actions before scene consumption")
 	var site: Node3D = world.story_build_citadel(Vector3(1915.05, 0.0, -2508.89), 0.375)
 	check(site != null and site.progress == 0.0 and is_equal_approx(site.forced_desire, 1.875) and site.model.get_child_count() > 0, "planned temple loads the installed construction mesh and requests building desire without instant completion")
 
@@ -364,7 +373,7 @@ func finish(world: Node) -> void:
 	for property in ["cam", "hand_ring", "hand_pivot", "hud", "align_bar", "align_label", "towns_label", "msg_label", "help_label", "dialogue_caption", "ambience", "sea_player", "creature_panel", "creature_status", "campaign_status", "choice_row"]:
 		var node: Variant = world.get(property)
 		if node is Node and is_instance_valid(node) and node.get_parent() == null:
-			node.free()
+			world.add_child(node)
 	world.free()
 	print("RESULT ", passed, " passed; ", failures.size(), " failed")
 	quit(0 if failures.is_empty() else 1)

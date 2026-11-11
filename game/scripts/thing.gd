@@ -14,6 +14,9 @@ var thrown := false
 var story_pickup_allowed := true
 var story_move_allowed := true
 var story_hold_position := false
+var story_health := 1.0
+var story_indestructible := false
+var story_drowning := false
 var story_resources := Vector2i.ZERO
 var _resource_attachments: Dictionary = {}
 var story_smooth_heading := true
@@ -31,6 +34,9 @@ var _script_move_active := false
 var _script_waypoints := PackedVector3Array()
 var _script_move_target := Vector3.ZERO
 var _script_move_radius := 0.0
+var _script_wander_radius := -1.0
+var _script_wander_centre := Vector3.ZERO
+var _script_wander_wait := Vector2(2.0, 7.0)
 var _wait := 0.0
 var _flee_left := 0.0
 var _dead_time := 0.0
@@ -158,6 +164,7 @@ func prepare_script_animation(reader: AnmReader, animation: int, repeats: int) -
 func play_script_animation() -> bool:
 	if _prepared_script_clip.is_empty() or state != State.IDLE:
 		return false
+	_script_wander_radius = -1.0
 	_script_clip = _prepared_script_clip
 	_script_clip_duration = float(_script_animations.clips[_script_clip]["duration"])
 	_script_clip_end = INF if _prepared_script_repeats == -1 else _script_clip_duration * _prepared_script_repeats
@@ -268,6 +275,7 @@ func _fly(delta: float) -> void:
 			velocity = Vector3.ZERO
 			state = State.IDLE
 			if kind == "villager":
+				story_drowning = true
 				die()
 				world._say("Житель утонул.")
 			elif kind == "food":
@@ -386,10 +394,11 @@ func _walk(delta: float) -> void:
 	if flat.length() < 1.0:
 		_wait -= delta
 		if _wait <= 0.0:
-			var r: float = ai["wander_radius"]
+			var r: float = _script_wander_radius if _script_wander_radius >= 0.0 else float(ai["wander_radius"])
+			var centre: Vector3 = _script_wander_centre if _script_wander_radius >= 0.0 else home
 			var a := randf() * TAU
-			_target = home + Vector3(cos(a), 0.0, sin(a)) * randf() * r
-			_wait = 2.0 + randf() * 5.0
+			_target = centre + Vector3(cos(a), 0.0, sin(a)) * randf() * r
+			_wait = randf_range(_script_wander_wait.x, _script_wander_wait.y) if _script_wander_radius >= 0.0 else 2.0 + randf() * 5.0
 		return
 	if not _walk_step(flat.normalized() * minf(speed * delta, flat.length())):
 		_target = position
@@ -409,6 +418,7 @@ func _walk_step(step: Vector3) -> bool:
 func set_script_move(target: Vector3, radius: float) -> bool:
 	if kind != "villager" or state != State.IDLE or not target.is_finite() or not is_finite(radius) or radius < 0.0:
 		return false
+	_script_wander_radius = -1.0
 	_script_move_target = target
 	story_hold_position = true
 	_script_waypoints.clear()
@@ -416,6 +426,35 @@ func set_script_move(target: Vector3, radius: float) -> bool:
 	_script_move_radius = radius
 	_script_move_active = true
 	return true
+
+
+func set_script_wander(centre: Vector3, radius: float, minimum_turns: int, maximum_turns: int) -> bool:
+	if kind != "villager" or state != State.IDLE or not centre.is_finite() or not is_finite(radius) or radius < 0.0 or radius > 1000.0 or minimum_turns < 0 or maximum_turns < minimum_turns or maximum_turns > 65535:
+		return false
+	# Adapt the existing provisional wanderer to the script's centre/radius
+	# and wait-turn bounds. Its random distribution is not an original solver.
+	_script_wander_centre = centre
+	_script_wander_radius = radius
+	var rate := float(preload("res://scripts/data.gd").STORY_VM["core"]["tick_rate"])
+	_script_wander_wait = Vector2(float(minimum_turns) / rate, float(maximum_turns) / rate)
+	_script_move_active = false
+	_script_waypoints.clear()
+	_script_clip = ""
+	_script_move_clip = ""
+	story_hold_position = false
+	_target = position
+	_wait = 0.0
+	return true
+
+
+func release_script_control() -> void:
+	story_hold_position = false
+	_script_wander_radius = -1.0
+	_script_move_active = false
+	_script_waypoints.clear()
+	_script_clip = ""
+	_script_move_clip = ""
+	_target = position
 
 
 func set_script_path(points: PackedVector3Array) -> bool:
@@ -496,7 +535,20 @@ func flee_from(p: Vector3) -> void:
 	state = State.FLEE
 
 
+func set_story_health(value: float) -> bool:
+	if not is_finite(value) or value < 0.0 or value > 1.0 or (state == State.DEAD and value > 0.0):
+		return false
+	# The checked native health setter ignores lethal writes while the
+	# indestructible flag is set; it does not replace them with full health.
+	if story_indestructible and value <= 0.01: return true
+	story_health = value
+	if value == 0.0: die()
+	return true
+
+
 func die() -> void:
+	if story_indestructible: return
+	story_health = 0.0
 	state = State.DEAD
 	rotation.x = 0.0 if rig else PI / 2.0
 	position.y = world.ground_y(position) + 0.3

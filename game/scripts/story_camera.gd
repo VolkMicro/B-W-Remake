@@ -18,6 +18,8 @@ var _follow_distance := 0.0
 var _follow_yaw := 0.0
 var _follow_pitch := MIN_FOLLOW_PITCH
 var _follow_heading := false
+var _path: Dictionary = {}
+var _path_elapsed := 0.0
 
 
 func update_player_pose(player_eye: Vector3, player_focus: Vector3) -> void:
@@ -94,6 +96,15 @@ func constrain_player_focus(point: Vector3) -> Vector3:
 
 
 func advance(delta: float) -> void:
+	if not is_finite(delta) or delta < 0.0:
+		return
+	if not _path.is_empty():
+		_path_elapsed = minf(_path_elapsed + delta * 1000.0, float(_path["duration"]))
+		eye = _sample_path_channel(_path["eye"], _path_elapsed)
+		focus = _sample_path_channel(_path["focus"], _path_elapsed)
+		if _path_elapsed >= float(_path["duration"]):
+			_path.clear()
+		return
 	if _follow_target != null:
 		_update_follow_pose()
 	if not _eye_motion.is_empty():
@@ -114,6 +125,7 @@ func release() -> void:
 	_focus_follow_target = null
 	_eye_motion.clear()
 	_focus_motion.clear()
+	_cancel_path()
 
 
 func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
@@ -144,7 +156,7 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 				release()
 			return _reply(0)
 		35:
-			var arrived := _eye_motion.is_empty() and _focus_motion.is_empty()
+			var arrived := _path.is_empty() and _eye_motion.is_empty() and _focus_motion.is_empty()
 			return _reply(0, [StoryVm.integer(int(arrived), StoryVm.BOOL)])
 		180:
 			return _set_follow_properties(stack, task)
@@ -154,6 +166,7 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 func follow(target: Node3D, distance: float, height: float, task: int) -> bool:
 	if task <= 0 or owner_task != task or not is_finite(distance) or not is_finite(height):
 		return false
+	_cancel_path()
 	var offset := eye - focus
 	_follow_target = weakref(target)
 	_follow_height = height
@@ -170,6 +183,7 @@ func follow(target: Node3D, distance: float, height: float, task: int) -> bool:
 func follow_focus(target: Node3D, task: int, half_height := 0.0) -> bool:
 	if task <= 0 or owner_task == 0 or not is_instance_valid(target) or not is_finite(half_height):
 		return false
+	_cancel_path()
 	_follow_target = null
 	_focus_follow_target = weakref(target)
 	_focus_follow_height = half_height
@@ -223,6 +237,7 @@ func _set_target(id: int, stack: Array) -> Dictionary:
 	var seconds := StoryVm.as_float(stack.back()) if moving else 0.0
 	if not target.is_finite() or not is_finite(seconds):
 		return {"ok": false}
+	_cancel_path()
 	_follow_target = null
 	if id in [2, 4]:
 		_focus_follow_target = null
@@ -250,6 +265,92 @@ func _set_target(id: int, stack: Array) -> Dictionary:
 		motion["elapsed"] = 0.0
 		motion["duration"] = seconds
 	return _reply(count)
+
+
+func run_path(editor: PackedByteArray, path_id: int, task: int) -> bool:
+	# Nested script calls may operate the active camera, just like move/set.
+	if task <= 0 or owner_task == 0:
+		return false
+	var track := read_path(editor, path_id)
+	if track.is_empty():
+		return false
+	_follow_target = null
+	_focus_follow_target = null
+	_eye_motion.clear()
+	_focus_motion.clear()
+	_path = track
+	_path_elapsed = 0.0
+	eye = _sample_path_channel(track["eye"], 0.0)
+	focus = _sample_path_channel(track["focus"], 0.0)
+	return true
+
+
+static func read_path(editor: PackedByteArray, path_id: int) -> Dictionary:
+	# The existing Track reader uses the second position channel for walkers.
+	# A camera needs both channels from that same editor record. Keep their
+	# independent key times; short focus channels settle while the eye continues.
+	if path_id < 0 or editor.size() < 80 or editor.slice(0, 14).get_string_from_ascii() != "LiOnHeAdEDITOR":
+		return {}
+	var name_bytes := ("Track%d" % path_id).to_ascii_buffer()
+	if name_bytes.size() >= 32:
+		return {}
+	var result: Dictionary = {}
+	for p in range(14, editor.size() - 40 + 1):
+		if editor[p] != name_bytes[0] or editor[p + name_bytes.size()] != 0 or editor.slice(p, p + name_bytes.size()) != name_bytes:
+			continue
+		if not result.is_empty():
+			return {}
+		var limit := p + 36 + int(editor.decode_u32(p + 32))
+		var first := p + 40
+		if limit > editor.size() or first + 36 > limit:
+			return {}
+		var second := first + int(editor.decode_u16(first))
+		var eye_track := _read_path_channel(editor, first, second)
+		var focus_track := _read_path_channel(editor, second, limit)
+		if eye_track.is_empty() or focus_track.is_empty():
+			return {}
+		result = {"eye": eye_track, "focus": focus_track,
+			"duration": maxi(int(eye_track["duration"]), int(focus_track["duration"]))}
+	return result
+
+
+static func _read_path_channel(editor: PackedByteArray, start: int, limit: int) -> Dictionary:
+	if start < 0 or limit > editor.size() or start + 36 > limit:
+		return {}
+	var count := int(editor.decode_u32(start + 4))
+	if count < 2 or count > 100 or start + 36 + 40 * count > limit:
+		return {}
+	var duration := int(editor.decode_u32(start + 16))
+	var points := PackedVector3Array()
+	var times := PackedFloat32Array()
+	for i in count:
+		var p := start + 36 + i * 12
+		var point := Vector3(editor.decode_float(p), editor.decode_float(p + 4), -editor.decode_float(p + 8))
+		var time := editor.decode_float(start + 36 + 36 * count + i * 4)
+		if not point.is_finite() or not is_finite(time) or (i > 0 and time <= times[i - 1]):
+			return {}
+		points.append(point)
+		times.append(time)
+	if duration <= 0 or times[0] != 0.0 or times[-1] < duration:
+		return {}
+	return {"points": points, "times": times, "duration": duration}
+
+
+static func _sample_path_channel(track: Dictionary, time: float) -> Vector3:
+	var points: PackedVector3Array = track["points"]
+	var times: PackedFloat32Array = track["times"]
+	var sample_time := clampf(time, 0.0, float(track["duration"]))
+	# Reuse the legacy walker's piecewise-linear presentation interpolation.
+	# Authored additional control points are not claimed as a restored spline.
+	for i in range(1, times.size()):
+		if sample_time <= times[i] or i == times.size() - 1:
+			return points[i - 1].lerp(points[i], clampf(inverse_lerp(times[i - 1], times[i], sample_time), 0.0, 1.0))
+	return points[-1]
+
+
+func _cancel_path() -> void:
+	_path.clear()
+	_path_elapsed = 0.0
 
 
 func _advance_motion(motion: Dictionary, delta: float) -> Vector3:
