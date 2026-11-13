@@ -1,6 +1,6 @@
 # Продолжение Black & White на Godot
 
-Дата состояния: 11 ноября 2026. Цель пользователя — пройти исходную кампанию
+Дата состояния: 13 ноября 2026. Цель пользователя — пройти исходную кампанию
 на новом движке, сохранив ощущение оригинала. Работа идёт в **native Godot**,
 оригинальный exe во время игры не запускается. Полная реставрация не закончена.
 
@@ -10,7 +10,41 @@
 TASK_CLAUDE_RU.md. Сначала CLEAN_ROOM_RU.md определяет роль/доступ: эта
 инструкция содержит legacy research и не передаётся чистому реализатору.
 
-## Текущий checkpoint: Preview 9.4 — 11 ноября 2026
+## Текущий checkpoint: Preview 9.5 — 13 ноября 2026
+
+Source commitafb3e9d. Exe: `build/story-preview/GodotIsland-village-preview9.5.exe`,
+SHA256 `342AB0F102E9B343A0AFE792336A4E48EB83BA6F808358389F8BFE36AC3BE4A6`.
+Отчёт: development/preview9.5-verification.json. Preview9.4 сохранён.
+
+Пользователь сообщил, что все свитки и подсказки не нажимаются обеими кнопками.
+Воспроизведён конкретный блокер: отпускание Shift во время ролика терялось,
+а handover не сбрасывал Shift, оставляя Action закрытым для всех трёх типов.
+Теперь release учитывается до GUI/cinematic gates, а focus loss и handover
+сбрасывают жесты без сброса/броска предмета. Точный исходный жест пользователя
+не был записан; это доказанная причина такого симптома, не всеобщая гарантия.
+
+Вторая ошибка: DYK entries с текстом, но без voice sample, молча отбрасывались.
+Теперь исходный caption выводится в новой карточке. Закрытие: «Продолжить»,
+Escape или ПКМ вне карточки. Пока она открыта, камера/мировые действия заблокированы.
+Язык текста берётся из установки. Main/HUD/OriginalDialogue — legacy/coordinator
+adapters, без нового clean-room заявления.
+
+Exact-pack:11 focused headless прогонов396 checks, rendered input43 PASS,
+все11 DYK и длиннейший текст при1600x900/1280x720/1024x768. Input тест проходит
+через настоящий viewport/GUI, а не прямой вызов _unhandled_input. Exported startup
+headless/rendered и fresh Git export/input42/LostBrother58/оба startup PASS.
+Rendered full opening повторён до второго камня: bits3/journal.5/camera0 PASS.
+Это ускоренный тест с пропуском медиа, не ручное прохождение. Engine/script errors0.
+Fresh headless forced-exit по-прежнему иногда предупреждает о4 ObjectDB instances.
+
+Следующий рубеж сохраняется: SetupSculptor/native51/address34914/line35,
+поиск незанятых сценарием камней, затем третий камень и реальный выбор существа.
+Приватные CHL listings — Research/ThirdStone; первый read-only Claude review
+исчерпал16 turns без отчёта, tool-less research review запущен отдельно. Не
+приписывать им готовую реализацию. Нормальный launcher переключён на9.5 после
+проверок, старые окна требуется закрыть и запустить заново.
+
+## Предыдущий checkpoint: Preview 9.4 — 11 ноября 2026 (история)
 
 Source commit4d2460d. Exe: `build/story-preview/GodotIsland-village-preview9.4.exe`,
 SHA256 `BA4AC5D63F015FDB8DA37FC06D71E8D3D1EEDE5123766967B775B96B7AB213A5`.

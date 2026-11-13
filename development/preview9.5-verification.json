@@ -1,0 +1,341 @@
+{
+  "date": "2026-11-13",
+  "preview": "9.5",
+  "sourceCommit": "afb3e9da0f545eda78f870ed19503fa306922cd2",
+  "executable": "build/story-preview/GodotIsland-village-preview9.5.exe",
+  "sha256": "342AB0F102E9B343A0AFE792336A4E48EB83BA6F808358389F8BFE36AC3BE4A6",
+  "status": "verified scroll/help input checkpoint; campaign boundary remains second delivered stone",
+  "engine": "Godot4.7.2 stable ed1daf0bf",
+  "requiresOriginalInstall": true,
+  "completeCampaign": false,
+  "changes": [
+    "Global release reconciliation before GUI/cinematic input gates; camera handover and focus loss clear Shift and mouse gestures without throwing or dropping the held item.",
+    "Installed text-only DYK captions now have a visible help card; optional speech only when a matching sample exists. Close with Continue, Escape, or RMB outside the card.",
+    "Help does not pick up world objects, blocks camera keyboard movement, and hides the 3D hand while using the visible GUI cursor.",
+    "New viewport-level regression dispatches through Input.parse_input_event and the real GUI path, rather than calling the world action handler directly.",
+    "LostBrother focused capture moved back to after the actual second delivery; its synchronous actor contract no longer contains the unrelated capture coroutine."
+  ],
+  "reproduced": {
+    "source": "295db7d Preview9.4 before product edits",
+    "log": "scratch/scroll-input-shift-repro.log",
+    "passed": 7,
+    "failed": 6,
+    "engineScriptErrors": [],
+    "sequence": "Press Shift through viewport, camera acquires control, release Shift during cinema, camera releases and resumes, RMB on each of DYK/silver/gold. Shift remained true and all three actions were blocked.",
+    "textOnlyHint": "A source-created first-island hint had help enum4120 and a valid parsed caption but no matching voice. Previous click handler tried speech only, so no text appeared.",
+    "limit": "This is a reproducible cause of the reported symptom; the user did not supply the exact preceding gesture sequence."
+  },
+  "checks": [
+    {
+      "test": "verify_scroll_input.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\scroll-input-9.5-candidate\\GodotIsland-village-preview9.5.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_scroll_input.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 42,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/preview9.5-pack-scroll-input.log"
+    },
+    {
+      "test": "verify_camera_handover.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\scroll-input-9.5-candidate\\GodotIsland-village-preview9.5.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_camera_handover.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 7,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/preview9.5-pack-camera-handover.log"
+    },
+    {
+      "test": "verify_story_camera_input.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\scroll-input-9.5-candidate\\GodotIsland-village-preview9.5.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_story_camera_input.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 16,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/preview9.5-pack-camera-input.log"
+    },
+    {
+      "test": "verify_hand_world.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\scroll-input-9.5-candidate\\GodotIsland-village-preview9.5.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_hand_world.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 20,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/preview9.5-pack-hand-world.log"
+    },
+    {
+      "test": "verify_resource_input.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\scroll-input-9.5-candidate\\GodotIsland-village-preview9.5.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_resource_input.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 55,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/preview9.5-pack-resource-input.log"
+    },
+    {
+      "test": "verify_audio.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\scroll-input-9.5-candidate\\GodotIsland-village-preview9.5.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_audio.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 68,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/preview9.5-pack-audio.log"
+    },
+    {
+      "test": "verify_story_scrolls.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\scroll-input-9.5-candidate\\GodotIsland-village-preview9.5.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_story_scrolls.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection",
+        "--deliver-key"
+      ],
+      "passed": 27,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/preview9.5-pack-scrolls.log"
+    },
+    {
+      "test": "verify_citadel_construction.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\scroll-input-9.5-candidate\\GodotIsland-village-preview9.5.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_citadel_construction.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 38,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/preview9.5-pack-construction.log"
+    },
+    {
+      "test": "verify_citadel_workflow.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\scroll-input-9.5-candidate\\GodotIsland-village-preview9.5.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_citadel_workflow.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection",
+        "--source-tutorial"
+      ],
+      "passed": 11,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/preview9.5-pack-workflow.log"
+    },
+    {
+      "test": "verify_landmark_spawn.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\scroll-input-9.5-candidate\\GodotIsland-village-preview9.5.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_landmark_spawn.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 54,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/preview9.5-pack-landmark.log"
+    },
+    {
+      "test": "verify_lost_brother.gd",
+      "arguments": [
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\scroll-input-9.5-candidate\\GodotIsland-village-preview9.5.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\game\\tests\\verify_lost_brother.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 58,
+      "exit": 0,
+      "engineScriptErrors": [],
+      "warnings": [],
+      "log": "scratch/preview9.5-pack-lost-brother.log"
+    }
+  ],
+  "focusedHeadlessPassed": 396,
+  "rendered": {
+    "test": "verify_scroll_input.gd",
+    "passed": 43,
+    "exit": 0,
+    "engineScriptErrors": [],
+    "log": "scratch/preview9.5-scroll-input-rendered.log",
+    "capture": "build/scroll-input-9.5-candidate/help-card.png",
+    "captureViewed": true,
+    "coverage": "Actual original scroll/hand meshes and source-created hint; all11 installed DYK captions; longest hint fits1600x900/1280x720/1024x768; focus loss retains held rock; GUI consumes world action; button and Escape close help."
+  },
+  "startup": [
+    {
+      "mode": "headless",
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "frames": 180,
+      "log": "scratch/preview9.5-startup-headless.log"
+    },
+    {
+      "mode": "rendered",
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "frames": 180,
+      "log": "scratch/preview9.5-startup-rendered.log"
+    }
+  ],
+  "freshGit": {
+    "commit": "afb3e9da0f545eda78f870ed19503fa306922cd2",
+    "source": "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\scroll-input-fresh-afb3e9d",
+    "exportExit": 0,
+    "lostBrotherPassed": 58,
+    "testExit": 0,
+    "testErrors": [],
+    "startup": [
+      {
+        "mode": "headless",
+        "exit": 0,
+        "errors": [],
+        "warnings": [
+          "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details)."
+        ]
+      },
+      {
+        "mode": "rendered",
+        "exit": 0,
+        "errors": [],
+        "warnings": []
+      }
+    ],
+    "sha256": "C3C2E55C202DB7B34ED3939D0F30CB62D50696518670AB08015D4274C2F4909F",
+    "limitation": "git archive only; no existing build/cache/research copied; matching engine used for pack test, tracked decoder included; original installation read separately",
+    "scrollInputPassed": 42,
+    "scrollInputLog": "scratch/scroll-input-fresh-ui.log"
+  },
+  "opening": {
+    "result": "PASS",
+    "log": "scratch/preview9.5-pack-opening.log",
+    "mode": "rendered Compatibility exact pack; fixed-fps15,time_scale4,media skipped",
+    "temple": true,
+    "doorWaitStable": true,
+    "keeper": true,
+    "plinthBits": 3,
+    "stones": 2,
+    "journal55": 0.5,
+    "cameraOwner": 0,
+    "unexpectedPickups": 0,
+    "nextUnsupported": {
+      "script": "SetupSculptor",
+      "native": 51,
+      "address": 34914,
+      "line": 35
+    },
+    "limitation": "Synthetic input into game handlers, not a normal-speed manual playthrough."
+  },
+  "provenance": {
+    "role": "coordinator/integrator",
+    "scope": "Existing main/input/HUD, OriginalDialogue caption reader and regression fixtures; no new independent module or clean-room claim.",
+    "originalData": "Read in memory from installed game; no original captions, meshes or recordings added to Git.",
+    "thirdStone": "Private source route exploration and Claude research-only review started separately. First read-only request exhausted its16-turn limit without a final report. Third-stone implementation is not part of this checkpoint."
+  },
+  "commands": {
+    "build": "tools/build_preview.ps1 -Godot <godot_console.exe> -PreviewVersion9.5 -OutputDirectory build/scroll-input-9.5-candidate",
+    "pack": "matching Godot console --path game --main-pack <absolute9.5.exe> --script <absolute-test.gd> -- --bw=<install>",
+    "rendered": "same pack command with --rendering-method gl_compatibility before --; verify_scroll_input.gd and --capture=<absolute.png>",
+    "opening": "verify_opening_runtime.gd on same pack, --fixed-fps15 before --; --runtime-automation --runtime-second-key --runtime-seconds=1600 after --",
+    "startup": "Exact exported.exe, Start-Process -WindowStyle Hidden -Wait -PassThru, --quit-after180 --log-file <absolute> -- --bw=<install> --story-preview"
+  },
+  "finalEngineScriptErrors": 0,
+  "knownWarnings": [
+    "Fresh Git headless forced-exit startup reported4 ObjectDB instances at exit; rendered startup and final candidate starts did not. This pre-existing intermittent warning remains open."
+  ],
+  "limitations": [
+    "No manual OS-click playthrough or original-frame fidelity claim.",
+    "Help card presentation is new UI, displaying the installed original text in its installed language.",
+    "Third stone, gate opening and creature choice remain incomplete; SetupSculptor native51 stays pending.",
+    "Prior hand/physics/weather approximations and aftertouch limitation remain."
+  ]
+}

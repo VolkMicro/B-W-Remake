@@ -397,6 +397,22 @@ skipped media, not a normal-speed manual campaign playthrough. Third-key work
 starts but SetupSculptor remains suspended at native51, address34914, line35.
 The first island, gates and creature choice remain incomplete.
 
+## Preview 9.5: scroll input recovery and text-only help
+
+13 November2026, sourceafb3e9d. Releasing Shift during a cinema previously
+left rotation active after camera handover, blocking Action on every scroll.
+Global release reconciliation and focus/handover cleanup now preserve held
+items while cancelling stale gestures. Installed text-only DYK entries now
+display their captions in a closeable help card; speech is optional.
+
+Viewport-level input/GUI42 headless and43 rendered checks, eleven focused
+runs396 checks, exact startup, repeated opening through the second stone and
+fresh Git export/input42/rescue58/startup passed. The help capture was viewed.
+These are automated fixtures, not manual original-game fidelity acceptance.
+Presentation/input adapter work retains legacy/coordinator provenance. Campaign
+progression remains blocked at SetupSculptor/native51; third stone and creature
+selection are not complete. See development/preview9.5-verification.json.
+
 ## Optional standalone packaging
 
 The user now accepts requiring original files in the finished remake. A one-time

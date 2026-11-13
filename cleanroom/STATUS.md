@@ -4,7 +4,8 @@
 
 - Некоммерческий фанатский ремейк на Godot; файлы оригинала допустимы
   и в готовой версии. Цель и этапы — PROJECT_RU.md.
-- Проверенная игровая основа — Preview9.4, source commit4d2460d.
+- Проверенная игровая основа — Preview9.5, source commitafb3e9d.
+  Second-stone checkpoint9.4 —4d2460d.
   Hand checkpoint9.3 —9c3324e.
   Storage checkpoint9.2 — cf74fad.
   Collision checkpoint9.1 — a061205.
@@ -13,7 +14,21 @@
 - Основной checkout/старые исследования — legacy, без заявления
   о доказанном clean-room происхождении.
 
-## Состояние 11 ноября: второй камень
+## Состояние 13 ноября: свитки и DYK
+
+Ремонт main/input/HUD и OriginalDialogue остаётся coordinator/legacy работой.
+Новых independent модулей нет. Воспроизведён потерянный Shift release во время
+cinematic, блокировавший все три типа свитка. Global release и cleanup после
+focus loss/handover не создают броска. DYK текст берётся из уже читаемой
+установки; отсутствие voice sample больше не скрывает caption. Новая карточка
+не заявляется точной копией renderer оригинала. Исходных текстов в Git нет.
+Exact viewport42/rendered43,11 focused396, полный opening до второго камня,
+exact startup и fresh Git export/input42/rescue58/startup PASS. Отчёт9.5.
+Первая readonly Claude research сессия по ThirdStone исчерпала16 turns без
+итогового отчёта; отдельный tools0 research prompt имеет исследовательскую
+роль и не является approved implementation packet. Native51 ещё pending.
+
+## Предыдущий checkpoint 11 ноября: второй камень
 
 Исходный LostBrother/GiveReward проходит до физической доставки второй награды,
 bits3, journal55=0.5 и возврата камеры. Новый WeatherZone получен от свежего

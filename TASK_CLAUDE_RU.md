@@ -20,7 +20,9 @@
 Ghidra должна устранять конкретную неопределённость. Не переписывай весь движок,
 не меняй платформу и не заменяй сюжет новой песочницей или отдельным ИИ-чатом.
 Исторический checkpoint передачи — Preview9, commit dce3b21. Текущий
-checkpoint — Preview9.4, source4d2460d: два реально доставленных камня,
+checkpoint — Preview9.5, sourceafb3e9d: исправлены stuck Shift/Action
+и text-only DYK; viewport/GUI input и exact/fresh builds проверены. Сюжетная
+граница Preview9.4, source4d2460d, сохраняется: два реально доставленных камня,
 LostBrother/GiveReward, journal55=0.5 и камера возвращена. Проверены exact exe,
 полный ускоренный rendered input-only путь и fresh Git build. Следующий блокер:
 SetupSculptor/native51/address34914/line35; не подменять завершение. Новый
@@ -30,7 +32,7 @@ Launch-Second-Stone-Test.cmd передаёт управление после н
 BW-001/002/004 имеют работающие scoped исправления; точность специальных
 состояний/эффектов и aftertouch остаются открытыми. BW-003 имеет исправленные
 регрессии и ожидает проверки исходного случая. Актуальные детали —
-BUGS_RU.md и development/preview9.4-verification.json; старые описания ниже
+BUGS_RU.md и development/preview9.5-verification.json; старые описания ниже
 показывают требования, а не отсутствие уже добавленных tests.
 Кампания и полное задание Preview10 не готовы.
 
@@ -113,7 +115,7 @@ BUGS_RU.md и development/preview9.4-verification.json; старые описа�
 - Новый exe: запуск с отрисовкой и без, декодер рядом, правильная загрузка
   ресурсов. Проверяй SCRIPT ERROR/ERROR явно, даже при exit code 0.
 - Свежая копия файлов Git без build/cache/research должна собираться.
-  tools/build_preview.ps1 принимает -PreviewVersion (default9.4):
+  tools/build_preview.ps1 принимает -PreviewVersion (default9.5):
   задай10 для Preview10 вместе с заголовком окна. Старый
   проверенный exe сохраняй; launcher переключай после проверки нового.
 
