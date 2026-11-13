@@ -26,7 +26,9 @@ Exact viewport42/rendered43,11 focused396, полный opening до второ�
 exact startup и fresh Git export/input42/rescue58/startup PASS. Отчёт9.5.
 Первая readonly Claude research сессия по ThirdStone исчерпала16 turns без
 итогового отчёта; отдельный tools0 research prompt имеет исследовательскую
-роль и не является approved implementation packet. Native51 ещё pending.
+роль и не является approved implementation packet. Второй review завершён;
+Ghidra native/query passes exit0/save. Проверенные границы и несверенные
+выводы Claude — third-stone-frontier-2026-11-13.md. Native51 ещё pending.
 
 ## Предыдущий checkpoint 11 ноября: второй камень
 

@@ -319,14 +319,14 @@
     "role": "coordinator/integrator",
     "scope": "Existing main/input/HUD, OriginalDialogue caption reader and regression fixtures; no new independent module or clean-room claim.",
     "originalData": "Read in memory from installed game; no original captions, meshes or recordings added to Git.",
-    "thirdStone": "Private source route exploration and Claude research-only review started separately. First read-only request exhausted its16-turn limit without a final report. Third-stone implementation is not part of this checkpoint."
+    "thirdStone": "Private CHL and Ghidra native/query passes completed with exit0/save. First readonly Claude session hit16-turn limit; fixed tools0 research-only review returned a dependency map with claims requiring verification. No third-stone product implementation in this checkpoint. See cleanroom/third-stone-frontier-2026-11-13.md."
   },
   "commands": {
-    "build": "tools/build_preview.ps1 -Godot <godot_console.exe> -PreviewVersion9.5 -OutputDirectory build/scroll-input-9.5-candidate",
+    "build": "tools/build_preview.ps1 -Godot <godot_console.exe> -PreviewVersion 9.5 -OutputDirectory build/scroll-input-9.5-candidate",
     "pack": "matching Godot console --path game --main-pack <absolute9.5.exe> --script <absolute-test.gd> -- --bw=<install>",
     "rendered": "same pack command with --rendering-method gl_compatibility before --; verify_scroll_input.gd and --capture=<absolute.png>",
-    "opening": "verify_opening_runtime.gd on same pack, --fixed-fps15 before --; --runtime-automation --runtime-second-key --runtime-seconds=1600 after --",
-    "startup": "Exact exported.exe, Start-Process -WindowStyle Hidden -Wait -PassThru, --quit-after180 --log-file <absolute> -- --bw=<install> --story-preview"
+    "opening": "verify_opening_runtime.gd on same pack, --fixed-fps 15 before --; --runtime-automation --runtime-second-key --runtime-seconds=1600 after --",
+    "startup": "Exact exported.exe, Start-Process -WindowStyle Hidden -Wait -PassThru, --quit-after 180 --log-file <absolute> -- --bw=<install> --story-preview"
   },
   "finalEngineScriptErrors": 0,
   "knownWarnings": [

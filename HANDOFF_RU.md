@@ -40,8 +40,10 @@ Fresh headless forced-exit по-прежнему иногда предупреж
 Следующий рубеж сохраняется: SetupSculptor/native51/address34914/line35,
 поиск незанятых сценарием камней, затем третий камень и реальный выбор существа.
 Приватные CHL listings — Research/ThirdStone; первый read-only Claude review
-исчерпал16 turns без отчёта, tool-less research review запущен отдельно. Не
-приписывать им готовую реализацию. Нормальный launcher переключён на9.5 после
+исчерпал16 turns без отчёта, отдельный tool-less research review завершён.
+Ghidra native/query passes exit0/save, результаты и открытые вопросы —
+cleanroom/third-stone-frontier-2026-11-13.md. Не приписывать им готовую
+реализацию. Нормальный launcher переключён на9.5 после
 проверок, старые окна требуется закрыть и запустить заново.
 
 ## Предыдущий checkpoint: Preview 9.4 — 11 ноября 2026 (история)
