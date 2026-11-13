@@ -161,6 +161,9 @@ var virtual_influence := true
 var influence_sources: Array[Dictionary] = []
 var story_highlights: Array[Node3D] = []
 var story_highlights_visible := true
+var story_help_panel: PanelContainer
+var story_help_text: Label
+var story_help_close: Button
 var town_nodes: Array[Node3D] = []
 var villager_anims := AnmReader.new()
 var landmark_anims := AnmReader.new()
@@ -286,7 +289,7 @@ func _load_world() -> void:
 	_update_camera()
 	loaded = true
 	if story_preview and DisplayServer.get_name() != "headless":
-		get_window().title = "Black & White — реставрация · Preview 9.4"
+		get_window().title = "Black & White — реставрация · Preview 9.5"
 		Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	_load_preservation()
 	var heights := PackedStringArray()
@@ -764,14 +767,46 @@ func _resume_player_camera() -> void:
 		dist = clampf(offset.length(), _camera_min_distance(), cfg_camera["max_dist"])
 		yaw = atan2(offset.x, offset.z)
 		pitch = atan2(offset.y, Vector2(offset.x, offset.z).length())
+	_reset_player_gestures()
+	_hand_surface_initialized = false
+
+
+func _reset_player_gestures() -> void:
 	_left_down = false
 	_right_down = false
 	_middle_down = false
+	_shift_camera = false
 	resource_interaction.stop()
 	_action_release = false
 	if _hand_momentum != null: _hand_momentum.cancel()
-	_hand_surface_initialized = false
 	_dragging = false
+	story_camera_input.set_hand_state(0)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_WINDOW_FOCUS_OUT:
+		# Releases can happen in another window. Cancel gestures without dropping
+		# or throwing the held object when the game receives focus again.
+		_reset_player_gestures()
+
+
+func _input(event: InputEvent) -> void:
+	# A cinematic, temple screen or GUI control can consume the matching release.
+	# Reconcile held modifiers before those gates; actions still start in
+	# _unhandled_input so clicking a UI control never picks up a world object.
+	if event is InputEventKey and event.keycode == KEY_SHIFT and not event.pressed:
+		_shift_camera = false
+	elif event is InputEventMouseButton and not event.pressed:
+		match event.button_index:
+			MOUSE_BUTTON_LEFT:
+				_left_down = false
+				_dragging = false
+			MOUSE_BUTTON_MIDDLE:
+				_middle_down = false
+				story_camera_input.set_hand_state(0)
+			MOUSE_BUTTON_RIGHT:
+				_right_down = false
+				resource_interaction.stop()
 
 
 func ground_point(screen: Vector2) -> Vector3:
@@ -810,6 +845,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
 			_hand_zoom_time = 0.25
 			_cancel_pending_fling()
+	if story_help_is_open():
+		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
+			story_close_help()
+		elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+			story_close_help()
+		return
 	if story_inside_temple():
 		if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 			story_temple.close()
@@ -998,6 +1039,7 @@ func _process(delta: float) -> void:
 
 
 func _move_player_camera(delta: float) -> void:
+	if story_help_is_open(): return
 	if story_interface_level not in [0, 13, 14, 15]:
 		return
 	var turn := 0.0
@@ -1052,7 +1094,7 @@ func _update_world(delta: float) -> void:
 	if _cursor_screen.is_finite(): mouse = _cursor_screen
 	if story_hand_demo.playing:
 		mouse = story_hand_demo.pose()["cursor"] * get_viewport().get_visible_rect().size
-	var hand_active := story_camera.owner_task == 0 or story_hand_demo.playing
+	var hand_active := (story_camera.owner_task == 0 or story_hand_demo.playing) and not story_help_is_open()
 	if hand_active: _sample_hand_pointer(delta, mouse)
 	var selection: Dictionary = hand_target(mouse) if hand_active else {"point":ground_point(mouse),"normal":Vector3.UP,"target":null}
 	var gp: Vector3 = selection["point"]
@@ -1156,7 +1198,7 @@ func _click(screen: Vector2) -> void:
 		story_bridge.clicked_thing = weakref(highlight)
 		highlight.set_active(true)
 		if highlight.highlight_type == 1 and highlight.has_meta("help_text"):
-			story_play_voice(int(highlight.get_meta("help_text")))
+			story_show_help(int(highlight.get_meta("help_text")))
 		return
 	var best: Thing = null
 	best = selection.get("pickup") as Thing
@@ -1398,6 +1440,7 @@ func add_belief(ti: int, amount: float) -> void:
 # ---------------------------------------------------------------- HUD
 
 func story_set_widescreen(enabled: bool) -> void:
+	if enabled: story_close_help()
 	if story_letterbox == null:
 		if not enabled:
 			return
@@ -1871,6 +1914,65 @@ func story_play_voice(text_enum: int, single_line := true) -> bool:
 
 func story_voice_playing(text_enum: int) -> bool:
 	return is_instance_valid(dialogue) and dialogue.is_text_enum_playing(text_enum)
+
+
+func story_help_is_open() -> bool:
+	return is_instance_valid(story_help_panel) and story_help_panel.visible
+
+
+func story_show_help(text_enum: int) -> bool:
+	if not is_instance_valid(dialogue): return false
+	var caption: Dictionary = dialogue.caption_for_text_enum(text_enum)
+	if caption.is_empty() or str(caption.get("text", "")).is_empty(): return false
+	if not is_instance_valid(story_help_panel):
+		# New presentation for installed text-only DYK entries. The original
+		# caption is retained; lack of a voice sample must not discard the hint.
+		var layer := CanvasLayer.new()
+		layer.layer = hud.layer + 3
+		add_child(layer)
+		story_help_panel = PanelContainer.new()
+		story_help_panel.name = "OriginalHelp"
+		layer.add_child(story_help_panel)
+		story_help_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+		var margin := MarginContainer.new()
+		for edge in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
+			margin.add_theme_constant_override(edge, 24)
+		story_help_panel.add_child(margin)
+		var column := VBoxContainer.new()
+		column.add_theme_constant_override("separation", 18)
+		margin.add_child(column)
+		var title := Label.new()
+		title.text = "Подсказка"
+		title.add_theme_font_size_override("font_size", 24)
+		column.add_child(title)
+		story_help_text = Label.new()
+		story_help_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		story_help_text.add_theme_font_size_override("font_size", 21)
+		column.add_child(story_help_text)
+		story_help_close = Button.new()
+		story_help_close.text = "Продолжить"
+		story_help_close.pressed.connect(story_close_help)
+		column.add_child(story_help_close)
+	var width := minf(680.0, maxf(160.0, get_viewport().get_visible_rect().size.x - 48.0))
+	story_help_text.custom_minimum_size.x = width - 48.0
+	story_help_panel.offset_left = -width * 0.5
+	story_help_panel.offset_right = width * 0.5
+	story_help_panel.offset_top = -150.0
+	story_help_text.text = str(caption["text"])
+	story_help_panel.set_meta("text_enum", text_enum)
+	story_help_panel.show()
+	_reset_player_gestures()
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	story_help_close.grab_focus()
+	if dialogue.has_text_enum(text_enum): story_play_voice(text_enum)
+	return true
+
+
+func story_close_help() -> void:
+	if not story_help_is_open(): return
+	story_help_panel.hide()
+	_reset_player_gestures()
+	Input.mouse_mode = Input.MOUSE_MODE_HIDDEN if story_preview else Input.MOUSE_MODE_VISIBLE
 
 
 func story_clear_voice() -> void:

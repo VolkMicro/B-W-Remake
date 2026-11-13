@@ -83,6 +83,16 @@ func has_text_enum(text_enum: int) -> bool:
 	return text_enum >= 0 and text_enum < _caption_ids.size() and _bank_for(_caption_ids[text_enum]) != null
 
 
+func caption_for_text_enum(text_enum: int) -> Dictionary:
+	# Text-only help entries have no matching speech in either sound bank.
+	if text_enum < 0 or text_enum >= _caption_ids.size(): return {}
+	var id := _caption_ids[text_enum]
+	if not captions.has(id): return {}
+	var result: Dictionary = captions[id].duplicate()
+	result["id"] = id
+	return result
+
+
 func _bank_for(id: String) -> SoundBank:
 	if bank.entries.has(id):
 		return bank

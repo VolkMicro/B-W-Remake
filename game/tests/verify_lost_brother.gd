@@ -99,6 +99,9 @@ func verify_key_delivery(world: Node) -> void:
 	if not await until(world, func() -> bool: return world.story_journal[55]["success"] == 0.5 and world.story_camera.owner_task == 0, "original keeper cinema acknowledges the second delivered stone"): return
 	check(StoryVm.as_float(world.story_vm.variables[91]) == 1.0 and StoryVm.as_float(world.story_vm.variables[92]) == 1.0 and StoryVm.as_float(world.story_vm.variables[93]) == 0.0, "only the two genuinely delivered source objectives are acknowledged")
 	check(world.story_vm.tasks.values().any(func(t:Dictionary): return t["script"] == "TheSculptor") or world.story_vm.finished.values().any(func(t:Dictionary): return t["script"] == "TheSculptor"), "source starts the next quest without completing the third stone or creature choice")
+	if not capture.is_empty() and DisplayServer.get_name() != "headless":
+		await RenderingServer.frame_post_draw
+		root.get_texture().get_image().save_png(capture.get_basename() + "-second-stone.png")
 
 
 func verify_actor_contract(world: Node) -> void:
@@ -130,9 +133,6 @@ func verify_actor_contract(world: Node) -> void:
 	check(bridge.invoke(159, [none], {}).get("ok", false) and bridge.invoke(48, [none, StoryVm.integer(1)], {}).get("ok", false), "release and supported deletion tolerate source cleanup of an absent actor")
 	check(not bridge.invoke(48, [none, StoryVm.integer(2)], {}).get("ok", false), "unimplemented deletion modes remain unsupported")
 	probe.free()
-	if not capture.is_empty() and DisplayServer.get_name() != "headless":
-		await RenderingServer.frame_post_draw
-		root.get_texture().get_image().save_png(capture.get_basename() + "-second-stone.png")
 
 
 func until(world: Node, predicate: Callable, label: String, turns := 2000) -> bool:
