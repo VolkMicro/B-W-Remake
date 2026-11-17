@@ -413,6 +413,28 @@ Presentation/input adapter work retains legacy/coordinator provenance. Campaign
 progression remains blocked at SetupSculptor/native51; third stone and creature
 selection are not complete. See development/preview9.5-verification.json.
 
+## Preview 9.6: the genuine sculptor and third stone
+
+17 November2026, source8d2bd5f. The original sculptor scroll, music, animation,
+quarry carry/drop, source60s carving timer, blank-rock consumption and crafted
+reward51 now run through real hand delivery: plinthbits7 and three visible
+stones. The source acknowledges all three, updates journal55 to0.75 and starts
+CreaturesInGlade. Its CREATE(type12, subtype1), native27/address39763/line735,
+remains pending; creature choice and the full gate sequence are incomplete.
+
+Stable handles/live VM reference exclusion and native/factory adapters retain
+coordinator/legacy provenance. New OrbitActors was returned unchanged by a
+fresh tool-less implementer using an independently reviewed v3 packet. Its2778
+synthetic checks and actual twenty installed bird rigs18/20 checks pass; orbit
+radius/speed are new presentation policy, not recovered original animal AI.
+Fire vulnerability is stored; fire damage and ignition remain unported.
+
+Exact and fresh Git exported full accelerated input-only opening, focused
+sculptor89/91, scroll42/43, resources55/57 and both startup modes pass. Original
+assets/research/captures stay outside Git. No manual original-fidelity claim.
+See development/preview9.6-verification.json. The normal exe is the exact fresh
+build that passed verification; Preview9.5 remains available.
+
 ## Optional standalone packaging
 
 The user now accepts requiring original files in the finished remake. A one-time

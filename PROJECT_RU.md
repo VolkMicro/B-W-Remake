@@ -30,11 +30,19 @@
 - Preview9.3 (11 ноября, source9c3324e) добавляет ручной ресурсный Action, количественные кучки, поток, бросок движением руки и исходные законы обычного движения/масштаба кисти. Exact exported pack проходит вступление до первого ключа; fresh Git export/startup проверены. Отчёт development/preview9.3-verification.json. Полное совпадение с оригиналом, aftertouch и завершённый первый остров ещё не заявляются.
 - Preview9.4 (source4d2460d) проходит спасение брата, получение награды и физическую установку второго камня: bits3, journal55=0.5, камера возвращена. Полный rendered exported-pack прогон,15 focused982 checks, fresh Git export и startup проверены. Это ускоренный маршрут с пропуском медиа, не ручное прохождение. Отчёт development/preview9.4-verification.json. Следующий блокер — SetupSculptor/native51; третий камень и выбор существа ещё не готовы.
 
-Текущий Preview9.5 (13 ноября, sourceafb3e9d) исправляет блокировку свитков
+Предыдущий Preview9.5 (13 ноября, sourceafb3e9d) исправляет блокировку свитков
 после Shift/cinematic и показ текстовых DYK. Exact viewport/GUI и экспорт,
 полный ускоренный путь до второго камня и fresh Git build проверены.
-Отчёт development/preview9.5-verification.json. Кампания дальше второго камня
-по-прежнему не восстановлена; следующим идёт native51 задания скульптора.
+Отчёт development/preview9.5-verification.json. На том этапе кампания дальше
+второго камня ещё не была восстановлена; следующим был native51 скульптора.
+
+Текущий Preview9.6 (17 ноября, source8d2bd5f) восстанавливает задание
+скульптора: перенос quarry50, исходный таймер обработки и изготовление51,
+физическая установка третьего камня, bits7 и начало CreaturesInGlade.
+Полный ускоренный input-only путь на exact/fresh exported builds, focused
+сценарии и startup проверены. Отчёт development/preview9.6-verification.json.
+Следующий блокер — native27/type12 в CreaturesInGlade: создание и выбор
+существа, ворота и остальная кампания пока не завершены.
 
 ## Что предстоит
 

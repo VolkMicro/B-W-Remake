@@ -20,19 +20,23 @@
 Ghidra должна устранять конкретную неопределённость. Не переписывай весь движок,
 не меняй платформу и не заменяй сюжет новой песочницей или отдельным ИИ-чатом.
 Исторический checkpoint передачи — Preview9, commit dce3b21. Текущий
-checkpoint — Preview9.5, sourceafb3e9d: исправлены stuck Shift/Action
-и text-only DYK; viewport/GUI input и exact/fresh builds проверены. Сюжетная
-граница Preview9.4, source4d2460d, сохраняется: два реально доставленных камня,
-LostBrother/GiveReward, journal55=0.5 и камера возвращена. Проверены exact exe,
-полный ускоренный rendered input-only путь и fresh Git build. Следующий блокер:
-SetupSculptor/native51/address34914/line35; не подменять завершение. Новый
-Launch-Second-Stone-Test.cmd передаёт управление после настоящего первого камня.
+checkpoint — Preview9.6, source8d2bd5f: пройдены исходный скульптор,
+реальная обработка/доставка третьего камня, bits7 и начало CreaturesInGlade.
+Следующий блокер — native27/address39763/line735, CREATE(type12, subtype1).
+Exact/fresh full input-only opening, сцены и startup PASS; ручное прохождение
+не заявляется. Быстрый Launch-Third-Stone-Test.cmd передаёт управление после
+двух настоящих камней. Отчёт development/preview9.6-verification.json.
+Предыдущий checkpoint — Preview9.5, sourceafb3e9d: исправлены stuck Shift/Action
+и text-only DYK; viewport/GUI input и exact/fresh builds проверены. Preview9.4,
+source4d2460d, восстановил LostBrother/GiveReward и второй доставленный камень.
+Прежний SetupSculptor/native51 устранён в9.6. История — REMASTER.md;
+Launch-Second-Stone-Test.cmd сохраняет передачу управления после первого камня.
 Предыдущий Preview9.3, source9c3324e (11 ноября): ручной сбор,
 перенос, бросок и bounded ordinary-hand laws реализованы и проверены.
 BW-001/002/004 имеют работающие scoped исправления; точность специальных
 состояний/эффектов и aftertouch остаются открытыми. BW-003 имеет исправленные
 регрессии и ожидает проверки исходного случая. Актуальные детали —
-BUGS_RU.md и development/preview9.5-verification.json; старые описания ниже
+BUGS_RU.md и development/preview9.6-verification.json; старые описания ниже
 показывают требования, а не отсутствие уже добавленных tests.
 Кампания и полное задание Preview10 не готовы.
 
@@ -115,7 +119,7 @@ BUGS_RU.md и development/preview9.5-verification.json; старые описа�
 - Новый exe: запуск с отрисовкой и без, декодер рядом, правильная загрузка
   ресурсов. Проверяй SCRIPT ERROR/ERROR явно, даже при exit code 0.
 - Свежая копия файлов Git без build/cache/research должна собираться.
-  tools/build_preview.ps1 принимает -PreviewVersion (default9.5):
+  tools/build_preview.ps1 принимает -PreviewVersion (default9.6):
   задай10 для Preview10 вместе с заголовком окна. Старый
   проверенный exe сохраняй; launcher переключай после проверки нового.
 

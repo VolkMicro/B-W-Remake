@@ -1,0 +1,686 @@
+{
+  "date": "2026-11-17",
+  "preview": "9.6",
+  "sourceCommit": "8d2bd5f38f6cd895f92011191349b9b4ee40c7c0",
+  "executable": "build/story-preview/GodotIsland-village-preview9.6.exe",
+  "sha256": "E8BAAF78591F0B06B4C90DBB27635066836AA5B17EFD5DBA5B4CAF2995BF8A83",
+  "status": "verified authentic sculptor quest and three physically delivered stones; creature selection pending",
+  "engine": "Godot4.7.2 stable ed1daf0bf",
+  "requiresOriginalInstall": true,
+  "completeCampaign": false,
+  "changes": [
+    "Stable per-object handles and bounded CALL_NEAR exclusion from real OBJECT values in globals and live task locals/stacks; finished snapshots are not owners.",
+    "Actual quarry50 pickup/drop, sculptor actors/animations, source carving timer60s, consumption of blank rock and creation/delivery of reward51.",
+    "Original music57 Script01, source quarter-turn commands16/17, source degree properties2/3/4 and CREATE_WITH_ANGLE_SCALE conversion.",
+    "Fire vulnerability321 changes real actor state; ignition/fire damage are separate unported operations.",
+    "POPULATE_CONTAINER count20/type6/subtype12 creates20 installed five-bone animated bird rigs, counted by ID_SIZE and released by disband.",
+    "New visual orbit module from approved v3 packet and a fresh tool-less implementer; radius/speed are explicit new presentation policy.",
+    "Full opening harness now drives the third stone exclusively through camera/Action handlers; optional genuine second-key handoff supports manual sculptor testing."
+  ],
+  "checks": [
+    {
+      "test": "verify_script_ownership",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_script_ownership.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 20,
+      "summary": [
+        "OWNERSHIP 20 passed; 0 failed"
+      ],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_script_ownership.log"
+    },
+    {
+      "test": "verify_orbit_actors",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_orbit_actors.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 2778,
+      "summary": [
+        "PASS: 2778 checks passed"
+      ],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_orbit_actors.log"
+    },
+    {
+      "test": "verify_bird_flock",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_bird_flock.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 18,
+      "summary": [
+        "BIRD FLOCK 18 passed; 0 failed"
+      ],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_bird_flock.log"
+    },
+    {
+      "test": "verify_story",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_story.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 100,
+      "summary": [
+        "RESULT 100 passed; 0 failed"
+      ],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_story.log"
+    },
+    {
+      "test": "verify_resource_input",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_resource_input.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 55,
+      "summary": [
+        "RESOURCE INPUT 55 passed; 0 failed"
+      ],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_resource_input.log"
+    },
+    {
+      "test": "verify_hand_world",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_hand_world.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 20,
+      "summary": [
+        "HAND WORLD 20 passed; 0 failed"
+      ],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_hand_world.log"
+    },
+    {
+      "test": "verify_item_contacts",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_item_contacts.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 12,
+      "summary": [
+        "ITEM CONTACTS 12 passed; 0 failed"
+      ],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_item_contacts.log"
+    },
+    {
+      "test": "verify_scroll_input",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_scroll_input.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 42,
+      "summary": [
+        "SCROLL_POINTER type=1 cursor=(797.0416, 246.8118) tip=(796.6871, 246.6668) gap=0.38302564620972 selected=true",
+        "SCROLL_INPUT received=1 unhandled=1 hovered_gui=<Object#null>",
+        "SCROLL_POINTER type=2 cursor=(799.6928, 220.082) tip=(798.213, 221.2453) gap=1.88237023353577 selected=true",
+        "SCROLL_INPUT received=2 unhandled=2 hovered_gui=<Object#null>",
+        "SCROLL_POINTER type=3 cursor=(799.6928, 220.082) tip=(798.213, 221.2453) gap=1.88237023353577 selected=true",
+        "SCROLL_INPUT received=3 unhandled=3 hovered_gui=<Object#null>",
+        "SCROLL INPUT 42 passed; 0 failed"
+      ],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_scroll_input.log"
+    },
+    {
+      "test": "verify_citadel_construction",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_citadel_construction.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 38,
+      "summary": [
+        "CITADEL_CONSTRUCTION failures=0"
+      ],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_citadel_construction.log"
+    },
+    {
+      "test": "verify_citadel_workflow",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_citadel_workflow.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 10,
+      "summary": [
+        "CITADEL_WORKFLOW failures=0"
+      ],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_citadel_workflow.log"
+    },
+    {
+      "test": "verify_landmark_spawn",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_landmark_spawn.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 54,
+      "summary": [
+        "RESULT 54 passed; 0 failed"
+      ],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_landmark_spawn.log"
+    },
+    {
+      "test": "verify_audio",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_audio.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 68,
+      "summary": [
+        "RESULT 68 passed; 0 failed"
+      ],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_audio.log"
+    },
+    {
+      "test": "verify_story_camera",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_story_camera.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 37,
+      "summary": [],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_story_camera.log"
+    },
+    {
+      "test": "verify_camera_path",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_camera_path.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 23,
+      "summary": [],
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_camera_path.log"
+    },
+    {
+      "test": "verify_gate_keys",
+      "mode": "headless",
+      "arguments": [
+        "--headless",
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_gate_keys.gd",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection"
+      ],
+      "passed": 24,
+      "summary": [
+        "GATE KEYS 24 passed; 0 failed"
+      ],
+      "exit": 0,
+      "errors": [],
+      "warnings": [
+        "WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details)."
+      ],
+      "log": "scratch/sculptor-pack-verify_gate_keys.log"
+    },
+    {
+      "test": "verify_sculptor",
+      "mode": "rendered",
+      "arguments": [
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_sculptor.gd",
+        "--rendering-method",
+        "gl_compatibility",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection",
+        "--capture=C:\\Users\\User\\Melty\\black-and-white-godot-engine/scratch/sculptor-pack-captures/verify_sculptor.png"
+      ],
+      "passed": 91,
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_sculptor-rendered.log"
+    },
+    {
+      "test": "verify_bird_flock",
+      "mode": "rendered",
+      "arguments": [
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_bird_flock.gd",
+        "--rendering-method",
+        "gl_compatibility",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection",
+        "--capture=C:\\Users\\User\\Melty\\black-and-white-godot-engine/scratch/sculptor-pack-captures/verify_bird_flock.png"
+      ],
+      "passed": 20,
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_bird_flock-rendered.log"
+    },
+    {
+      "test": "verify_scroll_input",
+      "mode": "rendered",
+      "arguments": [
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_scroll_input.gd",
+        "--rendering-method",
+        "gl_compatibility",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection",
+        "--capture=C:\\Users\\User\\Melty\\black-and-white-godot-engine/scratch/sculptor-pack-captures/verify_scroll_input.png"
+      ],
+      "passed": 43,
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_scroll_input-rendered.log"
+    },
+    {
+      "test": "verify_resource_input",
+      "mode": "rendered",
+      "arguments": [
+        "--path",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game",
+        "--main-pack",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-9.6-candidate\\GodotIsland-village-preview9.6.exe",
+        "--script",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine/game/tests/verify_resource_input.gd",
+        "--rendering-method",
+        "gl_compatibility",
+        "--",
+        "--bw=C:/Games/Black and White Complete Collection",
+        "--capture=C:\\Users\\User\\Melty\\black-and-white-godot-engine/scratch/sculptor-pack-captures/verify_resource_input.png"
+      ],
+      "passed": 57,
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_resource_input-rendered.log"
+    },
+    {
+      "test": "verify_sculptor",
+      "mode": "headless",
+      "exit": 0,
+      "passed": 89,
+      "errors": [],
+      "warnings": [],
+      "log": "scratch/sculptor-pack-verify_sculptor-headless-corrected.log",
+      "arguments": [
+        "matching Godot console",
+        "--headless",
+        "--path",
+        "game",
+        "--main-pack",
+        "<candidate9.6.exe>",
+        "--script",
+        "<absolute verify_sculptor.gd>",
+        "--",
+        "--bw=<install>"
+      ]
+    }
+  ],
+  "focusedChecks": 3599,
+  "candidateStartup": [
+    {
+      "mode": "headless",
+      "exit": 0,
+      "errors": [],
+      "warnings": [
+        "WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details)."
+      ],
+      "log": "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\scratch\\sculptor-startup-headless.log"
+    },
+    {
+      "mode": "rendered",
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "log": "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\scratch\\sculptor-startup-rendered.log"
+    }
+  ],
+  "opening": {
+    "result": "PASS",
+    "log": "scratch/sculptor-exact-opening.log",
+    "mode": "rendered Compatibility exact candidate pack; fixed-fps15,time_scale4,media skipped",
+    "temple": true,
+    "doorWaitStable": true,
+    "keeper": true,
+    "plinthBits": 7,
+    "stones": 3,
+    "flags": {
+      "91": 1,
+      "92": 1,
+      "93": 1,
+      "135": 1
+    },
+    "journal55AfterSourceUpdate": 0.75,
+    "cameraOwnerAtHandoff": 0,
+    "sourceReaction": "CreaturesInGlade starts; source snapshot55 becomes0.75 immediately after test completion request",
+    "nextUnsupported": {
+      "script": "CreaturesInGlade",
+      "native": 27,
+      "address": 39763,
+      "line": 735,
+      "operation": "CREATE(type12, subtype1, position of marker171)"
+    },
+    "limitation": "Input into game handlers, accelerated with skipped media; no manual normal-speed playthrough or original fidelity certification."
+  },
+  "freshGit": {
+    "commit": "8d2bd5f38f6cd895f92011191349b9b4ee40c7c0",
+    "source": "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f",
+    "executable": "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f\\build\\candidate\\GodotIsland-village-preview9.6.exe",
+    "exportExit": 0,
+    "checks": [
+      {
+        "test": "verify_sculptor",
+        "arguments": [
+          "--headless",
+          "--path",
+          "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f/game",
+          "--main-pack",
+          "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f\\build\\candidate\\GodotIsland-village-preview9.6.exe",
+          "--script",
+          "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f/game/tests/verify_sculptor.gd",
+          "--",
+          "--bw=C:/Games/Black and White Complete Collection"
+        ],
+        "passed": 89,
+        "exit": 0,
+        "errors": [],
+        "log": "C:\\Users\\User\\Melty\\black-and-white-godot-engine/scratch/sculptor-fresh-verify_sculptor.log"
+      },
+      {
+        "test": "verify_bird_flock",
+        "arguments": [
+          "--headless",
+          "--path",
+          "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f/game",
+          "--main-pack",
+          "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f\\build\\candidate\\GodotIsland-village-preview9.6.exe",
+          "--script",
+          "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f/game/tests/verify_bird_flock.gd",
+          "--",
+          "--bw=C:/Games/Black and White Complete Collection"
+        ],
+        "passed": 18,
+        "exit": 0,
+        "errors": [],
+        "log": "C:\\Users\\User\\Melty\\black-and-white-godot-engine/scratch/sculptor-fresh-verify_bird_flock.log"
+      },
+      {
+        "test": "verify_scroll_input",
+        "arguments": [
+          "--headless",
+          "--path",
+          "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f/game",
+          "--main-pack",
+          "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f\\build\\candidate\\GodotIsland-village-preview9.6.exe",
+          "--script",
+          "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f/game/tests/verify_scroll_input.gd",
+          "--",
+          "--bw=C:/Games/Black and White Complete Collection"
+        ],
+        "passed": 42,
+        "exit": 0,
+        "errors": [],
+        "log": "C:\\Users\\User\\Melty\\black-and-white-godot-engine/scratch/sculptor-fresh-verify_scroll_input.log"
+      },
+      {
+        "test": "full opening to third stone",
+        "arguments": [
+          "--path",
+          "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f/game",
+          "--main-pack",
+          "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f\\build\\candidate\\GodotIsland-village-preview9.6.exe",
+          "--rendering-method",
+          "gl_compatibility",
+          "--fixed-fps",
+          "15",
+          "--script",
+          "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\build\\sculptor-fresh-8d2bd5f/game/tests/verify_opening_runtime.gd",
+          "--",
+          "--bw=C:/Games/Black and White Complete Collection",
+          "--story-preview",
+          "--runtime-automation",
+          "--runtime-input-only",
+          "--runtime-third-key",
+          "--runtime-seconds=1800",
+          "--runtime-captures=C:\\Users\\User\\Melty\\black-and-white-godot-engine/scratch/sculptor-fresh-opening-captures"
+        ],
+        "exit": 0,
+        "pass": true,
+        "errors": [],
+        "result": [
+          "TEST quest_suspended { \"kind\": \"unbound_native\", \"task\": 281, \"script\": \"TheLostFlock\", \"address\": 59359, \"opcode\": 5, \"line\": 298, \"detail\": { \"native_id\": 27 } }",
+          "TEST journal updated source snapshot 55 success=0.25",
+          "TEST journal updated source snapshot 55 success=0.50",
+          "TEST journal updated source snapshot 20 success=0.30",
+          "OPENING FIRST KEY true bits=7",
+          "OPENING SECOND KEY true phase=waiting for original second-key keeper reaction bits=7 journal=0.5 stones=3 sculptor=true camera=0 unexpected=0",
+          "OPENING THIRD KEY true phase=waiting for original third-key reaction bits=7 journal=0.5 stones=3 glade=true camera=0",
+          "TEST journal updated source snapshot 55 success=0.75",
+          "TEST quest_suspended { \"kind\": \"unbound_native\", \"task\": 521, \"script\": \"CreaturesInGlade\", \"address\": 39763, \"opcode\": 5, \"line\": 735, \"detail\": { \"native_id\": 27 } }"
+        ],
+        "log": "C:\\Users\\User\\Melty\\black-and-white-godot-engine/scratch/sculptor-fresh-opening.log"
+      }
+    ],
+    "startup": [
+      {
+        "mode": "headless",
+        "exit": 0,
+        "errors": [],
+        "warnings": [
+          "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details)."
+        ],
+        "log": "C:\\Users\\User\\Melty\\black-and-white-godot-engine/scratch/sculptor-fresh-startup-headless.log"
+      },
+      {
+        "mode": "rendered",
+        "exit": 0,
+        "errors": [],
+        "warnings": [],
+        "log": "C:\\Users\\User\\Melty\\black-and-white-godot-engine/scratch/sculptor-fresh-startup-rendered.log"
+      }
+    ],
+    "sha256": "E8BAAF78591F0B06B4C90DBB27635066836AA5B17EFD5DBA5B4CAF2995BF8A83",
+    "limitation": "git archive only; no existing build/cache/research copied; matching engine used for pack tests, tracked decoder included; original installation read separately; accelerated parsed input, not manual playthrough"
+  },
+  "launchHandoff": {
+    "log": "scratch/sculptor-handoff.log",
+    "result": "PASS",
+    "route": "Launch-Third-Stone-Test.cmd → actual first and second key delivery → time_scale1, media restored, camera0, bits3, manual control",
+    "limitation": "Developer helper requires installed Godot and current source checkout; no fabricated save or progress flags."
+  },
+  "provenance": {
+    "role": "coordinator/integrator",
+    "independentModule": "OrbitActors only; cleanroom/specs/SPEC-ORBIT-ACTORS-001.*",
+    "boundary": "Fresh Claude CLI2.1.311 fixed tools0/MCP0 request using reviewed spec hash; module copied unchanged. Provider metadata types disclosed in manifest; broker is not an OS sandbox certification.",
+    "legacy": "Native/VM/factory/animation adapters and fixtures retain coordinator/legacy provenance; no retroactive clean-room claim.",
+    "research": "Ghidra native/query/references/scene/properties passes exit0/save; private source listings, raw exports, answers and100-file proof manifest remain outside Git.",
+    "originalData": "Installed data read in memory. No original archives, meshes, animation, captions or recordings added to Git."
+  },
+  "validationAttempts": [
+    "Initial bird adapter used a nonexistent sampler method; actual integration test caught it. Corrected to existing AnmReader.sample; final18 headless/20 rendered pass without errors.",
+    "First headless sculptor run incorrectly requested captures and awaited an unavailable frame_post_draw in the inherited fixture. Only that own process was stopped; corrected no-capture headless run passed. Keep failed log separate.",
+    "Two mistyped preliminary regression filenames failed to load; rerun using verify_story and verify_citadel_construction passed. They are not counted as successful checks.",
+    "An additional headless full handoff probe stalled while selecting the brother. Only its own helper processes were terminated. The user launcher uses rendered Godot; its handoff is checked separately. No headless full-route acceptance is claimed."
+  ],
+  "commands": {
+    "build": "tools/build_preview.ps1 -Godot <godot_console.exe> -PreviewVersion 9.6 -OutputDirectory <candidate>",
+    "pack": "matching Godot console --path <game> --main-pack <absolute9.6.exe> --script <absolute-test.gd> -- --bw=<install>",
+    "opening": "same pack with --fixed-fps 15 --rendering-method gl_compatibility; --runtime-automation --runtime-input-only --runtime-third-key --runtime-seconds=1800 after --",
+    "startup": "Exact exported executable without --path, --quit-after 180 --log-file <absolute> -- --bw <install> --story-preview",
+    "fresh": "git archive 8d2bd5f, fresh export with tracked decoder, no prior project cache/build/research copied; tests and both startup modes listed in freshGit"
+  },
+  "finalEngineScriptErrors": 0,
+  "knownWarnings": [
+    "WARNING: 2 ObjectDB instances were leaked at exit (run with `--verbose` for details).",
+    "WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details)."
+  ],
+  "limitations": [
+    "Creature creation native27/type12 remains pending with its stack/bytecode; creature choice and full gate sequence are incomplete.",
+    "Bird orbit is new visual presentation, not ordinary animal AI or a measured reproduction of original flight paths.",
+    "Fire flag support does not implement fire damage, miracles, skeleton/death/regeneration branches.",
+    "Full original script-reference lifetime is not certified; current live-VM adapter is explicitly bounded.",
+    "Existing approximate physics, hand feel, fade, weather and camera curves remain; aftertouch absent.",
+    "Intermittent ObjectDB warnings at forced exits remain open. No manual OS-click or normal-speed original comparison claimed."
+  ]
+}

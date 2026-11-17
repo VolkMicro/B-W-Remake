@@ -1,6 +1,6 @@
 # Продолжение Black & White на Godot
 
-Дата состояния: 13 ноября 2026. Цель пользователя — пройти исходную кампанию
+Дата состояния: 17 ноября 2026. Цель пользователя — пройти исходную кампанию
 на новом движке, сохранив ощущение оригинала. Работа идёт в **native Godot**,
 оригинальный exe во время игры не запускается. Полная реставрация не закончена.
 
@@ -10,7 +10,53 @@
 TASK_CLAUDE_RU.md. Сначала CLEAN_ROOM_RU.md определяет роль/доступ: эта
 инструкция содержит legacy research и не передаётся чистому реализатору.
 
-## Текущий checkpoint: Preview 9.5 — 13 ноября 2026
+## Текущий checkpoint: Preview 9.6 — 17 ноября 2026
+
+Source commit8d2bd5f. Exe: `build/story-preview/GodotIsland-village-preview9.6.exe`,
+SHA256 `E8BAAF78591F0B06B4C90DBB27635066836AA5B17EFD5DBA5B4CAF2995BF8A83`.
+Отчёт: development/preview9.6-verification.json. Preview9.5 сохранён.
+
+Восстановлен исходный TheSculptor: золотой свиток20, музыка57 и анимации,
+настоящий камень50 из каменоломни, перенос рукой к живому скульптору,
+принятие/блокировка на время работы, source timer60s, удаление blank rock,
+создание награды51 и физическая установка на пьедестал. Итог bits7/три камня,
+flags91/92/93=1; исходный журнал55 затем обновляется до0.75. Получение награды
+не подменяет её доставку. Камера возвращается до начала CreaturesInGlade.
+
+Добавлены native109 и321, всего147 bindings. Native51 использует стабильные
+handles и реальные OBJECT references живого VM; точный original refcount не
+сертифицирован.321 меняет vulnerability flag, но не реализует зажигание/урон.
+Source heading/pitch/roll и angle-scale factory переведены из градусов в
+mirrored Godot radians. В source стае действительно20 птиц subtype12,
+mesh5/animation8 с исходным flap; ID_SIZE/disband работают. OrbitActors —
+новая визуальная политика по approved v3 packet, полученная от свежего
+tool-less Claude; модуль не менялся. Legacy adapters остаются legacy.
+
+Exact candidate:15 focused headless прогонов, отдельный Sculptor89 headless/
+91 rendered, birds18/20, scroll input42/43 и resource input55/57 PASS.
+OrbitActors отдельно2778 checks. Полный rendered input-only opening проходит
+с начала до третьего камня на exact candidate и fresh Git export8d2bd5f.
+Fresh fixture Sculptor89, birds18, scroll42 и оба startup PASS. Нормальный
+exe скопирован именно из проверенного fresh build, без пересборки при активации.
+Engine/script errors0; intermittent ObjectDB warnings2/4 на teardown остаются.
+Это ускоренные проверки с пропуском медиа, не ручное прохождение.
+
+Запуск: Launch-Story-Preview.cmd. Новый Launch-Third-Stone-Test.cmd проходит
+первые два настоящих камня и возвращает скорость1/медиа/ручное управление.
+Handoff проверен: bits3, camera0. Затем ПКМ по золотому свитку скульптора →
+камень из каменоломни перенести рядом с ним → дождаться обработки → награду
+отнести к пьедесталу. Закройте старое окно9.5 перед новым запуском.
+
+Следующий реальный блокер: CreaturesInGlade/native27/address39763/line735,
+CREATE(type12, subtype1, позиция marker171). Стек/bytecode остаются pending;
+выбор существа и полная сцена открытия ворот ещё не готовы. Не закрывать это
+задание флагом. Приватные CHL/Ghidra exports и100-file proof manifest —
+Research/ThirdStone; подробности и ограничения —
+cleanroom/third-stone-frontier-2026-11-13.md. Первый кандидатный headless
+capture завис на frame_post_draw без renderer; его own process остановлен,
+правильный no-capture прогон прошёл. Не передавать research чистому worker.
+
+## Предыдущий checkpoint: Preview 9.5 — 13 ноября 2026 (история)
 
 Source commitafb3e9d. Exe: `build/story-preview/GodotIsland-village-preview9.5.exe`,
 SHA256 `342AB0F102E9B343A0AFE792336A4E48EB83BA6F808358389F8BFE36AC3BE4A6`.

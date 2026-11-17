@@ -4,7 +4,8 @@
 
 - Некоммерческий фанатский ремейк на Godot; файлы оригинала допустимы
   и в готовой версии. Цель и этапы — PROJECT_RU.md.
-- Проверенная игровая основа — Preview9.5, source commitafb3e9d.
+- Проверенная игровая основа — Preview9.6, source commit8d2bd5f.
+  Scroll checkpoint9.5 —afb3e9d.
   Second-stone checkpoint9.4 —4d2460d.
   Hand checkpoint9.3 —9c3324e.
   Storage checkpoint9.2 — cf74fad.
@@ -14,7 +15,29 @@
 - Основной checkout/старые исследования — legacy, без заявления
   о доказанном clean-room происхождении.
 
-## Состояние 13 ноября: свитки и DYK
+## Состояние 17 ноября: третий камень
+
+TheSculptor/quarry50/source timer60s/reward51/физическая установка пройдены:
+bits7, три видимые части, flags91/92/93=1, журнал55 затем0.75. Exact и fresh Git
+export8d2bd5f full rendered input-only opening PASS, startup обоих режимов PASS.
+Отчёт9.6 сохраняет commands, failed preliminary attempts и известные warnings.
+Новый Launch-Third-Stone-Test.cmd передаёт управление после двух настоящих
+камней. Это ускоренные tests, не manual normal-speed acceptance.
+
+Новый OrbitActors получен неизменённым от свежего tools0/MCP0 Claude CLI2.1.311
+по approved v3 packet; manifest фиксирует hashes/служебную оболочку и границу.
+Standalone/integration2778, actual bird rigs18/20 checks PASS. Новые radius14 и
+speed0.35 — presentation policy, не наблюдённый original animal AI. В source
+POPULATE_CONTAINER count20/type6/subtype12; прежний research ответ Claude
+перепутал аргументы, исправлено по CHL/Ghidra. Native/VM/factory/animation
+adapters остаются coordinator/legacy. Vulnerability321 не означает готовый огонь.
+
+Следующий pending bytecode: CreaturesInGlade/native27/address39763/line735,
+CREATE(type12, subtype1, position marker171). Не завершать задание обходом.
+Raw source/Ghidra и100-file proof manifest вне Git. Точный original refcount,
+огонь/смерть/регенерация, выбор существа и оставшаяся кампания открыты.
+
+## Предыдущий checkpoint 13 ноября: свитки и DYK
 
 Ремонт main/input/HUD и OriginalDialogue остаётся coordinator/legacy работой.
 Новых independent модулей нет. Воспроизведён потерянный Shift release во время

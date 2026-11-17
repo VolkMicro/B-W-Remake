@@ -1,7 +1,7 @@
 # Открытые замечания пользователя
 
-Обновлено: 13 ноября 2026. Preview9.5, sourceafb3e9d.
-Текущие результаты — development/preview9.5-verification.json.
+Обновлено: 17 ноября 2026. Preview9.6, source8d2bd5f.
+Текущие результаты — development/preview9.6-verification.json.
 Ниже прежние формулировки и требования сохранены как история воспроизведения;
 они не означают, что уже добавленные tests или механики отсутствуют.
 
@@ -11,6 +11,25 @@
 | BW-002, перенос | Обычный сбор hold/release/return, настоящие HandFood/HandWood, исходные позы, видимый поток, количественный drop/regather;55 native-input/57 rendered exact-pack checks | Точные исходные PSys trajectories, размер в ладони, все специальные состояния не восстановлены |
 | BW-003, проваливание | Прежние12 collision regressions PASS; key/plinth/hand-world20 PASS | Точный пользовательский эпизод без координат/траектории ещё не подтверждён |
 | BW-004, бросок | Второй holdAction + движение + release передаёт скорость body сразу; slow release идёт из grip; camera gestures отменяют fling | Estimator/параметры — явная политика ремейка; source angular response и aftertouch отсутствуют |
+
+## BW-009 — третий камень и скульптор
+
+В9.6 source8d2bd5f устранён SetupSculptor/native51 и последующие реальные
+остановки. Пройдены scroll20, исходная музыка/анимации, source стая20 birds,
+физический перенос quarry50, принятие рядом с живым скульптором, исходные60s
+обработки, удаление blank rock и награда51. Доставка рукой устанавливает третий
+камень: bits7/три видимые части, flags91/92/93=1. После реакции журнал55=.75.
+Нет подмены quest flags. Exact/fresh full opening и Sculptor89/91 PASS.
+
+Воспроизведение: Launch-Third-Stone-Test.cmd → дождаться ручного управления
+после второго камня → ПКМ по золотому свитку скульптора → камень из карьера
+опустить рядом с ним → дождаться обработки → награду отнести к пьедесталу.
+Птицы используют исходные модели/wing animation, но orbit motion — новая
+визуальная политика. Fire321 хранит vulnerability, не реализует fire damage.
+
+Открыто: CreaturesInGlade/native27/address39763/line735 — создание type12,
+subtype1 в marker171. Bytecode/стек сохранены; выбор существа и полное открытие
+ворот не реализованы. Автоматические ускоренные tests не заменяют ручной прогон.
 
 ## BW-008 — все свитки и подсказки не нажимаются
 
@@ -43,8 +62,8 @@ rendered input-only opening на exact exported pack PASS. Fixture отдель�
 Воспроизведение: Launch-Second-Stone-Test.cmd → дождаться ручного управления
 после первого камня → свиток19 у дома → перенести живого брата к сестре →
 награду принести на пьедестал. Не засчитывать простое получение награды.
-После второго камня **открыто**: SetupSculptor/native51/address34914/line35;
-третьего камня, ворот и выбора существа ещё нет. Погода и fade — новая
+В9.4/9.5 после второго камня оставался SetupSculptor/native51. В9.6 он
+устранён, третий камень восстановлен; текущая граница — BW-009 выше. Погода и fade — новая
 визуализация, Bezier camera/wander/physics не сертифицированы как точный оригинал.
 В headless180-frame forced-exit startup и старых key/scroll fixtures бывает
 ObjectDB warning2/4; engine/script errors в итоговой матрице0.
