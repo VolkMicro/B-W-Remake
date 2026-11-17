@@ -1,0 +1,15 @@
+{
+  "specId": "SPEC-ORBIT-ACTORS-001",
+  "specVersion": 3,
+  "status": "approved",
+  "reviewerRole": "independent specification reviewer",
+  "reviewedSpecSha256": "48B790F5866AF6E1529CABD8DF3D588BA95B58C49200CA12CC780F0094E29DF2",
+  "reviewerModel": "claude-opus-5-5",
+  "reviewerCliVersion": "2.1.311 (Claude Code)",
+  "reviewerInputSha256": "48B790F5866AF6E1529CABD8DF3D588BA95B58C49200CA12CC780F0094E29DF2",
+  "reviewerResultSha256": "1118E71297E17ACB8D46F102C3FE0D77A938AF67F0019D1EA1FC14872931AEC2",
+  "observedToolUses": 0,
+  "scope": "new visual orbit policy within explicit plain-actor/script-free domain; not original animal AI",
+  "priorReviews": "v1 and v2 requested concrete float/transform/lifecycle clarifications; v3 narrowed the supported reactive-script domain",
+  "notes": "Read-only specification review; no product implementation written; full answer private"
+}

@@ -143,5 +143,7 @@
   {"id":126,"name":"change_cloud_properties","arguments":4,"returns":0,"handler":"weather_properties","scope":"weather_cloud_count_shade_height"},
   {"id":131,"name":"set_affected_by_wind","arguments":2,"returns":0,"handler":"weather_wind","scope":"weather_presentation_wind_response"},
   {"id":18,"name":"set_script_state_pos","arguments":4,"returns":0,"handler":"villager_script_animation","scope":"registered_villager_script_position_parameter"},
-  {"id":19,"name":"set_script_float","arguments":2,"returns":0,"handler":"villager_script_animation","scope":"registered_villager_script_float_parameter"}
+  {"id":19,"name":"set_script_float","arguments":2,"returns":0,"handler":"villager_script_animation","scope":"registered_villager_script_float_parameter"},
+  {"id":321,"name":"set_hurt_by_fire","arguments":2,"returns":0,"handler":"fire_vulnerability","scope":"physical_thing_fire_damage_gate_flag"},
+  {"id":109,"name":"populate_container","arguments":4,"returns":0,"handler":"populate_bird_flock","scope":"installed_animal12_visual_flock_with_new_orbit_policy"}
 ]

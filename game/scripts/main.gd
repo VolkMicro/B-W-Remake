@@ -289,7 +289,7 @@ func _load_world() -> void:
 	_update_camera()
 	loaded = true
 	if story_preview and DisplayServer.get_name() != "headless":
-		get_window().title = "Black & White — реставрация · Preview 9.5"
+		get_window().title = "Black & White — реставрация · Preview 9.6"
 		Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	_load_preservation()
 	var heights := PackedStringArray()
@@ -2705,7 +2705,7 @@ func story_delete_object(object: Node3D, fade := false) -> bool:
 		story_highlights.erase(object)
 	else:
 		return false
-	if fade and object is Thing and object.kind == "villager":
+	if fade and object is Thing:
 		object.set_meta("story_deleted", true)
 		object.set_process(false)
 		object.set_physics_process(false)
@@ -2863,6 +2863,8 @@ func story_create_shark(position: Vector3) -> Node3D:
 
 
 func story_create_singing_stone(subtype: int, position: Vector3) -> Thing:
+	if subtype in [49, 50, 51, 52, 58]:
+		return story_create_mobile_static(subtype, position, 0.0, 1.0)
 	if subtype != 5 and subtype != 6:
 		return null
 	var record := host_info.record(subtype)

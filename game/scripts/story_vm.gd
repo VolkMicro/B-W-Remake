@@ -77,6 +77,23 @@ func start(name: String, args: Array = []) -> int:
 	return _start_entry(program.scripts[name], args)
 
 
+func active_object_handles() -> Dictionary:
+	# The host's candidate catalogue is not script ownership. Only genuine
+	# OBJECT values in live VM storage retain a script reference. Finished
+	# snapshots are diagnostic history, not owners. Suspended tasks keep theirs.
+	var handles := {}
+	for value in variables:
+		if int(value["type"]) == OBJECT and int(value["bits"]) != 0:
+			handles[int(value["bits"])] = true
+	for task in tasks.values():
+		if task["state"] in ["done", "failed"]: continue
+		for values in [task["locals"], task["stack"]]:
+			for value in values:
+				if int(value["type"]) == OBJECT and int(value["bits"]) != 0:
+					handles[int(value["bits"])] = true
+	return handles
+
+
 func _start_entry(entry: Dictionary, args: Array) -> int:
 	if tasks.size() >= int(_cfg["maximum_tasks"]):
 		error = {"kind":"task_limit","script":entry["name"]}

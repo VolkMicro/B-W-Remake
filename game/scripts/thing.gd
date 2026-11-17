@@ -16,6 +16,7 @@ var story_move_allowed := true
 var story_hold_position := false
 var story_health := 1.0
 var story_indestructible := false
+var story_hurt_by_fire := true
 var story_drowning := false
 var story_resources := Vector2i.ZERO
 var _resource_attachments: Dictionary = {}

@@ -5,6 +5,46 @@
 по-прежнему останавливается в SetupSculptor/native51/address34914/line35.
 Эта запись не означает, что третий камень реализован.
 
+## Продолжение 17 ноября 2026
+
+Историческая граница выше устранена в кандидате Preview9.6. Исходный
+TheSculptor проходит до физической доставки subtype51: bits7, три видимых
+камня, source flags91/92/93=1. Полный ускоренный rendered input-only маршрут
+с начала игры проходит на исходниках и exact exported pack; это не ручное
+прохождение. CreaturesInGlade начинается и остаётся pending на native27,
+address39763, line735: CREATE(type12, subtype1, позиция marker171).
+Ни выбор существа, ни полное открытие ворот пока не заявляются готовыми.
+На момент этой записи fresh Git export и активация обычного launcher ещё
+предстоят; нормальная проверенная сборка остаётся9.5.
+
+- TS-51-ADAPTER: стабильный handle для каждого объекта; исключение учитывает
+  настоящие OBJECT values в globals и locals/stacks живых задач. Завершённая
+  диагностическая история не владеет объектами, suspended задачи сохраняют
+  ссылки. Это bounded адаптер порта, не доказанная копия original refcount.
+- TS-321-FLAG: флаг восприимчивости к огню действительно меняется; зажигание,
+  чудеса и расчёт fire damage не реализованы этой командой и остаются отдельной
+  границей. Огнестойкость скульптора не выдаётся за готовую систему огня.
+- TS-TURNS: проверенные Ghidra quarter-turn commands16/17 и свойства
+  heading/pitch/roll в градусах подключены к mirrored Godot transforms.
+  CREATE_WITH_ANGLE_SCALE также принимает исходный угол в градусах.
+- TS-MUSIC57: подключён установленный Script01.sad из исходной music table.
+- TS-BIRDS: native109 получает count20, object type6, subtype12, а не
+  type20/subtype6/count12 из ошибочного первого Claude research ответа.
+  В установке это mesh5, animation8, clip M_dove_flap с5 bones. Создаются
+  все20 настоящих rigs; ID_SIZE считает их, disband освобождает контейнер.
+  Радиус14 и angular speed0.35 — явно новая визуальная политика порта;
+  обычный animal AI и точная траектория оригинальной стаи не восстановлены.
+- TS-CRAFT: quarry50 теперь переносимый rock; source принимает его рядом с
+  живым скульптором, блокирует перенос на время работы, ждёт60s, удаляет blank
+  rock и создаёт51. Получение награды не засчитывает доставку на пьедестал.
+
+Новый OrbitActors получен неизменённым по approved v3 packet от отдельной
+tool-less remote-модели; review/implementation manifests лежат рядом с packet.
+Standalone2778 и installed birds18 headless/20 rendered checks PASS.
+Native/VM/factory/animation adapters остаются coordinator/legacy работой.
+Новые Ghidra references/scene/properties passes завершились exit0/save.
+Raw exports, ошибочные первые probes, ответы и hashes остаются вне Git.
+
 Приватные source listings, Ghidra exports и manifest —
 `%LOCALAPPDATA%/BW-Restoration/Research/ThirdStone`. Проверен тот же установленный
 exe SHA256 525a6a31ba208ebace5365a10f6afc76c7a76f138722e132b838a2c2c71f1054.

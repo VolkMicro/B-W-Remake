@@ -45,6 +45,16 @@ var unexpected_drop_search := 0
 var unexpected_drops := 0
 var input_failure := ""
 var construction_diagnostics := false
+var continue_third_key := false
+var stop_after_second := false
+var third_key_finished := false
+var third_key_phase := "waiting for second key"
+var third_scroll_clicked := false
+var third_key_delivered := false
+var third_quarry_released := false
+var third_sculptor: WeakRef
+var third_drop_at := -1.0
+var third_drop_point := Vector3.INF
 
 func _initialize() -> void:
 	for arg in OS.get_cmdline_user_args():
@@ -66,6 +76,12 @@ func _initialize() -> void:
 			continue_keeper = true
 			continue_key = true
 			continue_second_key = true
+		elif arg in ["--runtime-third-key", "--runtime-stop-after-second"]:
+			continue_keeper = true
+			continue_key = true
+			continue_second_key = true
+			continue_third_key = arg == "--runtime-third-key"
+			stop_after_second = arg == "--runtime-stop-after-second"
 		elif arg == "--runtime-stop-after-first":
 			continue_keeper = true
 			continue_key = true
@@ -135,6 +151,9 @@ func _process(delta: float) -> bool:
 				var brother: Object = world.story_bridge._object(task["locals"][5])
 				if sister is Node3D: second_sister = weakref(sister)
 				if brother is Node3D: second_brother = weakref(brother)
+			if continue_third_key and script == "TheSculptor" and task["locals"].size() > 1:
+				var sculptor: Object = world.story_bridge._object(task["locals"][1])
+				if sculptor is Thing: third_sculptor = weakref(sculptor)
 			if continue_keeper and keeper_seen and script == "ChooseYourCreature" and not task["in_handler"] and task["pc"] >= 38705 and task["pc"] < 39572 and world.story_camera.owner_task == 0:
 				keeper_intro_finished = true
 			if DisplayServer.get_name() != "headless" and not capture_dir.is_empty() and script in ["TeachRotate", "TeachPitch", "TeachZoom", "GiveFood"] and not captured.has(script):
@@ -145,11 +164,24 @@ func _process(delta: float) -> bool:
 			# native. Count it as started, while checking this route separately.
 			for problem in world.story_vm.suspended.values():
 				visited[str(problem.get("script", ""))] = true
-				if second_key_required_script(str(problem.get("script", ""))):
+				if second_key_required_script(str(problem.get("script", ""))) or (continue_third_key and third_key_required_script(str(problem.get("script", "")))):
 					printerr("OPENING SECOND KEY BLOCKED ", problem)
 					quit(1)
 					return false
-			second_key_finished = second_key_delivered and second_scroll_clicked and world.story_gate_plinth.info_bits() == 3 and world.story_gate_plinth.get_child_count() == 2 and world.story_journal.get(55, {}).get("success", 0.0) == 0.5 and StoryVm.as_float(world.story_vm.variables[91]) == 1.0 and StoryVm.as_float(world.story_vm.variables[92]) == 1.0 and world.story_camera.owner_task == 0 and visited.has("TheSculptor")
+			second_key_finished = second_key_finished or (second_key_delivered and second_scroll_clicked and world.story_gate_plinth.info_bits() == 3 and world.story_gate_plinth.get_child_count() == 2 and world.story_journal.get(55, {}).get("success", 0.0) == 0.5 and StoryVm.as_float(world.story_vm.variables[91]) == 1.0 and StoryVm.as_float(world.story_vm.variables[92]) == 1.0 and world.story_camera.owner_task == 0 and visited.has("TheSculptor"))
+		if continue_third_key:
+			third_key_finished = third_scroll_clicked and third_quarry_released and third_key_delivered and world.story_gate_plinth.info_bits() == 7 and world.story_gate_plinth.get_child_count() == 3 and StoryVm.as_float(world.story_vm.variables[93]) == 1.0 and StoryVm.as_float(world.story_vm.variables[135]) == 1.0 and visited.has("CreaturesInGlade")
+	if stop_after_second and second_key_finished:
+		stop_after_second = false
+		continue_second_key = false
+		continue_key = false
+		continue_keeper = false
+		automate = false
+		automate_input = false
+		Engine.time_scale = 1.0
+		duration = INF
+		world.get_window().title = "Black & White — после второго камня"
+		print("SECOND_KEY_TEST_READY two actual stones delivered; media and manual input restored")
 	if stop_after_first and first_key_finished and not continue_second_key:
 		stop_after_first = false
 		continue_key = false
@@ -189,6 +221,8 @@ func _process(delta: float) -> bool:
 			if construction_diagnostics: print("BUILD_JOBS ", JSON.stringify(world.story_construction.diagnostics()))
 		if continue_second_key:
 			print("SECOND KEY phase=", second_key_phase, " first=", first_key_finished, " scroll=", second_scroll_clicked, " released=", second_brother_released, " delivered=", second_key_delivered, " bits=", world.story_gate_plinth.info_bits() if world.story_gate_plinth != null else -1)
+		if continue_third_key:
+			print("THIRD KEY phase=", third_key_phase, " scroll=", third_scroll_clicked, " quarry_released=", third_quarry_released, " delivered=", third_key_delivered)
 	if not input_failure.is_empty():
 		printerr("OPENING INPUT FAILED ", input_failure)
 		quit(1)
@@ -201,7 +235,7 @@ func _process(delta: float) -> bool:
 		printerr("OPENING BLOCKED ", world.story_vm.error)
 		quit(1)
 		return false
-	if elapsed >= duration or (continue_keeper and keeper_intro_finished and not continue_key) or (continue_key and first_key_finished and not continue_second_key) or (continue_second_key and second_key_finished):
+	if elapsed >= duration or (continue_keeper and keeper_intro_finished and not continue_key) or (continue_key and first_key_finished and not continue_second_key) or (continue_second_key and second_key_finished and not continue_third_key) or third_key_finished:
 		print("OPENING OBSERVED ", visited.keys())
 		var completed := []
 		for task in world.story_vm.finished.values():
@@ -218,6 +252,8 @@ func _process(delta: float) -> bool:
 			print("OPENING FIRST KEY ", first_key_finished, " bits=", world.story_gate_plinth.info_bits())
 		if continue_second_key:
 			print("OPENING SECOND KEY ", second_key_finished, " phase=", second_key_phase, " bits=", world.story_gate_plinth.info_bits(), " journal=", world.story_journal.get(55, {}).get("success", -1.0), " stones=", world.story_gate_plinth.get_child_count(), " sculptor=", visited.has("TheSculptor"), " camera=", world.story_camera.owner_task, " unexpected=", unexpected_drops)
+		if continue_third_key:
+			print("OPENING THIRD KEY ", third_key_finished, " phase=", third_key_phase, " bits=", world.story_gate_plinth.info_bits(), " journal=", world.story_journal.get(55, {}).get("success", -1.0), " stones=", world.story_gate_plinth.get_child_count(), " glade=", visited.has("CreaturesInGlade"), " camera=", world.story_camera.owner_task)
 		if automate_input:
 			var passed: bool = visited.has("GiveFood") and temple_visited and camera_clearance >= 0.49 and player_camera_clearance >= 2.99 and door_wait_complete and door_stable and world.story_construction != null and world.story_construction.wood_consumed > 0
 			for tutorial in ["TeachRotate", "TeachPitch", "TeachZoom"]:
@@ -225,9 +261,11 @@ func _process(delta: float) -> bool:
 			if continue_keeper:
 				passed = passed and keeper_seen and keeper_intro_finished and world.story_journal.has(55)
 			if continue_key:
-				passed = passed and first_key_finished and visited.has("LostBrother") and (world.story_gate_plinth.info_bits() == 3 if continue_second_key else world.story_gate_plinth.info_bits() == 2)
+				passed = passed and first_key_finished and visited.has("LostBrother") and world.story_gate_plinth.info_bits() == (7 if continue_third_key else (3 if continue_second_key else 2))
 			if continue_second_key:
 				passed = passed and second_key_finished
+			if continue_third_key:
+				passed = passed and third_key_finished
 			print("OPENING RESULT ", "PASS" if passed else "FAIL")
 			quit(0 if passed else 1)
 		else:
@@ -305,7 +343,10 @@ func drive_camera_input() -> void:
 			world._unhandled_input(click)
 			return
 	var target: Node3D
-	if continue_second_key and first_key_finished:
+	if continue_third_key and second_key_finished:
+		drive_third_key_input()
+		return
+	elif continue_second_key and first_key_finished:
 		drive_second_key_input()
 		return
 	elif continue_key and keeper_intro_finished and not first_key_finished:
@@ -377,6 +418,106 @@ func drive_camera_input() -> void:
 
 func second_key_required_script(script: String) -> bool:
 	return script.begins_with("LostBrother") or script in ["GiveReward", "HeadingHome", "ProtectGateKey1", "ProtectGateKey2", "ProtectGateKeys", "ChooseYourCreature"]
+
+func third_key_required_script(script: String) -> bool:
+	return script in ["TheSculptor", "SetupSculptor", "KeepRockScripted", "SculptorSculptingOutside", "SculptorSculpting", "AdvisorSpotsRock", "CreatureRetrieveRockReturned", "ProtectQuarryRock", "ProtectGateKey3"]
+
+func drive_third_key_input() -> void:
+	var vars: Array = world.story_vm.variables
+	var quarry := world.story_bridge._object(vars[95]) as Thing
+	var key := world.story_bridge._object(vars[90]) as Thing
+	var sculptor := third_sculptor.get_ref() as Thing if third_sculptor != null else null
+	if third_key_delivered:
+		third_key_phase = "waiting for original third-key reaction"
+		return
+	if world.held != null and world.held == key:
+		third_key_phase = "carrying carved third stone to plinth"
+		var plinth: OriginalLandmark = world.story_gate_plinth.landmark
+		if not drive_to_position(plinth.position): return
+		var centre: Vector3 = plinth.global_transform * plinth.rig.bounds.get_center()
+		if world.cam.is_position_behind(centre): return
+		var screen: Vector2 = world.cam.unproject_position(centre)
+		if world.get_viewport().get_visible_rect().has_point(screen) and world.hand_target(screen).get("target") == plinth:
+			click_at(screen)
+			third_key_delivered = world.held == null and not is_instance_valid(key) and world.story_gate_plinth.info_bits() == 7
+			if third_key_delivered:
+				print("THIRD KEY actual carved stone installed through mouse Action")
+				if not capture_dir.is_empty() and DisplayServer.get_name() != "headless": capture_frame.call_deferred("ThirdKeyInstalled")
+		else: orbit_for_visible_pickup()
+		return
+	if world.held != null and world.held != quarry:
+		third_key_phase = "putting down unexpected carried object"
+		release_unexpected_held(sculptor.position if is_instance_valid(sculptor) else world.focus)
+		return
+	if is_instance_valid(key) and StoryVm.as_float(vars[135]) == 1.0:
+		third_key_phase = "picking up source-carved third stone"
+		if not drive_to_position(key.position): return
+		var screen := visible_pickup_screen(key)
+		if screen.is_finite(): click_at(screen)
+		else: orbit_for_visible_pickup()
+		return
+	if not third_scroll_clicked:
+		third_key_phase = "finding original sculptor scroll"
+		for highlight in world.story_highlights:
+			if not is_instance_valid(highlight) or highlight.get_meta("challenge", -1) != 20: continue
+			if not drive_to_position(highlight.position, 12.0): return
+			var point: Vector3 = highlight.visual.global_transform * highlight.visual.mesh.get_aabb().get_center()
+			if world.cam.is_position_behind(point): return
+			var screen: Vector2 = world.cam.unproject_position(point)
+			if world.get_viewport().get_visible_rect().has_point(screen) and world.hand_target(screen).get("scroll") == highlight:
+				click_at(screen)
+				third_scroll_clicked = highlight.active
+				if third_scroll_clicked: print("THIRD KEY sculptor scroll activated through mouse Action")
+			else: orbit_for_visible_pickup()
+			return
+		return
+	if not is_instance_valid(sculptor) or sculptor.state == Thing.State.DEAD:
+		input_failure = "source sculptor absent or dead after introduction"
+		return
+	if StoryVm.as_float(vars[136]) == 1.0:
+		third_key_phase = "waiting for original acceptance and carving timer"
+		return
+	if not is_instance_valid(quarry):
+		input_failure = "source quarry missing before acceptance"
+		return
+	if world.held == quarry:
+		third_key_phase = "carrying actual quarry rock to sculptor"
+		if not drive_to_position(sculptor.position): return
+		if third_drop_at < 0.0:
+			for offset in [Vector3(5,0,0),Vector3(-5,0,0),Vector3(0,0,5),Vector3(0,0,-5)]:
+				var point: Vector3 = sculptor.position + offset
+				point.y = world.ground_y(point)
+				if world.cam.is_position_behind(point): continue
+				var screen: Vector2 = world.cam.unproject_position(point)
+				if not world.get_viewport().get_visible_rect().has_point(screen): continue
+				var hit: Vector3 = world.hand_target(screen)["point"]
+				if hit.distance_to(point) > 2.0 or not world.has_influence(hit): continue
+				third_drop_point = point
+				third_drop_at = elapsed + 0.75
+				mouse_move_to(screen)
+				return
+			orbit_for_visible_pickup()
+			return
+		var screen: Vector2 = world.cam.unproject_position(third_drop_point)
+		mouse_move_to(screen)
+		if elapsed >= third_drop_at:
+			click_at(screen)
+			if world.held == null:
+				third_quarry_released = true
+				third_drop_at = -1.0
+				print("THIRD KEY quarry released through mouse Action; waiting for physics and sculptor")
+		return
+	if quarry.state == Thing.State.FLYING:
+		third_key_phase = "waiting for quarry rock to settle physically"
+		return
+	if third_quarry_released and Vector2(quarry.position.x-sculptor.position.x,quarry.position.z-sculptor.position.z).length() < 15.0:
+		third_key_phase = "waiting for source sculptor to accept delivered rock"
+		return
+	third_key_phase = "finding and picking up original quarry rock"
+	if not drive_to_position(quarry.position): return
+	var screen := visible_pickup_screen(quarry)
+	if screen.is_finite(): click_at(screen)
+	else: orbit_for_visible_pickup()
 
 
 func drive_to_position(point: Vector3, stopping_distance := 3.0) -> bool:

@@ -10,6 +10,7 @@ const WelcomeDance := preload("res://scripts/story_welcome_dance.gd")
 var terrain: WeakRef
 var _objects: Dictionary = {}
 var _object_types: Dictionary = {}
+var _object_handles: Dictionary = {}
 var _created_markers: Array[Node3D] = []
 var _created_flocks: Array[StoryFlock] = []
 var _next_object := 1
@@ -45,10 +46,17 @@ func record_contact(target: Node3D, hitter: Node3D) -> void:
 func register_object(object: Object, story_type := -1) -> int:
 	if not is_instance_valid(object):
 		return 0
+	if object is Node and object.get_meta("story_deleted", false): return 0
+	var instance := object.get_instance_id()
+	var existing := int(_object_handles.get(instance, 0))
+	if _objects.has(existing) and _objects[existing].get_ref() == object:
+		if int(_object_types[existing]) == -1: _object_types[existing] = story_type
+		return existing
 	var id := _next_object
 	_next_object += 1
 	_objects[id] = weakref(object)
 	_object_types[id] = story_type
+	_object_handles[instance] = id
 	return id
 
 
@@ -116,7 +124,8 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 			var p := stack.size() - count
 			var world: Object = terrain.get_ref() if terrain else null
 			if not is_instance_valid(world) or not world.has_method("story_create_mobile_static") or StoryVm.as_int(stack[p + 2]) != 8: return {"ok":false}
-			var actor: Thing = world.story_create_mobile_static(StoryVm.as_int(stack[p + 3]), _vector(stack, p + 4), StoryVm.as_float(stack[p]), StoryVm.as_float(stack[p + 1]))
+			# Script angles are degrees; object transforms use mirrored radians.
+			var actor: Thing = world.story_create_mobile_static(StoryVm.as_int(stack[p + 3]), _vector(stack, p + 4), -deg_to_rad(StoryVm.as_float(stack[p])), StoryVm.as_float(stack[p + 1]))
 			if actor == null: return {"ok":false}
 			result.append(StoryVm.integer(register_object(actor, 8), StoryVm.OBJECT))
 		"story_snapshot":
@@ -323,7 +332,15 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 			for member in container.members:
 				if is_instance_valid(member):
 					size += 1
+			size += container.scripted_bird_count()
 			result.append(StoryVm.number(float(size)))
+		"populate_bird_flock":
+			var p := stack.size() - count
+			var flock := _object(stack[p]) as StoryFlock
+			var amount := StoryVm.as_float(stack[p + 1])
+			var world: Object = terrain.get_ref() if terrain else null
+			if flock == null or not world is Node or not is_finite(amount) or amount < 1.0 or amount > 64.0 or floorf(amount) != amount or StoryVm.as_int(stack[p + 2]) != 6 or StoryVm.as_int(stack[p + 3]) != 12: return {"ok":false}
+			if not flock.populate_scripted_birds(world, int(amount)): return {"ok":false}
 		"call_in_villager":
 			var p := stack.size() - count
 			var container := _object(stack[p + 2])
@@ -376,7 +393,7 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 				return {"ok":false}
 			# The native consumes an already-invalid handle without another delete.
 			if actor == null: return {"ok":true,"pop":count,"push":[]}
-			if mode == 1 and (not actor is Thing or actor.kind != "villager"): return {"ok":false}
+			if mode == 1 and not actor is Thing: return {"ok":false}
 			if not world.story_delete_object(actor, mode == 1):
 				return {"ok":false}
 			_objects.erase(actor_handle)
@@ -460,6 +477,11 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 					actor.story_smooth_heading = StoryVm.as_int(stack[p]) != 0
 				9:
 					actor.rotation.y = -actor.rotation.y
+					actor.story_smooth_heading = false
+				16, 17:
+					# Scripted quarter-turns in the mirrored world; the following
+					# command8 restores ordinary heading interpolation.
+					actor.rotation.y += -PI / 2.0 if StoryVm.as_int(stack[p + 1]) == 16 else PI / 2.0
 					actor.story_smooth_heading = false
 				_:
 					return {"ok":false}
@@ -606,7 +628,7 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 				return {"ok":false}
 		"singing_stone_interaction":
 			var stone := _object(stack.back()) as Thing
-			if not is_instance_valid(stone) or not int(stone.get_meta("story_mobile_subtype", -1)) in [5, 49, 50, 52]:
+			if not is_instance_valid(stone):
 				return {"ok":false}
 			var allowed := StoryVm.as_int(stack[stack.size() - 2]) != 0
 			if id == 168:
@@ -622,6 +644,12 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 			var actor := _object(stack.back()) as Thing
 			if actor == null: return {"ok":false}
 			actor.story_indestructible = StoryVm.as_int(stack[stack.size() - count]) != 0
+		"fire_vulnerability":
+			var actor := _object(stack.back()) as Thing
+			if actor == null: return {"ok":false}
+			# This native configures vulnerability; it does not ignite the actor.
+			# Unported ignition/damage operations still suspend independently.
+			actor.story_hurt_by_fire = StoryVm.as_int(stack[stack.size() - count]) != 0
 		"weather_properties":
 			var p := stack.size() - count
 			var zone := _object(stack[p]) as Node3D
@@ -767,7 +795,7 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 			var p := stack.size() - count
 			var actor := _object(stack[p]) as Thing
 			var point := _vector(stack, p + 1)
-			if not is_instance_valid(actor) or actor.kind not in ["villager", "gate_key"] or not point.is_finite():
+			if not is_instance_valid(actor) or actor.kind not in ["villager", "gate_key", "rock"] or not point.is_finite():
 				return {"ok":false}
 			actor.position = point
 		"distance":
@@ -940,13 +968,19 @@ func _invoke_world(handler: String, stack: Array, p: int) -> Dictionary:
 			var object_type := StoryVm.as_int(stack[p])
 			var subtype := StoryVm.as_int(stack[p + 1])
 			var is_town := object_type == int(rules["town_object_type"]) and subtype == 5000
-			var is_mobile_static := object_type == 8 and subtype in [5, 49, 50, 52]
+			var is_mobile_static := object_type == 8 and subtype in [2, 5, 49, 50, 51, 52, 58]
 			var is_citadel := object_type == 18 and subtype == 5000
 			var is_highlight := object_type == 37 and subtype in [0, 1, 2, 3]
 			var is_rock: bool = object_type == 33 and (subtype == 5000 or not world.host_info.record(subtype).is_empty())
 			var is_pillar := object_type == 3 and subtype == 34
-			if not (is_town or is_mobile_static or is_citadel or is_highlight or is_rock or is_pillar) or StoryVm.as_int(stack[p + 6]) != 0:
+			if not (is_town or is_mobile_static or is_citadel or is_highlight or is_rock or is_pillar):
 				return {}
+			var exclude_scripted := StoryVm.as_int(stack[p + 6]) != 0
+			var references := {}
+			if exclude_scripted:
+				var vm: StoryVm = world.get("story_vm") as StoryVm
+				if vm == null: return {}
+				references = vm.active_object_handles()
 			var centre := _vector(stack, p + 2)
 			var radius := StoryVm.as_float(stack[p + 5])
 			if not centre.is_finite() or not is_finite(radius) or radius <= 0.0:
@@ -954,9 +988,10 @@ func _invoke_world(handler: String, stack: Array, p: int) -> Dictionary:
 			var best := 0
 			var best_distance := radius
 			for object_id in _object_types:
+				if exclude_scripted and references.has(object_id): continue
 				if _object_types[object_id] != object_type and not (is_rock and _object_types[object_id] == 8):
 					continue
-				var town: Object = _objects[object_id].get_ref()
+				var town := _object(StoryVm.integer(object_id, StoryVm.OBJECT))
 				if not town is Node3D:
 					continue
 				if is_mobile_static and town.get_meta("story_mobile_subtype", -1) != subtype:
@@ -1021,6 +1056,16 @@ func _invoke_world(handler: String, stack: Array, p: int) -> Dictionary:
 					result.append(StoryVm.number(0.0 if target.state == Thing.State.DEAD else target.story_health))
 				elif target.kind != "villager" or not target.set_story_health(StoryVm.as_float(stack[p + 2])):
 					return {}
+				return {"result":result}
+			if target is Thing and property in [2, 3, 4]:
+				var axis := 1 if property == 2 else (0 if property == 3 else 2)
+				var angle_sign := -1.0 if property in [2, 3] else 1.0
+				if handler == "get_property":
+					result.append(StoryVm.number(rad_to_deg(target.rotation[axis]) * angle_sign))
+				else:
+					var angle := StoryVm.as_float(stack[p + 2])
+					if not is_finite(angle): return {}
+					target.rotation[axis] = deg_to_rad(angle) * angle_sign
 				return {"result":result}
 			if handler == "set_property" and target is Thing and property == 24:
 				var altitude := StoryVm.as_float(stack[p + 2])

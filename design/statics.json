@@ -3,6 +3,7 @@
   {"id":1,"kind":"scenery","pickable":false,"physics":"none","description":"tall fence"},
   {"id":2,"kind":"rock","pickable":true,"physics":"rock","description":"movable rock"},
   {"id":49,"kind":"gate_key","pickable":true,"physics":"gate_key","description":"creature gate totem"},
-  {"id":50,"kind":"scenery","pickable":false,"physics":"none","description":"blank gate totem"},
+  {"id":50,"kind":"rock","pickable":true,"physics":"rock","description":"quarry stone for the sculptor"},
+  {"id":58,"kind":"scenery","pickable":false,"physics":"none","description":"sculptor work-in-progress model"},
   {"id":53,"kind":"toy","pickable":true,"physics":"toy","description":"creature toy"}
 ]
