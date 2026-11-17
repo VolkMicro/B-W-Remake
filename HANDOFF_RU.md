@@ -12,6 +12,14 @@ TASK_CLAUDE_RU.md. Сначала CLEAN_ROOM_RU.md определяет роль
 
 ## Текущий checkpoint: Preview 9.6 — 17 ноября 2026
 
+**Последующее продолжение, подсказка/желания:** BW-013 исправляет устаревшее
+предложение войти в храм после завершения CitadelGuideCinema. Exact rendered
+hint candidate подтвердил active door hint и отсутствие её у настоящей рощи;
+проход трёх камней/cow/home снова остановлен на188, exit1, без script/engine
+errors. Не считать полный run PASS. Новое статическое исследование таймера,
+исключений и селектора с шестым tools0 Claude review описано в
+cleanroom/creature-desire-frontier-2026-11-17.md. Native188 пока не реализован.
+
 **Последнее продолжение, камера/QA:** исправлен BW-011 — sky miss больше не
 двигает camera pan на тысячи единиц. Новый verify_camera_sky_drag: baseline
 3FAIL, после исправления source/rendered/exact5PASS. Проверен export

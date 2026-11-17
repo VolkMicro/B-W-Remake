@@ -2379,8 +2379,11 @@ func _update_story_input_hint(delta: float) -> void:
 	help_label.visible = story_camera.owner_task == 0 and not story_inside_temple()
 	var current := ""
 	var instructions := ""
+	var temple_lesson := false
 	for task in story_vm.tasks.values():
 		var script: String = task["script"]
+		if script == "CitadelGuideCinema":
+			temple_lesson = true
 		if script not in ["TeachRotate", "TeachPitch", "TeachZoom"]:
 			continue
 		current = script
@@ -2407,7 +2410,7 @@ func _update_story_input_hint(delta: float) -> void:
 		help_label.text = instructions
 	elif _tutorial_hint_time > 0.0:
 		help_label.text = _tutorial_completed_hint
-	elif story_citadel_interface and story_citadel != null and story_citadel.progress >= 1.0:
+	elif temple_lesson and story_citadel_interface and story_citadel != null and story_citadel.progress >= 1.0:
 		help_label.text = "Нажмите ПКМ на дверь храма, чтобы войти · СКМ или Shift: поворот · колесо: масштаб"
 	else:
 		help_label.text = "ПКМ: действие · тяните землю с ЛКМ · СКМ или Shift: поворот и наклон · колесо: масштаб"

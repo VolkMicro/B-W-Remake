@@ -17,6 +17,14 @@
 
 ## Состояние 17 ноября: третий камень
 
+Следующее продолжение: шестой tools0/MCP0 Claude research reviewer завершён.
+Ghidra read-only follow-up уточнил ABI/mode, suppression exceptions и elapsed
+consumer. Descriptive ID27=Sadness требует проверки file/runtime layout и
+связи с действием. Draft остаётся NOT APPROVED; независимая реализация нового
+модуля не запускалась. См. creature-desire-frontier-2026-11-17.md. Отдельный
+BW-013 hint guard — coordinator fix существующей подсказки, не новая чистая
+реализация. Exact rendered route проверил оба hint states и снова дошёл до188.
+
 Последующее camera/QA продолжение: четыре tools0 Claude diagnostic/patch
 запроса получили существующий legacy код, не независимый approved packet.
 Их нельзя называть новой чистой реализацией. Проверенные гипотезы и адаптации

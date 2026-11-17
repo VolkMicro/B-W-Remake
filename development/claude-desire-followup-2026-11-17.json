@@ -1,0 +1,42 @@
+{
+  "timestampUtc": "2026-11-17T16:41:55.7918366Z",
+  "role": "research-only original only-desire follow-up reviewer; no product implementation",
+  "cliVersion": "2.1.311 (Claude Code)",
+  "model": "claude-fable-5-2",
+  "packetSHA256": "24B104CCAA568887992BC923C84F9A847B2CA249CF07C9C1ED936C36DA267707",
+  "systemSHA256": "CBD310B9F7B627C9AEA641C8A461C28A9D1B19A5DC170C12CA97C98F943F5460",
+  "auth": "normal single-owner CLI OAuth transport; no credential copying",
+  "safeMode": true,
+  "restrictedMode": true,
+  "tools": [],
+  "mcpServers": [],
+  "builtinPluginNames": [
+    "cc-plugin-sec-default",
+    "cc-plugin-agents-md",
+    "cc-plugin-telemetry",
+    "cc-plugin-plugin-authoring"
+  ],
+  "builtinAgentNames": [
+    "claude",
+    "Explore",
+    "general-purpose",
+    "Plan"
+  ],
+  "observedToolUses": 0,
+  "permittedEnvelopeFieldNames": [
+    "userEmail",
+    "environment"
+  ],
+  "noSessionPersistence": true,
+  "processExit": 0,
+  "resultSubtype": "success",
+  "acceptedCapabilityBoundary": true,
+  "resultSHA256": "507AED906E2487CE2EBA400690DAE9B6D73295E2AE942A3CC7D9714FFCE98095",
+  "evidence": "runner-probe-2026-11-07.json; same CLI/flags; no credentials cloned",
+  "scope": "research reviewer only, original observations and legacy adapter; NOT APPROVED implementation packet",
+  "limitations": [
+    "Constructor selected40 claim rejected by raw offsets",
+    "File/runtime identity and autonomous action consumer not proven",
+    "No product implementation, no native188 binding"
+  ]
+}

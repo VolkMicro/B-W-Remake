@@ -106,6 +106,21 @@ Claude research review явно NOT APPROVED: не доказаны ID27, тай
 и потребитель. Нужен реальный автономный выбор поведения; хранение поля,
 включение sandbox AI или искусственное PLAYED не считаются восстановлением.
 
+Дополнение: повторный hint candidate rendered route снова доходит до188.
+Ghidra follow-up устранил ABI ошибку и нашёл timer/score consumer; шестой
+Claude research review оставляет draft NOT APPROVED. ID27 подписан Sadness
+в descriptive table, но точная связь file/runtime layout и действия ещё открыта.
+Границы и отвергнутые гипотезы — cleanroom/creature-desire-frontier-2026-11-17.md.
+
+## BW-013 — подсказка входа в храм оставалась у рощи
+
+На rendered camera candidate у CreaturesInGlade оставалась строка про дверь:
+готовый храм и разрешённый интерфейс сохраняются после завершения урока.
+Теперь эта строка дополнительно требует активного CitadelGuideCinema.
+Новый exact exported-pack input-only route: active door hint PASS и glade
+generic hint PASS, три реальные доставки/cow/home, затем известный188 pending.
+Это исправление собственной подсказки порта; original HUD fidelity не заявляется.
+
 ## BW-008 — все свитки и подсказки не нажимаются
 
 Сообщение13 ноября: «Все свитки и подсказки, пробовал обе кнопки».

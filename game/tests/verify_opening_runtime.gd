@@ -22,6 +22,8 @@ var door_wait_started := -1.0
 var door_wait_pose := Transform3D.IDENTITY
 var door_stable := true
 var door_wait_complete := false
+var door_hint_checked := false
+var glade_hint_checked := false
 var continue_keeper := false
 var keeper_seen := false
 var keeper_intro_finished := false
@@ -206,6 +208,12 @@ func _process(delta: float) -> bool:
 		if continue_third_key:
 			third_key_finished = third_scroll_clicked and third_quarry_released and third_key_delivered and world.story_gate_plinth.info_bits() == 7 and world.story_gate_plinth.get_child_count() == 3 and StoryVm.as_float(world.story_vm.variables[93]) == 1.0 and StoryVm.as_float(world.story_vm.variables[135]) == 1.0 and visited.has("CreaturesInGlade")
 		if continue_creature:
+			if glade_ready and not glade_hint_checked and world.story_camera.owner_task == 0:
+				world._update_story_input_hint(0.0)
+				glade_hint_checked = true
+				var valid_hint: bool = world.story_citadel != null and world.story_citadel.progress >= 1.0 and world.help_label.visible and not world.help_label.text.contains("дверь храма")
+				print("OPENING HINT glade ", "PASS" if valid_hint else "FAIL", " text=", world.help_label.text)
+				if not valid_hint: input_failure = "completed temple-entry hint remains at genuine glade handover"
 			creature_finished = glade_ready and creature_choice_established() and world.story_vm.finished.values().any(func(t:Dictionary): return t["script"] == "CreaturesInGlade")
 			if creature_finished and not capture_dir.is_empty() and DisplayServer.get_name() != "headless" and not captured.has("CreatureOwnedRequested"):
 				captured["CreatureOwnedRequested"] = true
@@ -364,6 +372,7 @@ func capture_frame(label: String) -> void:
 			"keep_aspect": world.cam.keep_aspect, "near": world.cam.near, "far": world.cam.far,
 			"source_owner": world.story_camera.owner_task},
 		"fade_alpha": world.story_fade_rect.color.a if world.story_fade_rect != null else 0.0,
+		"input_hint": {"visible": world.help_label.visible, "text": world.help_label.text},
 		"source_tasks": world.story_vm.tasks.values().map(func(task:Dictionary): return {"script":task["script"], "pc":task["pc"]}),
 		"original_runtime_comparison": false,
 	}
@@ -427,6 +436,14 @@ func drive_camera_input() -> void:
 			door_stable = door_stable and world.cam.position.distance_to(door_wait_pose.origin) < 0.01 and world.cam.basis.is_equal_approx(door_wait_pose.basis)
 			return
 		door_wait_complete = true
+		if not door_hint_checked:
+			world._update_story_input_hint(0.0)
+			door_hint_checked = true
+			var valid_hint: bool = world.help_label.visible and world.help_label.text.contains("дверь храма")
+			print("OPENING HINT door ", "PASS" if valid_hint else "FAIL", " text=", world.help_label.text)
+			if not valid_hint:
+				input_failure = "active temple-entry lesson has no visible door instruction"
+				return
 		var doorway: Vector3 = world.story_citadel.entrance_position()
 		if not world.cam.is_position_behind(doorway):
 			var click := InputEventMouseButton.new()
