@@ -1,5 +1,5 @@
-# Reconstructed teaching loop, using the player's real model and animations.
-# This is not yet a reproduction of Lionhead's full learning AI.
+# Original models/animations, a legacy teaching prototype and a bounded source
+# actor adapter. Lionhead's full learning AI is not yet reproduced.
 class_name IslandCreature
 extends Node3D
 
@@ -23,6 +23,24 @@ var _visual_form := "base"
 var _animation_tick := 0.0
 var _target := Vector3.ZERO
 var _rules: Dictionary = Data.PORT_RULES["creature"]
+var story_actor := false
+var story_player_id := -1
+var story_home := Vector3.INF
+var story_script_controlled := false
+var story_development_phase := -1
+var story_in_development_script := false
+var story_desires: Dictionary = {}
+var story_tether_center := Vector3.INF
+var story_tether_radius := 0.0
+var story_fatigue := 0.0
+var _story_sleep_phase := ""
+var _story_clock: RefCounted
+var _story_move_active := false
+var _story_tether_moving := false
+var _story_stop_distance := 0.5
+var _story_look_target: WeakRef
+var _story_look_camera := false
+var _story_look_point := Vector3.INF
 
 
 func configure(owner_world: Node, id: String, pos: Vector3) -> bool:
@@ -49,6 +67,10 @@ func configure(owner_world: Node, id: String, pos: Vector3) -> bool:
 
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(world) or rig == null or morph == null:
+		return
+	if story_actor:
+		# Source-created actors must not run the older sandbox teaching loop.
+		advance_story(delta)
 		return
 	hunger = clampf(hunger + float(_rules["hunger_per_second"]) * delta, 0.0, 1.0)
 	last_action_age += delta
@@ -79,6 +101,174 @@ func _physics_process(delta: float) -> void:
 		var clip: String = Data.CREATURE_ACTIONS[action]["clip"]
 		rig.apply_local_pose(morph.sample(clip, action_time, rig.rests))
 	_update_form()
+
+
+func enter_story_control() -> bool:
+	if morph == null or not ResourceLoader.exists("res://scripts/clip_clock.gd"): return false
+	var clock: RefCounted = load("res://scripts/clip_clock.gd").new()
+	var durations := {}
+	for clip in morph.clips: durations[clip] = float(morph.clips[clip]["duration"])
+	if not clock.configure(durations): return false
+	_story_clock = clock
+	# World normalization for the young glade actors is explicit port policy;
+	# the sandbox's much larger display scale must not overlap all three bodies.
+	rig.root.scale = Vector3.ONE * float(Data.PORT_RULES["story"]["creature_visual_scale"])
+	story_actor = true
+	story_script_controlled = true
+	following = false
+	return true
+
+
+func play_story_animation(index: int, repeats: int) -> bool:
+	if _story_clock == null or not morph.names_by_index.has(index): return false
+	if not _story_clock.start(morph.names_by_index[index], repeats): return false
+	_story_move_active = false
+	_story_sleep_phase = ""
+	story_script_controlled = true
+	return true
+
+
+func story_animation_playing() -> bool:
+	return _story_clock != null and bool(_story_clock.snapshot()["playing"])
+
+
+func set_script_move(point: Vector3, radius: float) -> bool:
+	if not story_actor or not point.is_finite() or not is_finite(radius) or radius < 0.0 or radius > 1000.0: return false
+	_target = point
+	_story_stop_distance = radius
+	_story_move_active = true
+	_story_tether_moving = false
+	_story_sleep_phase = ""
+	_story_look_target = null
+	_story_look_camera = false
+	_story_look_point = Vector3.INF
+	_story_clock.stop()
+	return true
+
+
+func set_script_focus(point: Vector3) -> bool:
+	if not story_actor or not point.is_finite(): return false
+	_story_look_point = point
+	_story_look_target = null
+	_story_look_camera = false
+	return true
+
+
+func story_action(id: int, target: Node3D) -> bool:
+	# Installed action names establish intent; the look/point/sit adaptation
+	# below is bounded presentation, not the original creature decision system.
+	if _story_clock == null or not is_instance_valid(target) or id not in [17, 81, 82, 163, 168, 188, 189]: return false
+	if id == 17 and not story_home.is_finite(): return false
+	var clip := "static/start_sleep" if id == 17 else ("static/start_sit" if id == 81 else ("point/lo_right" if id in [163, 168] else ""))
+	if not clip.is_empty() and not _story_clock.start(clip, 1): return false
+	if clip.is_empty(): _story_clock.stop()
+	_story_move_active = false
+	_story_tether_moving = false
+	_story_sleep_phase = "starting" if id == 17 else ""
+	_story_look_camera = id in [82, 168]
+	_story_look_target = null if _story_look_camera else weakref(target)
+	_story_look_point = Vector3.INF
+	story_script_controlled = true
+	return true
+
+
+func set_story_fatigue(value: float) -> bool:
+	if not is_finite(value) or value < 0.0 or value > 1.0: return false
+	if value == 0.0 and _story_sleep_phase in ["starting","sleeping"]:
+		if not _story_clock.start("static/end_sleep",1): return false
+		_story_sleep_phase = "ending"
+	story_fatigue = value
+	return true
+
+
+func release_story_control() -> void:
+	story_script_controlled = false
+	_story_move_active = false
+	_story_look_target = null
+	_story_look_camera = false
+	_story_look_point = Vector3.INF
+	_story_clock.stop()
+	# Subsequent source training commands remain responsible for behavior;
+	# release does not activate the unrelated sandbox learning prototype.
+
+
+func initialize_story_development(phase: Dictionary, initialize_tether := true) -> bool:
+	if not story_actor or story_player_id != 1 or not story_home.is_finite() or not phase.has("enable") or not phase.has("disable") or not phase["enable"] is Array or not phase["disable"] is Array: return false
+	var next := {}
+	for id in 40: next[id] = false
+	for key in ["enable","disable"]:
+		for id in phase[key]:
+			if not id is int or id < 0 or id >= 40: return false
+			next[id] = key == "enable"
+	story_desires = next
+	story_development_phase = 0
+	if _story_tether_moving:
+		_story_move_active = false
+		_story_tether_moving = false
+	if initialize_tether:
+		story_tether_center = story_home
+		story_tether_radius = 12.0
+	last_action = ""
+	last_action_age = 999.0
+	return true
+
+
+func set_story_training(active: bool) -> void:
+	story_in_development_script = active
+	if active and _story_tether_moving:
+		_story_move_active = false
+		_story_tether_moving = false
+
+
+func advance_story(delta: float) -> void:
+	if _story_clock == null or not _story_clock.advance(delta): return
+	action_time += delta
+	if not story_script_controlled and not story_in_development_script and story_development_phase == 0 and story_tether_center.is_finite():
+		var from_home := Vector2(position.x - story_tether_center.x, position.z - story_tether_center.z)
+		if from_home.length() > story_tether_radius:
+			# Bounded movement consumer of the initialized source tether. The
+			# complete desire decision/learning system is still unported.
+			_target = story_tether_center
+			_story_move_active = true
+			_story_tether_moving = true
+			_story_stop_distance = 0.0
+	var clip := "move/stand"
+	var seconds := action_time
+	var loop := true
+	if _story_move_active:
+		var flat := Vector3(_target.x - position.x, 0, _target.z - position.z)
+		if flat.length() <= _story_stop_distance:
+			_story_move_active = false
+			_story_tether_moving = false
+		else:
+			# Reuse the port's existing creature walking policy for source movement.
+			var step := flat.normalized() * minf(float(Data.CREATURES[species]["speed"]) * delta, maxf(0, flat.length() - _story_stop_distance))
+			position += step
+			position.y = world.ground_y(position)
+			if not step.is_zero_approx(): rotation.y = atan2(step.x, step.z)
+			clip = "move/walk"
+	var look := _story_look_point
+	if _story_look_camera: look = world.cam.global_position
+	elif _story_look_target != null:
+		var target := _story_look_target.get_ref() as Node3D
+		if is_instance_valid(target): look = target.global_position if target.is_inside_tree() else target.position
+	if look.is_finite():
+		var flat := Vector3(look.x - global_position.x, 0, look.z - global_position.z)
+		if not flat.is_zero_approx(): rotation.y = atan2(flat.x, flat.z)
+	var state: Dictionary = _story_clock.snapshot()
+	if _story_sleep_phase == "starting" and state["completed"]:
+		_story_clock.start("static/sleep",-1)
+		_story_sleep_phase = "sleeping"
+		state = _story_clock.snapshot()
+	elif _story_sleep_phase == "ending" and state["completed"]:
+		_story_clock.stop()
+		_story_sleep_phase = ""
+		state = _story_clock.snapshot()
+	if not str(state["name"]).is_empty():
+		clip = state["name"]
+		seconds = state["position"]
+		loop = not state["completed"]
+	rig.apply_local_pose(morph.sample_creature(clip, seconds, rig, loop))
 
 
 func _decide() -> void:

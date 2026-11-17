@@ -144,6 +144,7 @@ var _test_log: Array[String] = []
 var _melty_checks := "" # Melty's test file: where to append "pass <check>" lines
 const MELTY_SLUG := "black-white-godot-island"
 var creature: IslandCreature
+var story_creatures: Array[IslandCreature] = []
 var campaign := ChlReader.new()
 var story_vm: StoryVm
 var _reported_suspended_tasks: Dictionary = {}
@@ -289,7 +290,7 @@ func _load_world() -> void:
 	_update_camera()
 	loaded = true
 	if story_preview and DisplayServer.get_name() != "headless":
-		get_window().title = "Black & White — реставрация · Preview 9.6"
+		get_window().title = "Black & White — реставрация · Preview 9.7"
 		Input.mouse_mode = Input.MOUSE_MODE_HIDDEN
 	_load_preservation()
 	var heights := PackedStringArray()
@@ -735,7 +736,8 @@ func _update_camera() -> void:
 		view_eye.y = maxf(view_eye.y, maxf(ground_y(view_eye), sea_y) + 0.5)
 		var offset: Vector3 = view_eye - view_focus
 		_rendered_focus = view_focus
-		cam.position = view_eye
+		var shake := story_camera.visual_shake_offset()
+		cam.position = view_eye + shake
 		if offset.length_squared() > 0.00001:
 			var up := Vector3.RIGHT if absf(offset.normalized().dot(Vector3.UP)) > 0.999 else Vector3.UP
 			cam.basis = Basis.looking_at(-offset, up)
@@ -744,7 +746,9 @@ func _update_camera() -> void:
 	focus.y = maxf(ground_y(focus), sea_y) + _focus_height_offset
 	var off := Vector3(sin(yaw) * cos(pitch), sin(pitch), cos(yaw) * cos(pitch)) * dist
 	cam.position = story_camera.constrain_player_eye(focus + off, focus, ground_y, sea_y)
-	cam.look_at(focus, Vector3.UP)
+	var shake := story_camera.visual_shake_offset()
+	cam.position += shake
+	cam.look_at(focus + shake, Vector3.UP)
 	_rendered_focus = focus
 	story_camera.update_player_pose(cam.position, focus)
 
@@ -986,12 +990,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_tree().quit()
 		elif not story_preview and k.keycode >= KEY_1 and k.keycode <= KEY_3 and not is_instance_valid(creature):
 			choose_creature(["ape", "cow", "tiger"][k.keycode - KEY_1])
-		elif k.keycode == KEY_C and is_instance_valid(creature):
+		elif k.keycode == KEY_C and is_instance_valid(creature) and not creature.story_actor:
 			creature.following = not creature.following
 			_say("Существо идёт за Рукой." if creature.following else "Существо остаётся здесь.")
-		elif k.keycode == KEY_R and is_instance_valid(creature):
+		elif k.keycode == KEY_R and is_instance_valid(creature) and not creature.story_actor:
 			creature.feedback(true)
-		elif k.keycode == KEY_F and is_instance_valid(creature):
+		elif k.keycode == KEY_F and is_instance_valid(creature) and not creature.story_actor:
 			creature.feedback(false)
 		elif k.keycode == KEY_F5:
 			_save_preservation()
@@ -1201,6 +1205,10 @@ func _click(screen: Vector2) -> void:
 			story_show_help(int(highlight.get_meta("help_text")))
 		return
 	var best: Thing = null
+	var selected_creature := selection.get("target") as IslandCreature
+	if selected_creature != null and selected_creature.story_actor:
+		if story_bridge != null: story_bridge.clicked_thing = weakref(selected_creature)
+		return
 	best = selection.get("pickup") as Thing
 	if best:
 		if story_bridge != null: story_bridge.clicked_thing = weakref(best)
@@ -1264,6 +1272,9 @@ func hand_target(screen: Vector2) -> Dictionary:
 			if contact != null and origin.distance_to(contact) <= distance + 0.5:
 				result = {"point":contact,"normal":Vector3.UP,"target":story_gate_plinth.landmark}
 	if held == null:
+		if result.get("target") is IslandCreature and result["target"].story_actor:
+			result["story_creature"] = result["target"]
+			return result
 		var nearest := INF
 		for scroll in story_highlights:
 			if not is_instance_valid(scroll) or not scroll.screen_hit(cam, screen): continue
@@ -2331,6 +2342,22 @@ func choose_creature(id: String, restored: Dictionary = {}) -> bool:
 	return true
 
 
+func story_create_creature(subtype: int, position: Vector3) -> IslandCreature:
+	if subtype not in [0, 1, 2] or not position.is_finite(): return null
+	var next := IslandCreature.new()
+	if not next.configure(self, ["ape", "cow", "tiger"][subtype], position):
+		next.free()
+		return null
+	if not next.enter_story_control():
+		next.free()
+		return null
+	next.set_meta("story_creature_subtype", subtype)
+	add_child(next)
+	story_creatures.append(next)
+	world_geometry.register_node(next, next, next.rig)
+	return next
+
+
 func _update_preservation_hud() -> void:
 	if not is_instance_valid(creature):
 		creature_status.text = "Выберите спутника. После выбора воспитывайте его поступками."
@@ -2703,6 +2730,9 @@ func story_delete_object(object: Node3D, fade := false) -> bool:
 		story_sharks.erase(object)
 	elif story_highlights.has(object):
 		story_highlights.erase(object)
+	elif object is IslandCreature and story_creatures.has(object):
+		story_creatures.erase(object)
+		if creature == object: creature = null
 	else:
 		return false
 	if fade and object is Thing:

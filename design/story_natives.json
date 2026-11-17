@@ -145,5 +145,15 @@
   {"id":18,"name":"set_script_state_pos","arguments":4,"returns":0,"handler":"villager_script_animation","scope":"registered_villager_script_position_parameter"},
   {"id":19,"name":"set_script_float","arguments":2,"returns":0,"handler":"villager_script_animation","scope":"registered_villager_script_float_parameter"},
   {"id":321,"name":"set_hurt_by_fire","arguments":2,"returns":0,"handler":"fire_vulnerability","scope":"physical_thing_fire_damage_gate_flag"},
-  {"id":109,"name":"populate_container","arguments":4,"returns":0,"handler":"populate_bird_flock","scope":"installed_animal12_visual_flock_with_new_orbit_policy"}
+  {"id":109,"name":"populate_container","arguments":4,"returns":0,"handler":"populate_bird_flock","scope":"installed_animal12_visual_flock_with_new_orbit_policy"},
+  {"id":42,"name":"get_hand_position","arguments":0,"returns":3,"handler":"hand_position","scope":"current_port_hand_surface_contact"},
+  {"id":75,"name":"creature_do_action","arguments":4,"returns":0,"handler":"creature_action","scope":"bounded_source_glade_look_point_sit_presentation"},
+  {"id":83,"name":"creature_set_player","arguments":1,"returns":0,"handler":"creature_player","scope":"source_selected_actor_becomes_current_player_creature"},
+  {"id":201,"name":"shake_camera","arguments":6,"returns":0,"handler":"camera_shake","scope":"bounded_new_visual_shake_presentation"},
+  {"id":223,"name":"set_creature_home","arguments":4,"returns":0,"handler":"creature_home","scope":"source_selected_creature_home_position"},
+  {"id":307,"name":"set_open_close","arguments":2,"returns":0,"handler":"open_original_gate","scope":"open_installed_landmark_using_original_clip"},
+  {"id":205,"name":"dev_function","arguments":1,"returns":0,"handler":"creature_development_init","scope":"case1_initial_desire_mask_and_home_tether_only"},
+  {"id":197,"name":"call_player_creature","arguments":1,"returns":1,"handler":"player_creature","scope":"actual_player_one_owned_actor_or_null"},
+  {"id":208,"name":"set_creature_dev_stage","arguments":2,"returns":0,"handler":"creature_development_stage","scope":"installed_phase_zero_desire_configuration"},
+  {"id":282,"name":"creature_in_dev_script","arguments":2,"returns":0,"handler":"creature_development_flag","scope":"training_control_gate_on_actual_creature"}
 ]

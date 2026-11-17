@@ -17,6 +17,20 @@
 
 ## Состояние 17 ноября: третий камень
 
+Продолжение, кандидат9.7: все три focused выбора CreaturesInGlade и переход
+CreatureDevSeeHome/fade-in/sleep проходят, обычная сборка ещё9.6. Новый
+ClipClock v2 прошёл отдельный review и tools0/MCP0 Claude CLI2.1.311 запрос;
+модуль не менялся,363 standalone checks. Packet/review/implementation manifests
+в cleanroom/specs/SPEC-CLIP-CLOCK-001*. Адаптеры существ, типов, действий,
+развития/камеры остаются coordinator/legacy. Не заявлять clean-room всего порта.
+
+Bind-space исправление поз/scale0.06 и visual action policies ещё не сверены
+с работающим оригиналом. По запросу пользователя начат reference workflow,
+но валидной original/Godot пары нет: оригинал показал неисправный UI, wrapper
+пробы не довели до игрового кадра. Полный rendered маршрут после нового home
+fix и fresh delivery ещё нужны. Exact candidate startup/home уже PASS; см. HANDOFF_RU.md и
+development/VISUAL_REFERENCE_RU.md; candidate не является готовой игрой.
+
 TheSculptor/quarry50/source timer60s/reward51/физическая установка пройдены:
 bits7, три видимые части, flags91/92/93=1, журнал55 затем0.75. Exact и fresh Git
 export8d2bd5f full rendered input-only opening PASS, startup обоих режимов PASS.

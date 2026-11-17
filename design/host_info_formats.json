@@ -42,6 +42,14 @@
     "storage_pile_record_size": 308,
     "storage_pile_record_count": 6,
     "hand_pile_offset": 288460,
+    "creature_development_offset": 68416,
+    "creature_development_record_size": 116,
+    "creature_development_record_count": 14,
+    "creature_development_enable_offset": 60,
+    "creature_development_enable_count": 10,
+    "creature_development_disable_count": 4,
+    "creature_desire_count": 40,
+    "creature_desire_sentinel": 42,
     "verification": "validated on installed 1.2 data"
   }
 ]

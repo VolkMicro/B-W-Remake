@@ -1,0 +1,13 @@
+{
+  "specId": "SPEC-CLIP-CLOCK-001",
+  "specVersion": 2,
+  "status": "approved",
+  "reviewerRole": "independent specification reviewer; no product implementation",
+  "reviewedSpecSha256": "94D4753DCE600E4FA7556CD2FF40A8C5FFE6AE9704710BD7A07525D41D324CBB",
+  "reviewerModel": "claude-opus-5-5",
+  "reviewerCliVersion": "2.1.311 (Claude Code)",
+  "reviewerResultSha256": "BA99DFB8F378D892670AB2DCF854C6857E918FC1F3E2F364F2A8CEC1BC8C0DDB",
+  "observedToolUses": 0,
+  "scope": "new scalar presentation scheduler; no original algorithm claim",
+  "priorReview": "v1 required explicit typing/return/snapshot/lifecycle rules; v2 approved with full rationale private"
+}

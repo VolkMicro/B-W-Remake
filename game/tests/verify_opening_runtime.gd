@@ -11,6 +11,7 @@ var automate := false
 var automate_input := false
 var capture_dir := ""
 var captured: Dictionary = {}
+var capture_initial := false
 var camera_clearance := INF
 var player_camera_clearance := INF
 var temple_until := 0.0
@@ -55,6 +56,13 @@ var third_quarry_released := false
 var third_sculptor: WeakRef
 var third_drop_at := -1.0
 var third_drop_point := Vector3.INF
+var continue_creature := false
+var stop_at_glade := false
+var glade_ready := false
+var requested_creature := "cow"
+var creature_finished := false
+var creature_phase := "waiting for three stones"
+var creature_last_click := -10.0
 
 func _initialize() -> void:
 	for arg in OS.get_cmdline_user_args():
@@ -82,6 +90,14 @@ func _initialize() -> void:
 			continue_second_key = true
 			continue_third_key = arg == "--runtime-third-key"
 			stop_after_second = arg == "--runtime-stop-after-second"
+		elif arg.begins_with("--runtime-creature=") or arg == "--runtime-stop-at-glade":
+			continue_keeper = true
+			continue_key = true
+			continue_second_key = true
+			continue_third_key = true
+			continue_creature = true
+			stop_at_glade = arg == "--runtime-stop-at-glade"
+			if not stop_at_glade: requested_creature = arg.substr(19)
 		elif arg == "--runtime-stop-after-first":
 			continue_keeper = true
 			continue_key = true
@@ -93,6 +109,8 @@ func _initialize() -> void:
 			construction_diagnostics = true
 		elif arg.begins_with("--runtime-captures="):
 			capture_dir = arg.substr(19)
+		elif arg == "--runtime-capture-initial":
+			capture_initial = true
 	if not capture_dir.is_empty():
 		DirAccess.make_dir_recursive_absolute(capture_dir)
 	if automate:
@@ -108,6 +126,9 @@ func _process(delta: float) -> bool:
 	elapsed += delta
 	if not is_instance_valid(world) or not world.loaded:
 		return false
+	if capture_initial and not captured.has("InitialRequested") and not capture_dir.is_empty() and DisplayServer.get_name() != "headless":
+		captured["InitialRequested"] = true
+		capture_frame.call_deferred("Initial")
 	if stop_at_village and world.story_citadel != null:
 		stop_at_village = false
 		automate = false
@@ -154,6 +175,8 @@ func _process(delta: float) -> bool:
 			if continue_third_key and script == "TheSculptor" and task["locals"].size() > 1:
 				var sculptor: Object = world.story_bridge._object(task["locals"][1])
 				if sculptor is Thing: third_sculptor = weakref(sculptor)
+			if continue_creature and script == "CreaturesInGlade" and task["pc"] >= 40344 and world.story_camera.owner_task == 0 and world.story_creatures.size() == 3:
+				glade_ready = true
 			if continue_keeper and keeper_seen and script == "ChooseYourCreature" and not task["in_handler"] and task["pc"] >= 38705 and task["pc"] < 39572 and world.story_camera.owner_task == 0:
 				keeper_intro_finished = true
 			if DisplayServer.get_name() != "headless" and not capture_dir.is_empty() and script in ["TeachRotate", "TeachPitch", "TeachZoom", "GiveFood"] and not captured.has(script):
@@ -164,13 +187,31 @@ func _process(delta: float) -> bool:
 			# native. Count it as started, while checking this route separately.
 			for problem in world.story_vm.suspended.values():
 				visited[str(problem.get("script", ""))] = true
-				if second_key_required_script(str(problem.get("script", ""))) or (continue_third_key and third_key_required_script(str(problem.get("script", "")))):
+				if second_key_required_script(str(problem.get("script", ""))) or (continue_third_key and third_key_required_script(str(problem.get("script", "")))) or (continue_creature and creature_required_script(str(problem.get("script", "")))):
 					printerr("OPENING SECOND KEY BLOCKED ", problem)
 					quit(1)
 					return false
 			second_key_finished = second_key_finished or (second_key_delivered and second_scroll_clicked and world.story_gate_plinth.info_bits() == 3 and world.story_gate_plinth.get_child_count() == 2 and world.story_journal.get(55, {}).get("success", 0.0) == 0.5 and StoryVm.as_float(world.story_vm.variables[91]) == 1.0 and StoryVm.as_float(world.story_vm.variables[92]) == 1.0 and world.story_camera.owner_task == 0 and visited.has("TheSculptor"))
 		if continue_third_key:
 			third_key_finished = third_scroll_clicked and third_quarry_released and third_key_delivered and world.story_gate_plinth.info_bits() == 7 and world.story_gate_plinth.get_child_count() == 3 and StoryVm.as_float(world.story_vm.variables[93]) == 1.0 and StoryVm.as_float(world.story_vm.variables[135]) == 1.0 and visited.has("CreaturesInGlade")
+		if continue_creature:
+			creature_finished = glade_ready and creature_choice_established() and world.story_vm.finished.values().any(func(t:Dictionary): return t["script"] == "CreaturesInGlade")
+			if creature_finished and not capture_dir.is_empty() and DisplayServer.get_name() != "headless" and not captured.has("CreatureOwnedRequested"):
+				captured["CreatureOwnedRequested"] = true
+				capture_frame.call_deferred("CreatureOwned")
+	if stop_at_glade and glade_ready:
+		stop_at_glade = false
+		continue_creature = false
+		continue_third_key = false
+		continue_second_key = false
+		continue_key = false
+		continue_keeper = false
+		automate = false
+		automate_input = false
+		Engine.time_scale = 1.0
+		duration = INF
+		world.get_window().title = "Black & White — выбор существа"
+		print("CREATURE_CHOICE_TEST_READY three genuine stones delivered; source glade unlocked; media and manual input restored")
 	if stop_after_second and second_key_finished:
 		stop_after_second = false
 		continue_second_key = false
@@ -223,6 +264,8 @@ func _process(delta: float) -> bool:
 			print("SECOND KEY phase=", second_key_phase, " first=", first_key_finished, " scroll=", second_scroll_clicked, " released=", second_brother_released, " delivered=", second_key_delivered, " bits=", world.story_gate_plinth.info_bits() if world.story_gate_plinth != null else -1)
 		if continue_third_key:
 			print("THIRD KEY phase=", third_key_phase, " scroll=", third_scroll_clicked, " quarry_released=", third_quarry_released, " delivered=", third_key_delivered)
+		if continue_creature:
+			print("CREATURE phase=",creature_phase," glade=",glade_ready," owned=",world.creature.species if is_instance_valid(world.creature) else "none"," focus=",world.focus," dist=",world.dist)
 	if not input_failure.is_empty():
 		printerr("OPENING INPUT FAILED ", input_failure)
 		quit(1)
@@ -235,7 +278,7 @@ func _process(delta: float) -> bool:
 		printerr("OPENING BLOCKED ", world.story_vm.error)
 		quit(1)
 		return false
-	if elapsed >= duration or (continue_keeper and keeper_intro_finished and not continue_key) or (continue_key and first_key_finished and not continue_second_key) or (continue_second_key and second_key_finished and not continue_third_key) or third_key_finished:
+	if elapsed >= duration or (continue_keeper and keeper_intro_finished and not continue_key) or (continue_key and first_key_finished and not continue_second_key) or (continue_second_key and second_key_finished and not continue_third_key) or (continue_third_key and third_key_finished and not continue_creature) or (creature_finished and (capture_dir.is_empty() or DisplayServer.get_name() == "headless" or captured.get("CreatureOwned",false))):
 		print("OPENING OBSERVED ", visited.keys())
 		var completed := []
 		for task in world.story_vm.finished.values():
@@ -254,6 +297,8 @@ func _process(delta: float) -> bool:
 			print("OPENING SECOND KEY ", second_key_finished, " phase=", second_key_phase, " bits=", world.story_gate_plinth.info_bits(), " journal=", world.story_journal.get(55, {}).get("success", -1.0), " stones=", world.story_gate_plinth.get_child_count(), " sculptor=", visited.has("TheSculptor"), " camera=", world.story_camera.owner_task, " unexpected=", unexpected_drops)
 		if continue_third_key:
 			print("OPENING THIRD KEY ", third_key_finished, " phase=", third_key_phase, " bits=", world.story_gate_plinth.info_bits(), " journal=", world.story_journal.get(55, {}).get("success", -1.0), " stones=", world.story_gate_plinth.get_child_count(), " glade=", visited.has("CreaturesInGlade"), " camera=", world.story_camera.owner_task)
+		if continue_creature:
+			print("OPENING CREATURE ",creature_finished," requested=",requested_creature," owned=",world.creature.species if is_instance_valid(world.creature) else "none"," actors=",world.story_creatures.size()," flag2=",StoryVm.as_float(world.story_vm.variables[2])," camera=",world.story_camera.owner_task)
 		if automate_input:
 			var passed: bool = visited.has("GiveFood") and temple_visited and camera_clearance >= 0.49 and player_camera_clearance >= 2.99 and door_wait_complete and door_stable and world.story_construction != null and world.story_construction.wood_consumed > 0
 			for tutorial in ["TeachRotate", "TeachPitch", "TeachZoom"]:
@@ -266,6 +311,8 @@ func _process(delta: float) -> bool:
 				passed = passed and second_key_finished
 			if continue_third_key:
 				passed = passed and third_key_finished
+			if continue_creature:
+				passed = passed and creature_finished
 			print("OPENING RESULT ", "PASS" if passed else "FAIL")
 			quit(0 if passed else 1)
 		else:
@@ -276,6 +323,34 @@ func _process(delta: float) -> bool:
 func capture_frame(label: String) -> void:
 	await RenderingServer.frame_post_draw
 	world.get_viewport().get_texture().get_image().save_png(capture_dir.path_join(label + ".png"))
+	var size: Vector2 = world.get_viewport().get_visible_rect().size
+	var eye: Vector3 = world.cam.global_position
+	var forward: Vector3 = -world.cam.global_basis.z
+	var focus: Vector3 = world.focus
+	var arguments := OS.get_cmdline_args()
+	# Godot can consume --main-pack before exposing arguments to the script.
+	# Empty fields do not certify source/export provenance: record the actual
+	# launch command and exported SHA separately with the capture set.
+	var pack_index := arguments.find("--main-pack")
+	var main_pack := arguments[pack_index + 1] if pack_index >= 0 and pack_index + 1 < arguments.size() else ""
+	var metadata := {
+		"schema": 1, "event": label, "engine": Engine.get_version_info()["string"],
+		"executable": OS.get_executable_path(), "viewport": [int(size.x), int(size.y)],
+		"main_pack": main_pack, "main_pack_sha256": FileAccess.get_sha256(main_pack) if not main_pack.is_empty() else "",
+		"wall_utc": Time.get_datetime_string_from_system(true),
+		"elapsed_fixture_seconds": elapsed, "frame": Engine.get_process_frames(),
+		"time_scale": Engine.time_scale, "automated_input": automate_input, "media_skipped": automate,
+		"camera": {"eye": [eye.x,eye.y,eye.z], "forward": [forward.x,forward.y,forward.z],
+			"focus": [focus.x,focus.y,focus.z], "fov_degrees": world.cam.fov,
+			"keep_aspect": world.cam.keep_aspect, "near": world.cam.near, "far": world.cam.far,
+			"source_owner": world.story_camera.owner_task},
+		"fade_alpha": world.story_fade_rect.color.a if world.story_fade_rect != null else 0.0,
+		"source_tasks": world.story_vm.tasks.values().map(func(task:Dictionary): return {"script":task["script"], "pc":task["pc"]}),
+		"original_runtime_comparison": false,
+	}
+	var metadata_file := FileAccess.open(capture_dir.path_join(label + ".json"), FileAccess.WRITE)
+	if metadata_file != null: metadata_file.store_string(JSON.stringify(metadata, "\t") + "\n")
+	captured[label] = true
 
 
 func drag(from: Vector2, to: Vector2, right := false) -> void:
@@ -343,7 +418,10 @@ func drive_camera_input() -> void:
 			world._unhandled_input(click)
 			return
 	var target: Node3D
-	if continue_third_key and second_key_finished:
+	if continue_creature and third_key_finished:
+		drive_creature_input()
+		return
+	elif continue_third_key and second_key_finished:
 		drive_third_key_input()
 		return
 	elif continue_second_key and first_key_finished:
@@ -421,6 +499,67 @@ func second_key_required_script(script: String) -> bool:
 
 func third_key_required_script(script: String) -> bool:
 	return script in ["TheSculptor", "SetupSculptor", "KeepRockScripted", "SculptorSculptingOutside", "SculptorSculpting", "AdvisorSpotsRock", "CreatureRetrieveRockReturned", "ProtectQuarryRock", "ProtectGateKey3"]
+
+func creature_required_script(script: String) -> bool:
+	return script in ["CreaturesInGlade", "CreaturesPlayVarietyOfAnims"]
+
+func creature_choice_established() -> bool:
+	return is_instance_valid(world.creature) and world.creature.species == requested_creature and world.creature.story_player_id == 1 and world.creature.story_home.is_finite() and world.creature.story_development_phase == 0 and not world.creature.story_script_controlled and world.story_bridge.profile_has_creature and world.story_creatures.size() == 1 and world.story_camera.owner_task == 0 and StoryVm.as_float(world.story_vm.variables[2]) == 1.0 and (world.story_fade_rect == null or world.story_fade_rect.color.a <= 0.01)
+
+
+func drive_creature_input() -> void:
+	if not glade_ready:
+		creature_phase = "waiting for original glade cinema"
+		return
+	if requested_creature not in ["cow","ape","tiger"]:
+		input_failure = "unknown requested source creature: " + requested_creature
+		return
+	if is_instance_valid(world.creature):
+		creature_phase = "waiting for source ownership and cleanup"
+		return
+	var task: Dictionary
+	for candidate in world.story_vm.tasks.values():
+		if candidate["script"] == "CreaturesInGlade": task = candidate
+	if task.is_empty():
+		input_failure = "source glade task disappeared before creature choice"
+		return
+	var slot: int = ["cow","ape","tiger"].find(requested_creature)
+	var actor := world.story_bridge._object(task["locals"][slot]) as IslandCreature
+	if actor == null:
+		input_failure = "source creature missing before choice"
+		return
+	creature_phase = "approaching actual " + requested_creature
+	if world.dist > 22.0 or world.dist < 8.0:
+		var wheel := InputEventMouseButton.new()
+		wheel.button_index = MOUSE_BUTTON_WHEEL_UP if world.dist > 22.0 else MOUSE_BUTTON_WHEEL_DOWN
+		wheel.pressed = true
+		wheel.position = world.get_viewport().get_visible_rect().size * 0.5
+		world._unhandled_input(wheel)
+		return
+	var point: Vector3 = actor.rig.root.global_transform * actor.rig.bounds.get_center()
+	if world.cam.is_position_behind(point):
+		if drive_to_position(actor.position,8.0): orbit_for_visible_pickup()
+		return
+	var centre: Vector2 = world.cam.unproject_position(point)
+	var hit := Vector2.INF
+	for offset in [Vector2.ZERO,Vector2(10,0),Vector2(-10,0),Vector2(0,10),Vector2(0,-10),Vector2(20,0),Vector2(-20,0)]:
+		var screen: Vector2 = centre + offset
+		if world.get_viewport().get_visible_rect().has_point(screen) and world.hand_target(screen).get("story_creature") == actor:
+			hit = screen
+			break
+	if not hit.is_finite():
+		if drive_to_position(actor.position,8.0): orbit_for_visible_pickup()
+		return
+	mouse_move_to(hit)
+	var clicks := int(StoryVm.as_float(task["locals"][slot+7]))
+	creature_phase = "confirming actual %s, source clicks=%d" % [requested_creature,clicks]
+	if elapsed - creature_last_click < 0.75 or (clicks == 1 and world.story_bridge.dialogue_owner != 0): return
+	if clicks >= 2: return
+	click_at(hit)
+	if world.story_bridge.clicked_thing != null and world.story_bridge.clicked_thing.get_ref() == actor:
+		creature_last_click = elapsed
+		print("CREATURE Action click delivered to actual ",requested_creature," prior_source_clicks=",clicks)
+		if not capture_dir.is_empty() and DisplayServer.get_name() != "headless": capture_frame.call_deferred("CreatureChoice")
 
 func drive_third_key_input() -> void:
 	var vars: Array = world.story_vm.variables

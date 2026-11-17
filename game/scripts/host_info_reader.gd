@@ -13,6 +13,7 @@ var highlights: Array[Dictionary] = []
 var villagers: Array[Dictionary] = []
 var storage_piles: Array[Dictionary] = []
 var hand_resources: Array[Dictionary] = []
+var creature_development: Array[Dictionary] = []
 
 
 func load_file(path: String, mesh_count: int) -> bool:
@@ -26,6 +27,7 @@ func load_file(path: String, mesh_count: int) -> bool:
 	villagers.clear()
 	storage_piles.clear()
 	hand_resources.clear()
+	creature_development.clear()
 	var f := FileAccess.open(path, FileAccess.READ)
 	if f == null or f.get_buffer(8).get_string_from_ascii() != "LiOnHeAd":
 		return _fail("Original object information is unavailable")
@@ -51,6 +53,22 @@ func _read_info(bytes: PackedByteArray, mesh_count: int) -> bool:
 			break
 	if format.is_empty():
 		return _fail("Unsupported Black & White object information version")
+	var phase_start: int = format["creature_development_offset"]
+	var phase_size: int = format["creature_development_record_size"]
+	var phase_count: int = format["creature_development_record_count"]
+	var enabled_offset: int = format["creature_development_enable_offset"]
+	var enabled_count: int = format["creature_development_enable_count"]
+	var disabled_count: int = format["creature_development_disable_count"]
+	if phase_start < 0 or phase_count != 14 or phase_start + phase_size * phase_count > bytes.size() or enabled_offset < 0 or enabled_count != 10 or disabled_count != 4 or enabled_offset + (enabled_count + disabled_count) * 4 > phase_size:
+		return _fail("Invalid creature development table")
+	for phase in phase_count:
+		var row := {"enable":[],"disable":[]}
+		for slot in enabled_count + disabled_count:
+			var desire := int(bytes.decode_u32(phase_start + phase * phase_size + enabled_offset + slot * 4))
+			if desire == int(format["creature_desire_sentinel"]): continue
+			if desire < 0 or desire >= int(format["creature_desire_count"]): return _fail("Invalid creature development desire")
+			row["enable" if slot < enabled_count else "disable"].append(desire)
+		creature_development.append(row)
 	var influence_offset: int = format["influence_offset"]
 	if int(format["influence_float_count"]) != 3 or influence_offset < 0 or influence_offset + 12 > bytes.size():
 		return _fail("Original influence settings are truncated")
@@ -183,6 +201,10 @@ func animal(index: int) -> Dictionary:
 	return animals[index] if index >= 0 and index < animals.size() else {}
 
 
+func creature_development_phase(index: int) -> Dictionary:
+	return creature_development[index] if index >= 0 and index < creature_development.size() else {}
+
+
 func highlight(index: int) -> Dictionary:
 	return highlights[index] if index >= 0 and index < highlights.size() else {}
 
@@ -202,4 +224,5 @@ func _fail(message: String) -> bool:
 	villagers.clear()
 	storage_piles.clear()
 	hand_resources.clear()
+	creature_development.clear()
 	return false

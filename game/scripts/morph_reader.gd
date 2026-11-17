@@ -4,6 +4,7 @@ extends RefCounted
 
 var error := ""
 var clips: Dictionary = {}
+var names_by_index: Dictionary = {}
 var base_mesh := ""
 var _data := PackedByteArray()
 var adviser_metadata: Dictionary = {}
@@ -99,6 +100,7 @@ func _register_clip(name: String, p: int, end: int) -> bool:
 
 
 func load_file(path: String, data_folder: String) -> bool:
+	names_by_index.clear()
 	var bytes := FileAccess.get_file_as_bytes(path)
 	if bytes.size() < 44 + 236 or bytes.slice(0, 8).get_string_from_ascii() != "LiOnHeAd":
 		return _fail("Missing creature animation pack")
@@ -149,10 +151,11 @@ func load_file(path: String, data_folder: String) -> bool:
 				return _fail("Translation bone outside skeleton")
 			tids.append(idx)
 		clips[names[i]] = {"frames":nf,"bones":nb,"rids":rids,"tids":tids,"offset":frames,"duration":maxf(float(_data.decode_u32(p)) / 1000.0, 0.1)}
+		names_by_index[i] = names[i]
 	return clips.has("move/stand") and clips.has("move/walk")
 
 
-func sample(name: String, seconds: float, rest: Array[Transform3D], base_clip := "", base_seconds := 0.0) -> Array[Transform3D]:
+func sample(name: String, seconds: float, rest: Array[Transform3D], base_clip := "", base_seconds := 0.0, loop := true) -> Array[Transform3D]:
 	var pose: Array[Transform3D] = rest.duplicate()
 	# Base stand defines channels not present in a sparse action clip.
 	if clips.has("move/stand"):
@@ -162,19 +165,33 @@ func sample(name: String, seconds: float, rest: Array[Transform3D], base_clip :=
 	if not base_clip.is_empty() and clips.has(base_clip):
 		_apply(clips[base_clip], base_seconds, pose, rest, true)
 	if clips.has(name):
-		_apply(clips[name], seconds, pose, rest, true)
+		_apply(clips[name], seconds, pose, rest, true, loop)
 	return pose
 
 
 # HelpDude uses CAnim::FillBuffer in the original bind coordinate frame. Its
-# rotations are not local XYZ Euler offsets. Keep this separate from the
-# creature adapter until that format's retargeting is migrated too.
+# rotations are not local XYZ Euler offsets.
 func sample_adviser(name: String, seconds: float, rig: L3dRig) -> Array[Transform3D]:
 	var pose: Array[Transform3D] = rig.rests.duplicate()
 	if clips.has("move/stand"):
 		_apply_adviser(clips["move/stand"], 0.0, pose, rig)
 	if clips.has(name):
 		_apply_adviser(clips[name], seconds, pose, rig)
+	return pose
+
+
+func sample_creature(name: String, seconds: float, rig: L3dRig, loop := true) -> Array[Transform3D]:
+	# CBN channels share the bind-space transform used by the existing CAnim
+	# adapter. Multiplying local XYZ rotations by local rest distorts limbs.
+	var pose: Array[Transform3D] = rig.rests.duplicate()
+	if clips.has("move/stand"):
+		_apply_adviser(clips["move/stand"], 0.0, pose, rig, Vector3.ZERO)
+	if clips.has(name):
+		var clip: Dictionary = clips[name]
+		var progress := fposmod(seconds, float(clip["duration"])) / float(clip["duration"]) if loop else clampf(seconds / float(clip["duration"]), 0.0, 1.0)
+		var frame := progress * float(int(clip["frames"]) - 1)
+		var first := int(frame)
+		_apply_adviser(clip, seconds, pose, rig, Vector3(first, mini(first + 1, int(clip["frames"]) - 1), frame - first))
 	return pose
 
 
@@ -216,8 +233,8 @@ func _adviser_channel(clip: Dictionary, channel: int, frame: Vector3, rotation: 
 	return Vector3(position.x, position.y, -position.z)
 
 
-func _apply_adviser(clip: Dictionary, seconds: float, pose: Array[Transform3D], rig: L3dRig) -> void:
-	var frame := _adviser_frame(clip, seconds)
+func _apply_adviser(clip: Dictionary, seconds: float, pose: Array[Transform3D], rig: L3dRig, explicit_frame := Vector3.INF) -> void:
+	var frame := explicit_frame if explicit_frame.is_finite() else _adviser_frame(clip, seconds)
 	var rids: PackedInt32Array = clip["rids"]
 	var tids: PackedInt32Array = clip["tids"]
 	for channel in rids.size():
@@ -270,9 +287,10 @@ func adviser_root_motion(name: String, position: float) -> Vector3:
 	return current - first
 
 
-func _apply(clip: Dictionary, seconds: float, pose: Array[Transform3D], rest: Array[Transform3D], lock_root: bool) -> void:
+func _apply(clip: Dictionary, seconds: float, pose: Array[Transform3D], rest: Array[Transform3D], lock_root: bool, loop := true) -> void:
 	var nf: int = clip["frames"]
-	var frame: float = fposmod(seconds, float(clip["duration"])) / float(clip["duration"]) * float(nf - 1)
+	var progress := fposmod(seconds, float(clip["duration"])) / float(clip["duration"]) if loop else clampf(seconds / float(clip["duration"]), 0.0, 1.0)
+	var frame: float = progress * float(nf - 1)
 	var a := int(frame)
 	var b := mini(a + 1, nf - 1)
 	var weight := frame - float(a)

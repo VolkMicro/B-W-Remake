@@ -12,6 +12,53 @@ TASK_CLAUDE_RU.md. Сначала CLEAN_ROOM_RU.md определяет роль
 
 ## Текущий checkpoint: Preview 9.6 — 17 ноября 2026
 
+**Новые работы17 ноября, ещё не активированы:** кандидат9.7 проходит focused
+три ключа → CreaturesInGlade → выбор cow/ape/tiger через реальные Action.
+Исходные CREATE/type12, анимации/ворота/музыка, ownership/home/development0
+подключены; source сам удаляет альтернативы и завершает CreaturesInGlade.
+Отдельный verify_creature_home продолжает настоящую CreatureDevSeeHome:
+fade-in снимает чёрный экран, выбранный зверь спит. Это focused fixture,
+не доказательство целого нормального игрового маршрута.
+
+Новый ClipClock получен неизменённым от tools0 Claude по reviewed v2 packet;
+363 checks PASS. Адаптеры legacy/coordinator. Риги существ переведены на
+существующий bind-space путь YXZ; старый sample давал растянутые позы.
+Scale0.06, look/point/sit и visual shake — ограниченные presentation policies,
+ещё не измеренные против запущенного оригинала. Нет полной физиологии/
+обучения/need-driven AI. Native205 только case1,208 только stage0; остальные
+состояния честно остаются unsupported. Property31 — bounded state/sleep/wake,
+название fatigue выведено из source use, не доказанный enum label.
+
+Проверки source: actors59, три выбора111 каждый, home114, ClipClock363,
+12 regressions (логи scratch/glade-regression-*), adviser pose/runtime PASS.
+Последний candidate export SHA256
+BA01AC0094029A430FB4829946976D8699BE3A5D33AD6DF9B43E6BBC074BBD5F:
+matching-engine main-pack startup обоих режимов и home114 PASS, ошибок0.
+Fixture tests читаются извне с --path game, product resources из exported pack.
+Captured800x600 PNG+JSON просмотрен/проверен; это ещё не original comparison.
+Последний full headless opening4 **FAIL**: автоматический поиск брата не дошёл
+до второго камня. Предыдущий rendered opening3 прошёл выбор, но остановился
+на CreatureDevSeeHome/native21/address6116/property31 при fade1; после добавления
+31+sleep этот полный rendered маршрут не повторён. Opening2 старее fade guard
+и не доказывает выход из чёрного экрана. Не считать9.7 выпущенной.
+
+Новый приоритет пользователя — сравнение с работающим оригиналом кадр в кадр.
+Порядок и фактические неудачные reference попытки:
+development/VISUAL_REFERENCE_RU.md. Оригинал запущен, форма профиля искажена;
+**валидной пары original/Godot ещё нет**. compare_frames.py даёт пару/overlay/
+diff, отклоняет разные размеры. Godot runtime captures теперь сохраняют JSON
+камеры/события рядом с PNG. Не называть Godot old/new pose снимки оригиналом.
+Setup.exe UAC отменён пользователем; не запускать конфигуратор вслепую снова.
+Команда установки DDrawCompat/нового запуска отклонена автоматической
+проверкой (blocked by policy), не исполнена; не обходить повтором.
+
+Следующие шаги: рабочий original reference без артефактов → одинаковые
+viewport/события → реальные пары и исправления, затем полный rendered route
+с последним source, exact/fresh export/startup и только после этого активация.
+Приватное исследование CreatureGlade.cany и Research/CreatureGlade содержит
+Ghidra/CHL/action/development proofs. В Git только reviewed packets, adapters
+и tests; чистому реализатору полный checkout/history не передавать.
+
 Source commit8d2bd5f. Exe: `build/story-preview/GodotIsland-village-preview9.6.exe`,
 SHA256 `E8BAAF78591F0B06B4C90DBB27635066836AA5B17EFD5DBA5B4CAF2995BF8A83`.
 Отчёт: development/preview9.6-verification.json. Preview9.5 сохранён.

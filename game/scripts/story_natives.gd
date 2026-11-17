@@ -498,6 +498,21 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 		"villager_script_animation":
 			var p := stack.size() - count
 			var target := _object(stack[p])
+			if target is IslandCreature and target.story_actor:
+				match id:
+					20:
+						var animation := StoryVm.as_int(stack[p + 1])
+						var repeats := StoryVm.as_int(stack[p + 2])
+						if not target.morph.names_by_index.has(animation) or (repeats < 1 and repeats != -1): return {"ok":false}
+						target.set_meta("script_unsigned", Vector2i(animation, repeats))
+					17:
+						var parameters: Vector2i = target.get_meta("script_unsigned", Vector2i(-1, -1))
+						if StoryVm.as_int(stack[p + 1]) != 200 or not target.play_story_animation(parameters.x, parameters.y): return {"ok":false}
+					64:
+						result.append(StoryVm.integer(int(not target.story_animation_playing()), StoryVm.BOOL))
+					_:
+						return {"ok":false}
+				return {"ok":true,"pop":count,"push":result}
 			if id == 17 and target is StoryFlock and StoryVm.as_int(stack[p + 1]) == 244:
 				target.crowd_mode = true
 				return {"ok":true,"pop":count,"push":result}
@@ -608,7 +623,7 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 			var radius := StoryVm.as_float(stack[start + 4])
 			if actor is StoryFlock and target.is_finite() and radius == 0.0:
 				actor.position = target
-			elif not actor is Thing or not actor.set_script_move(target, radius):
+			elif (not actor is Thing and not actor is IslandCreature) or not actor.set_script_move(target, radius):
 				return {"ok":false}
 		"set_focus":
 			var start := stack.size() - count
@@ -618,7 +633,7 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 				for member in target.members:
 					if is_instance_valid(member):
 						member.set_script_focus(point)
-			elif not target is Thing or not target.set_script_focus(point):
+			elif (not target is Thing and not target is IslandCreature) or not target.set_script_focus(point):
 				return {"ok":false}
 		"set_high_graphics_detail":
 			var villager := _object(stack.back()) as Thing
@@ -793,11 +808,64 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 			result.append(StoryVm.number(-position.z, StoryVm.VECTOR))
 		"set_position":
 			var p := stack.size() - count
-			var actor := _object(stack[p]) as Thing
+			var actor := _object(stack[p])
 			var point := _vector(stack, p + 1)
-			if not is_instance_valid(actor) or actor.kind not in ["villager", "gate_key", "rock"] or not point.is_finite():
+			if not ((actor is Thing and actor.kind in ["villager", "gate_key", "rock"]) or (actor is IslandCreature and actor.story_actor)) or not point.is_finite():
 				return {"ok":false}
 			actor.position = point
+		"hand_position":
+			var world: Object = terrain.get_ref() if terrain else null
+			if not is_instance_valid(world): return {"ok":false}
+			var point: Vector3 = world._hand_surface
+			if not point.is_finite(): return {"ok":false}
+			result.append_array([StoryVm.number(point.x, StoryVm.VECTOR),StoryVm.number(point.y, StoryVm.VECTOR),StoryVm.number(-point.z, StoryVm.VECTOR)])
+		"creature_action":
+			var p := stack.size() - count
+			var actor := _object(stack[p]) as IslandCreature
+			var target := _object(stack[p + 2]) as Node3D
+			if actor == null or StoryVm.as_int(stack[p + 3]) != 0 or not actor.story_action(StoryVm.as_int(stack[p + 1]), target): return {"ok":false}
+		"creature_development_init":
+			var world: Object = terrain.get_ref() if terrain else null
+			if StoryVm.as_int(stack.back()) != 1 or not is_instance_valid(world) or not is_instance_valid(world.creature): return {"ok":false}
+			if not world.creature.initialize_story_development(world.host_info.creature_development_phase(0)): return {"ok":false}
+		"player_creature":
+			var value: Dictionary = stack.back()
+			if int(value["type"]) not in [StoryVm.INT,StoryVm.FLOAT]: return {"ok":false}
+			var player := StoryVm.as_float(value) if int(value["type"]) == StoryVm.FLOAT else float(StoryVm.as_int(value))
+			var world: Object = terrain.get_ref() if terrain else null
+			if not is_equal_approx(player,1.0) or not is_instance_valid(world): return {"ok":false}
+			var actor: IslandCreature = world.creature
+			result.append(StoryVm.integer(register_object(actor,12) if is_instance_valid(actor) and actor.story_player_id == 1 else 0,StoryVm.OBJECT))
+		"creature_development_stage", "creature_development_flag":
+			var p := stack.size() - count
+			var actor := _object(stack[p if id == 208 else p + 1]) as IslandCreature
+			var world: Object = terrain.get_ref() if terrain else null
+			if actor == null or not actor.story_actor or not is_instance_valid(world): return {"ok":false}
+			if id == 208:
+				if StoryVm.as_int(stack[p + 1]) != 0 or not actor.initialize_story_development(world.host_info.creature_development_phase(0),false): return {"ok":false}
+			else:
+				actor.set_story_training(StoryVm.as_int(stack[p]) != 0)
+		"creature_player", "creature_home":
+			var p := stack.size() - count
+			var actor := _object(stack[p]) as IslandCreature
+			var world: Object = terrain.get_ref() if terrain else null
+			if actor == null or not actor.story_actor or not is_instance_valid(world): return {"ok":false}
+			if id == 83:
+				world.creature = actor
+				actor.story_player_id = int(Data.PORT_RULES["story"]["player_one"])
+				profile_has_creature = true
+			else:
+				var point := _vector(stack, p + 1)
+				if not point.is_finite(): return {"ok":false}
+				actor.story_home = point
+		"camera_shake":
+			var p := stack.size() - count
+			if camera == null or not camera.start_visual_shake(_vector(stack, p), StoryVm.as_float(stack[p + 3]), StoryVm.as_float(stack[p + 4]), StoryVm.as_float(stack[p + 5])): return {"ok":false}
+		"open_original_gate":
+			var p := stack.size() - count
+			var target := _object(stack[p + 1]) as OriginalLandmark
+			if target == null or StoryVm.as_int(stack[p]) != 1: return {"ok":false}
+			if not target.gate_open and not target.play_original(): return {"ok":false}
 		"distance":
 			var p := stack.size() - count
 			var a := Vector3(StoryVm.as_float(stack[p]), StoryVm.as_float(stack[p + 1]), StoryVm.as_float(stack[p + 2]))
@@ -847,6 +915,13 @@ func invoke(id: int, stack: Array, context: Dictionary) -> Dictionary:
 			var position := Vector3(StoryVm.as_float(stack[p + 2]), StoryVm.as_float(stack[p + 3]), -StoryVm.as_float(stack[p + 4]))
 			if not position.is_finite():
 				return {"ok":false}
+			if object_type == 12:
+				var world: Object = terrain.get_ref() if terrain else null
+				if not is_instance_valid(world) or not world.has_method("story_create_creature"): return {"ok":false}
+				var actor: IslandCreature = world.story_create_creature(subtype, position)
+				if actor == null: return {"ok":false}
+				result.append(StoryVm.integer(register_object(actor, 12), StoryVm.OBJECT))
+				return {"ok":true,"pop":count,"push":result}
 			if object_type == 15 and subtype == 2:
 				var world: Object = terrain.get_ref() if terrain else null
 				if not is_instance_valid(world): return {"ok":false}
@@ -1051,6 +1126,13 @@ func _invoke_world(handler: String, stack: Array, p: int) -> Dictionary:
 			if handler == "get_property" and target == null:
 				result.append(StoryVm.number(0.0))
 				return {"result":result}
+			if handler == "get_property" and target is IslandCreature and property == 19:
+				result.append(StoryVm.number(target.rig.bounds.size.y * target.rig.root.global_basis.get_scale().y))
+				return {"result":result}
+			if target is IslandCreature and property == 31:
+				if handler == "get_property": result.append(StoryVm.number(target.story_fatigue))
+				elif not target.set_story_fatigue(StoryVm.as_float(stack[p + 2])): return {}
+				return {"result":result}
 			if target is Thing and property == 1:
 				if handler == "get_property":
 					result.append(StoryVm.number(0.0 if target.state == Thing.State.DEAD else target.story_health))
@@ -1127,6 +1209,8 @@ func _invoke_world(handler: String, stack: Array, p: int) -> Dictionary:
 				return {"result":result}
 			if object is Thing:
 				object.release_script_control()
+			elif object is IslandCreature and object.story_actor:
+				object.release_story_control()
 		_:
 			return {}
 	return {"result":result}

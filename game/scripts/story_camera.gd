@@ -20,6 +20,23 @@ var _follow_pitch := MIN_FOLLOW_PITCH
 var _follow_heading := false
 var _path: Dictionary = {}
 var _path_elapsed := 0.0
+var _visual_shake: Dictionary = {}
+
+
+func start_visual_shake(point: Vector3, radius: float, strength: float, duration: float) -> bool:
+	# Bounded new presentation for the source shake request; state queried by
+	# LHVM remains unshaken, so arrival and camera zones keep their meaning.
+	if not point.is_finite() or not is_finite(radius) or not is_finite(strength) or not is_finite(duration) or radius <= 0 or radius > 10000 or strength < 0 or strength > 1000 or duration <= 0 or duration > 600: return false
+	_visual_shake = {"point":point,"radius":radius,"strength":strength,"duration":duration,"age":0.0}
+	return true
+
+
+func visual_shake_offset() -> Vector3:
+	if _visual_shake.is_empty(): return Vector3.ZERO
+	var s := _visual_shake
+	var spatial := clampf(1.0 - eye.distance_to(s["point"]) / float(s["radius"]), 0.0, 1.0)
+	var envelope := 1.0 - float(s["age"]) / float(s["duration"])
+	return Vector3(sin(float(s["age"]) * 37.0),sin(float(s["age"]) * 53.0),0) * float(s["strength"]) * spatial * envelope
 
 
 func update_player_pose(player_eye: Vector3, player_focus: Vector3) -> void:
@@ -98,6 +115,9 @@ func constrain_player_focus(point: Vector3) -> Vector3:
 func advance(delta: float) -> void:
 	if not is_finite(delta) or delta < 0.0:
 		return
+	if not _visual_shake.is_empty():
+		_visual_shake["age"] += delta
+		if float(_visual_shake["age"]) >= float(_visual_shake["duration"]): _visual_shake.clear()
 	if not _path.is_empty():
 		_path_elapsed = minf(_path_elapsed + delta * 1000.0, float(_path["duration"]))
 		eye = _sample_path_channel(_path["eye"], _path_elapsed)
