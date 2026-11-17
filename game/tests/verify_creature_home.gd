@@ -14,6 +14,11 @@ func source_step(world: Node) -> void:
 func verify_third_stone(world: Node, quarry: Thing) -> void:
 	await super.verify_third_stone(world, quarry)
 	if failed > 0 or glade_ready_only: return
+	# Parent drives the VM in fixed turns while SceneTree owns the fade tween.
+	# On a fast fresh/exported fixture CG can end before that tween's wall-clock
+	# step. Let its real requested cover finish before starting the next scene.
+	if world.story_fade_tween != null and world.story_fade_tween.is_valid() and world.story_fade_tween.is_running():
+		await world.story_fade_tween.finished
 	check(world.story_fade_rect != null and world.story_fade_rect.color.a >= 0.99, "source choice leaves a covered transition for LandControl1's next scene")
 	if failed > 0: return
 	world.story_vm.strict_scripts.append_array(PackedStringArray(["CreatureDevSeeHome", "CreatureDevelopmentTrainerLeaveCitadel"]))

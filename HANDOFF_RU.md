@@ -24,6 +24,12 @@ build/camera-9.7-candidate/GodotIsland-village-preview9.7.exe, SHA256
 SET_CREATURE_ONLY_DESIRE(creature,27,86400.0), камера571. Не считать полный
 run PASS. Более ранний creature candidate ниже сохранён.
 
+Первый fresh export1705dd7 прошёл sky/driver/handover/scroll/startup, но home
+fixture не дождалась собственного fade tween после CGEND. Исправлен только
+тест: он ждёт настоящее tween.finished перед запуском следующей сцены.
+Проверка исправленной fixture против того же pack:114PASS; повторный fresh
+Git export ещё выполняется. Исходный FAIL сохранён, не замазывать его PASS.
+
 Claude2.1.311 выполнил четыре tools0/MCP0 legacy диагностических/QA запроса
 с существующим кодом repo. Это не clean-room implementer. Новые input-only
 helper и бюджеты проверены; manifest — development/claude-camera-review-2026-11-17.json.
