@@ -77,6 +77,10 @@ pan, движение в небо приостанавливает его, дв�
 поведение оригинала не заявляется. Исходный пользовательский жест не записан.
 Source/headless, rendered и exported-pack fixture:5PASS, ошибок движка/скрипта0.
 Handover7, camera-input16, scroll42, hand20 и resources55 также PASS.
+Fresh Git47905ee: camera5/driver8/handover7/scroll42/home114, оба startup PASS.
+Тестовый кандидат доступен в build/review-preview9.7; ordinary launcher ещё9.6.
+Первый fresh home FAIL был ошибкой fixture clock: CGEND опережал реальный fade.
+Fixture теперь ждёт Tween.finished; игровой код для этого не менялся.
 
 Claude выполнил четыре bounded legacy QA review/patch запроса. Драйвер теперь
 выбирает безопасный реальный drag по пересечению лучей и ограничивает попытки;

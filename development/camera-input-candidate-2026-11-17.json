@@ -140,5 +140,87 @@
     "Strong exposure, foliage/creature-scale fidelity and stale temple hint during glade remain open.",
     "Native188 remains pending: existing adapter lacks a real autonomous desire consumer; no stub added.",
     "Candidate is not promoted; fresh Git export checks recorded separately."
-  ]
+  ],
+  "fresh_git": {
+    "source_commit": "47905eedc52ed912cb521ba9a211d82dd2fc6a3a",
+    "sha256": "1C2A5517218C255251FAB7B156B6FEE75B913C4B7AC4F3BB786716DF83E3AAE5",
+    "checks": [
+      {
+        "test": "verify_camera_sky_drag",
+        "exit": 0,
+        "passed": 5,
+        "errors": []
+      },
+      {
+        "test": "verify_opening_driver",
+        "exit": 0,
+        "passed": 8,
+        "errors": []
+      },
+      {
+        "test": "verify_camera_handover",
+        "exit": 0,
+        "passed": 7,
+        "errors": []
+      },
+      {
+        "test": "verify_scroll_input",
+        "exit": 0,
+        "passed": 42,
+        "errors": []
+      },
+      {
+        "test": "verify_creature_home",
+        "exit": 0,
+        "passed": 114,
+        "errors": []
+      }
+    ],
+    "startup": [
+      {
+        "mode": "story",
+        "exit": 0,
+        "errors": []
+      },
+      {
+        "mode": "default",
+        "exit": 0,
+        "errors": []
+      }
+    ],
+    "fixture_clock_fix": "Wait actual requested cover tween before standalone home scene; no product/quest changes",
+    "first_failed_fresh_home": {
+      "test": "verify_creature_home",
+      "exit": 1,
+      "passed": 111,
+      "errors": [
+        "FAIL source choice leaves a covered transition for LandControl1's next scene"
+      ]
+    }
+  },
+  "review_package": {
+    "directory": "build/review-preview9.7",
+    "sha256": "1C2A5517218C255251FAB7B156B6FEE75B913C4B7AC4F3BB786716DF83E3AAE5",
+    "standalone_startup": [
+      {
+        "mode": "story",
+        "exit": 0,
+        "errors": []
+      },
+      {
+        "mode": "default",
+        "exit": 0,
+        "errors": []
+      },
+      {
+        "mode": "rendered-story",
+        "exit": 0,
+        "errors": []
+      }
+    ],
+    "status": "candidate-native188-pending",
+    "launcher": "Launch-Story-Preview.cmd",
+    "normal_launcher_changed": false,
+    "scene_test_method": "matching godot_console + main-pack and external fixtures; direct exported --script probe did not execute the fixture"
+  }
 }

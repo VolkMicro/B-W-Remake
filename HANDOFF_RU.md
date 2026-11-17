@@ -27,8 +27,16 @@ run PASS. Более ранний creature candidate ниже сохранён.
 Первый fresh export1705dd7 прошёл sky/driver/handover/scroll/startup, но home
 fixture не дождалась собственного fade tween после CGEND. Исправлен только
 тест: он ждёт настоящее tween.finished перед запуском следующей сцены.
-Проверка исправленной fixture против того же pack:114PASS; повторный fresh
-Git export ещё выполняется. Исходный FAIL сохранён, не замазывать его PASS.
+Повторный fresh Git export47905ee: sky5/driver8/handover7/scroll42/home114 и
+оба startup PASS, engine/script errors0. Исходный FAIL сохранён в report.
+Fresh exe SHA256
+1C2A5517218C255251FAB7B156B6FEE75B913C4B7AC4F3BB786716DF83E3AAE5
+скопирован без пересборки в build/review-preview9.7. Реальный exported exe
+проходит headless story/default и rendered story startup, exit0/errors0.
+Launch-Story-Preview.cmd там запускает этот тестовый9.7 с проверенным renderer.
+Обычный build/story-preview/Launch-Story-Preview.cmd по-прежнему9.6.
+Fixture scenes проверяются matching godot_console + --main-pack и внешними
+tests: direct exported exe --script probe не запустил тест и не считается PASS.
 
 Claude2.1.311 выполнил четыре tools0/MCP0 legacy диагностических/QA запроса
 с существующим кодом repo. Это не clean-room implementer. Новые input-only
@@ -81,7 +89,7 @@ BA01AC0094029A430FB4829946976D8699BE3A5D33AD6DF9B43E6BBC074BBD5F:
 matching-engine main-pack startup обоих режимов и home114 PASS, ошибок0.
 Fixture tests читаются извне с --path game, product resources из exported pack.
 Captured800x600 PNG+JSON просмотрен/проверен; это ещё не original comparison.
-Последний full headless opening4 **FAIL**: автоматический поиск брата не дошёл
+Предыдущий full headless opening4 **FAIL**: автоматический поиск брата не дошёл
 до второго камня. Предыдущий rendered opening3 прошёл выбор, но остановился
 на CreatureDevSeeHome/native21/address6116/property31 при fade1; после добавления
 31+sleep этот полный rendered маршрут не повторён. Opening2 старее fade guard

@@ -42,7 +42,8 @@ Bind-space исправление поз/scale0.06 и visual action policies е�
 с работающим оригиналом. По запросу пользователя начат reference workflow,
 но валидной original/Godot пары нет: оригинал показал неисправный UI, wrapper
 пробы не дали исправного игрового кадра. Последующий rendered маршрут дошёл
-до нового честного native188 frontier; fresh delivery ещё проверяется.
+до нового честного native188 frontier. Fresh47905ee и отдельный review candidate
+прошли scoped checks; ordinary launcher не активирован.
 Exact candidate startup/home уже PASS; см. HANDOFF_RU.md и
 development/VISUAL_REFERENCE_RU.md; candidate не является готовой игрой.
 
