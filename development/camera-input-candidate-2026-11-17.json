@@ -221,6 +221,8 @@
     "status": "candidate-native188-pending",
     "launcher": "Launch-Story-Preview.cmd",
     "normal_launcher_changed": false,
-    "scene_test_method": "matching godot_console + main-pack and external fixtures; direct exported --script probe did not execute the fixture"
+    "scene_test_method": "matching godot_console + main-pack and external fixtures; direct exported --script probe did not execute the fixture",
+    "superseded_by_report": "development/hint-desire-candidate-2026-11-17.json",
+    "prior_executable_retained_at": "build/camera-fresh-47905ee-20261117162128/candidate/GodotIsland-village-preview9.7.exe"
   }
 }

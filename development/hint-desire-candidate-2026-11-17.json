@@ -1,0 +1,206 @@
+{
+  "date": "2026-11-17",
+  "preview": "9.7 candidate",
+  "source_commit": "6c1fd072b8351f41a91bd05fca96090fd175d487",
+  "sha256": "B55CDE59D84733C60DF3271C28E835491501F778B3BB66B07C524AE29DADE91B",
+  "delivery": "build/review-preview9.7/GodotIsland-village-preview9.7.exe",
+  "launcher": "build/review-preview9.7/Launch-Story-Preview.cmd",
+  "normal_launcher_changed": false,
+  "normal_preview": "9.6",
+  "complete_campaign": false,
+  "requires_original_install": true,
+  "changes": [
+    "BW-013: temple-entry instruction only while CitadelGuideCinema remains active",
+    "Actual full-route door/glade hint observations and hint text in capture metadata",
+    "Read-only Ghidra and tool-less Claude research of genuine native188; no stub or new product desire module"
+  ],
+  "fresh_export": {
+    "source": "6c1fd072b8351f41a91bd05fca96090fd175d487",
+    "exit": 0,
+    "bit_identical_to_rendered_tested_pack": true
+  },
+  "checks": [
+    {
+      "test": "verify_camera_sky_drag",
+      "exit": 0,
+      "pass_lines": 5,
+      "errors": [],
+      "warnings": [],
+      "log": "hint-fresh-verify_camera_sky_drag.log"
+    },
+    {
+      "test": "verify_opening_driver",
+      "exit": 0,
+      "pass_lines": 8,
+      "errors": [],
+      "warnings": [],
+      "log": "hint-fresh-verify_opening_driver.log"
+    },
+    {
+      "test": "verify_camera_handover",
+      "exit": 0,
+      "pass_lines": 7,
+      "errors": [],
+      "warnings": [],
+      "log": "hint-fresh-verify_camera_handover.log"
+    },
+    {
+      "test": "verify_scroll_input",
+      "exit": 0,
+      "pass_lines": 42,
+      "errors": [],
+      "warnings": [],
+      "log": "hint-fresh-verify_scroll_input.log"
+    },
+    {
+      "test": "verify_creature_home",
+      "exit": 0,
+      "pass_lines": 114,
+      "errors": [],
+      "warnings": [],
+      "log": "hint-fresh-verify_creature_home.log"
+    },
+    {
+      "test": "verify_creature_actors",
+      "exit": 0,
+      "pass_lines": 59,
+      "errors": [],
+      "warnings": [],
+      "log": "hint-fresh-verify_creature_actors.log"
+    }
+  ],
+  "actual_exported_exe_startups": [
+    {
+      "mode": "story",
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "args": [
+        "--quit-after",
+        "180",
+        "--log-file",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\scratch\\hint-fresh-startup-checked-story.log",
+        "--headless",
+        "--",
+        "--bw=C:\\Games\\Black and White Complete Collection",
+        "--story-preview"
+      ]
+    },
+    {
+      "mode": "default",
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "args": [
+        "--quit-after",
+        "180",
+        "--log-file",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\scratch\\hint-fresh-startup-checked-default.log",
+        "--headless",
+        "--",
+        "--bw=C:\\Games\\Black and White Complete Collection"
+      ]
+    },
+    {
+      "mode": "rendered-story",
+      "exit": 0,
+      "errors": [],
+      "warnings": [],
+      "args": [
+        "--quit-after",
+        "180",
+        "--log-file",
+        "C:\\Users\\User\\Melty\\black-and-white-godot-engine\\scratch\\hint-fresh-startup-checked-rendered-story.log",
+        "--rendering-method",
+        "gl_compatibility",
+        "--resolution",
+        "800x600",
+        "--",
+        "--bw=C:\\Games\\Black and White Complete Collection",
+        "--story-preview"
+      ]
+    }
+  ],
+  "rendered_route": {
+    "exit": 1,
+    "status": "BLOCKED-native188",
+    "pass_full_route": false,
+    "pack_sha256": "B55CDE59D84733C60DF3271C28E835491501F778B3BB66B07C524AE29DADE91B",
+    "automated_input": true,
+    "media_skipped": true,
+    "time_scale": 4,
+    "method": "matching godot_console with exact exported main-pack and external fixture; not a manual OS-input playthrough",
+    "command": [
+      "build/camera-9.7-candidate/Godot_v4.7.2-stable_win64_console.exe",
+      "--path",
+      "game",
+      "--main-pack",
+      "build/hint-9.7-candidate/GodotIsland-village-preview9.7.exe",
+      "--script",
+      "res://tests/verify_opening_runtime.gd",
+      "--rendering-method",
+      "gl_compatibility",
+      "--resolution",
+      "800x600",
+      "--",
+      "--bw=<installed game>",
+      "--story-preview",
+      "--runtime-automation",
+      "--runtime-creature=cow",
+      "--runtime-seconds=2400",
+      "--runtime-captures=<ignored scratch directory>"
+    ],
+    "door_hint": "PASS-active",
+    "glade_hint": "PASS-generic after completed temple lesson",
+    "progress": [
+      "three genuine key deliveries, bits7",
+      "source choice cow via two Action clicks",
+      "home scene and source snapshot64, fade0"
+    ],
+    "pending": {
+      "script": "CreatureDevSeeHome",
+      "native": 188,
+      "address": 6441,
+      "line": 512
+    },
+    "engine_script_errors": [],
+    "captures_viewed": [
+      "CreatureChoice.png"
+    ],
+    "limits": [
+      "No valid original/remake event-aligned frame pair",
+      "Foliage, creature size/proportions, hand appearance and exposure remain fidelity issues"
+    ]
+  },
+  "failed_setup_attempts": [
+    {
+      "test": "verify_story_creatures",
+      "exit": 1,
+      "pass_lines": 0,
+      "errors": [
+        "ERROR: Attempt to open script 'res://tests/verify_story_creatures.gd' resulted in error 'File not found'.",
+        "ERROR: Failed loading resource: res://tests/verify_story_creatures.gd.",
+        "ERROR: Can't load script: res://tests/verify_story_creatures.gd"
+      ],
+      "warnings": [],
+      "log": "hint-fresh-verify_story_creatures.log"
+    },
+    {
+      "test": "initial direct GUI executable invocation",
+      "status": "not-counted",
+      "reason": "PowerShell returned before GUI process exit; no exit code available. Repeated with Start-Process/WaitForExit and actual log requirement."
+    }
+  ],
+  "research": {
+    "role": "coordinator/research legacy; not independent implementation",
+    "packet": "NOT APPROVED",
+    "native188_bound": false,
+    "summary": "cleanroom/creature-desire-frontier-2026-11-17.md",
+    "claude_manifest": "development/claude-desire-followup-2026-11-17.json"
+  },
+  "limits": [
+    "Ordinary launcher remains verified9.6",
+    "Full campaign and remaining creature training not restored",
+    "Fresh tests use external fixtures, exported exe startup tested separately"
+  ]
+}

@@ -20,6 +20,13 @@ errors. Не считать полный run PASS. Новое статическ
 исключений и селектора с шестым tools0 Claude review описано в
 cleanroom/creature-desire-frontier-2026-11-17.md. Native188 пока не реализован.
 
+Fresh Git6c1fd07 даёт byte-identical hint candidate B55CDE59…ADE91B.
+Шесть focused suites:235 PASS; настоящий exported exe story/default headless
+и story rendered: exit0/errors0/warnings0. Новый пакет скопирован без пересборки
+в build/review-preview9.7, обычный9.6 не менялся. Отчёт —
+development/hint-desire-candidate-2026-11-17.json. Ошибочный запуск отсутствующего
+verify_story_creatures сохранён как setup FAIL; правильный actors59 PASS.
+
 **Последнее продолжение, камера/QA:** исправлен BW-011 — sky miss больше не
 двигает camera pan на тысячи единиц. Новый verify_camera_sky_drag: baseline
 3FAIL, после исправления source/rendered/exact5PASS. Проверен export

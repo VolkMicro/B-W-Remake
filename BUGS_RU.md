@@ -121,6 +121,11 @@ Claude research review оставляет draft NOT APPROVED. ID27 подпис�
 generic hint PASS, три реальные доставки/cow/home, затем известный188 pending.
 Это исправление собственной подсказки порта; original HUD fidelity не заявляется.
 
+Fresh6c1fd07 export совпал с rendered-tested exe по SHA256 B55CDE59…ADE91B.
+Scoped regressions235, actual exported startup3 PASS, errors/warnings0.
+Тестовая build/review-preview9.7 обновлена; normal9.6 не переключена.
+Команды/failed setup и границы — development/hint-desire-candidate-2026-11-17.json.
+
 ## BW-008 — все свитки и подсказки не нажимаются
 
 Сообщение13 ноября: «Все свитки и подсказки, пробовал обе кнопки».
