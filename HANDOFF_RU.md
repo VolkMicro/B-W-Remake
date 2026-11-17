@@ -12,6 +12,45 @@ TASK_CLAUDE_RU.md. Сначала CLEAN_ROOM_RU.md определяет роль
 
 ## Текущий checkpoint: Preview 9.6 — 17 ноября 2026
 
+**Последнее продолжение, камера/QA:** исправлен BW-011 — sky miss больше не
+двигает camera pan на тысячи единиц. Новый verify_camera_sky_drag: baseline
+3FAIL, после исправления source/rendered/exact5PASS. Проверен export
+build/camera-9.7-candidate/GodotIsland-village-preview9.7.exe, SHA256
+120ED711272692FFDA8D856A4A98609C8B88247235475C8E82081997DF43EBEE:
+оба startup и exact sky5/handover7/driver8/scroll42 PASS, engine/script errors0.
+Это кандидат; ordinary launcher остаётся9.6. Полный rendered input-only запуск
+прошёл настоящие три камня, два Action по корове, исходную рощу и home cinema
+с fade0. Он честно BLOCKED на CreatureDevSeeHome/native188/address6441/line512,
+SET_CREATURE_ONLY_DESIRE(creature,27,86400.0), камера571. Не считать полный
+run PASS. Более ранний creature candidate ниже сохранён.
+
+Claude2.1.311 выполнил четыре tools0/MCP0 legacy диагностических/QA запроса
+с существующим кодом repo. Это не clean-room implementer. Новые input-only
+helper и бюджеты проверены; manifest — development/claude-camera-review-2026-11-17.json.
+Первый guarded full headless реально прошёл второй камень (bits3/journal.5),
+затем остановился на третьем свитке: zoom5.336 оставил его вне кадра. Новая
+поправка использует колесо/орбиту и реальный mesh pick, без перемещения камеры
+присваиванием и без искусственной активации свитка. Неподдержанные home natives
+теперь считаются настоящими блокерами полного маршрута, а не молчаливым timeout.
+
+Original reference: пользователь сообщил, что Setup не открывается. Правильный
+cwd сам по себе не помог — видны растянутые3D треугольники. Ghidra статически
+подтвердила BWSetup/HardwareTnL/FullScreen; per-user FullScreen0 действительно
+создал окно. Сама геометрия ещё искажена. Отдельный HardwareTnL1 fullscreen
+запуск после reactivation показывал чёрное поле; значение восстановлено.
+Windowed с HardwareTnL1 и0 тоже показал искажённую геометрию. Все собственные
+original процессы закрыты; оба временных per-user значения восстановлены к
+отсутствующим, проверка — scratch/reference-settings-restored-final.json.
+Валидной original/Godot пары ещё нет; не повторять отклонённую DLL-пробу.
+
+Пятый tools0 Claude-запрос — research reviewer с raw Ghidra, не implementer.
+Его draft NOT APPROVED: native188 нельзя честно связать с текущим адаптером,
+поскольку нет реального селектора/подавления желаний после release. ID27 и
+единицы таймера ещё не доказаны; есть неполные switch/ABI выводы. Не ставить
+only-desire поле без потребителя и не завершать PLAYED искусственно. Следующие
+ограниченные исследования перечислены в приватном Claude response и
+Research/CreatureHomeDesire; current pending bytecode сохранён.
+
 **Новые работы17 ноября, ещё не активированы:** кандидат9.7 проходит focused
 три ключа → CreaturesInGlade → выбор cow/ape/tiger через реальные Action.
 Исходные CREATE/type12, анимации/ворота/музыка, ownership/home/development0
@@ -31,7 +70,7 @@ Scale0.06, look/point/sit и visual shake — ограниченные presentat
 
 Проверки source: actors59, три выбора111 каждый, home114, ClipClock363,
 12 regressions (логи scratch/glade-regression-*), adviser pose/runtime PASS.
-Последний candidate export SHA256
+Предыдущий creature candidate export SHA256
 BA01AC0094029A430FB4829946976D8699BE3A5D33AD6DF9B43E6BBC074BBD5F:
 matching-engine main-pack startup обоих режимов и home114 PASS, ошибок0.
 Fixture tests читаются извне с --path game, product resources из exported pack.

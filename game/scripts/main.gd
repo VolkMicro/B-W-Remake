@@ -813,7 +813,7 @@ func _input(event: InputEvent) -> void:
 				resource_interaction.stop()
 
 
-func ground_point(screen: Vector2) -> Vector3:
+func ground_point(screen: Vector2, allow_miss_fallback := true) -> Vector3:
 	var o := cam.project_ray_origin(screen)
 	var dir := cam.project_ray_normal(screen)
 	var step := 4.0
@@ -837,7 +837,7 @@ func ground_point(screen: Vector2) -> Vector3:
 		prev = t
 		t += step
 		step = minf(step * 1.05, 40.0)
-	return o + dir * 8000.0
+	return o + dir * 8000.0 if allow_miss_fallback else Vector3.INF
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -885,13 +885,20 @@ func _unhandled_input(event: InputEvent) -> void:
 					if story_citadel.entrance_hit(cam.project_ray_origin(mb.position), cam.project_ray_normal(mb.position)):
 						story_enter_temple()
 						return
+				# A miss is useful as a distant hand/cursor fallback, but cannot
+				# anchor a terrain pan or replace the free-camera pivot.
+				var press_ground := ground_point(mb.position, false)
+				if not press_ground.is_finite():
+					_left_down = false
+					_dragging = false
+					return
 				if mb.double_click and story_interface_level in [4, 13, 14, 15]:
-					focus = ground_point(mb.position)
+					focus = press_ground
 					_focus_height_offset = 0.0
 				_left_down = true
 				_dragging = false
 				_press_pos = mb.position
-				_grab_point = ground_point(mb.position)
+				_grab_point = press_ground
 			else:
 				_left_down = false
 		elif mb.button_index == MOUSE_BUTTON_RIGHT:
@@ -962,9 +969,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			if mm.position.distance_to(_press_pos) > 6.0:
 				_dragging = true
 			if _dragging:
-				var now := ground_point(mm.position)
-				focus += Vector3(_grab_point.x - now.x, 0, _grab_point.z - now.z)
-				_update_camera()
+				var now := ground_point(mm.position, false)
+				if now.is_finite():
+					focus += Vector3(_grab_point.x - now.x, 0, _grab_point.z - now.z)
+					_update_camera()
 		if _right_down: _right_moved += mm.relative.length()
 		if _middle_down or _shift_camera:
 			_camera_input_idle = 0.2

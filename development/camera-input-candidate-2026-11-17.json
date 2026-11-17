@@ -1,0 +1,144 @@
+{
+  "date": "2026-11-17",
+  "status": "candidate-not-activated",
+  "complete_campaign": false,
+  "source_baseline": "12e1712; coordinator working tree camera guard and reviewed legacy QA adapters",
+  "candidate": {
+    "path": "build\\camera-9.7-candidate\\GodotIsland-village-preview9.7.exe",
+    "sha256": "120ED711272692FFDA8D856A4A98609C8B88247235475C8E82081997DF43EBEE"
+  },
+  "normal_unchanged": {
+    "preview": "9.6",
+    "sha256": "E8BAAF78591F0B06B4C90DBB27635066836AA5B17EFD5DBA5B4CAF2995BF8A83"
+  },
+  "scope": "Prevent camera movement from sky-ray fallbacks; improve real-input automated route coverage. No original-fidelity acceptance.",
+  "source_files_sha256": {
+    "game\\scripts\\main.gd": "E6653171C39A2816B61BC0B13CF7FE036E9BE49B94B5C75D5E8CFA937307620F",
+    "game\\scripts\\creature.gd": "64B15730AD91995B6F909D357C6BA26E139D83F778E601734096809AA504AC11",
+    "game\\scripts\\story_natives.gd": "49CE4F92DDDCBB09F64E15FE5CF6264E5890E30CC67DD7083244831CC6188D7D",
+    "game\\scripts\\clip_clock.gd": "B385B472D390D6BA90657B4AEFD3333B1C6EC123D06E082C7EE4A7202DC30018"
+  },
+  "regressions": [
+    {
+      "test": "verify_camera_handover",
+      "exit": 0,
+      "passed": 7,
+      "errors": []
+    },
+    {
+      "test": "verify_story_camera_input",
+      "exit": 0,
+      "passed": 16,
+      "errors": []
+    },
+    {
+      "test": "verify_scroll_input",
+      "exit": 0,
+      "passed": 42,
+      "errors": []
+    },
+    {
+      "test": "verify_hand_world",
+      "exit": 0,
+      "passed": 20,
+      "errors": []
+    },
+    {
+      "test": "verify_resource_input",
+      "exit": 0,
+      "passed": 55,
+      "errors": []
+    }
+  ],
+  "exact_pack_scenes": [
+    {
+      "test": "verify_camera_sky_drag",
+      "exit": 0,
+      "passed": 5,
+      "errors": []
+    },
+    {
+      "test": "verify_camera_handover",
+      "exit": 0,
+      "passed": 7,
+      "errors": []
+    },
+    {
+      "test": "verify_opening_driver",
+      "exit": 0,
+      "passed": 8,
+      "errors": []
+    },
+    {
+      "test": "verify_scroll_input",
+      "exit": 0,
+      "passed": 42,
+      "errors": []
+    }
+  ],
+  "sky_drag": {
+    "baseline_passed": 2,
+    "baseline_failed": 3,
+    "baseline_jump_units": [
+      7753.107421875,
+      7796.63037109375
+    ],
+    "fixed_headless_passed": 5,
+    "fixed_rendered_passed": 5,
+    "fixed_exact_passed": 5,
+    "engine_script_errors": 0
+  },
+  "qa_route_planner": {
+    "baseline_failed_cases": 3,
+    "fixed_passed": 8,
+    "declared_flat_world_fixtures": true,
+    "negative_camera_zone_expected_failure": true,
+    "camera_or_actor_pose_writes_during_route": false,
+    "quest_flag_writes": false
+  },
+  "exact_startup": {
+    "story_exit": 0,
+    "default_exit": 0,
+    "engine_script_errors": 0,
+    "matching_engine_beside_decoder": true
+  },
+  "full_rendered_route": {
+    "status": "BLOCKED_NEXT_ORIGINAL_NATIVE",
+    "automatic_input": true,
+    "media_skipped": true,
+    "time_scale": 4.0,
+    "manual_playthrough": false,
+    "actual_three_stone_delivery": true,
+    "selected_creature": "cow",
+    "home_scene_revealed": true,
+    "final_fade_alpha": 0.0,
+    "quest64_snapshot_recorded": true,
+    "next_pending": {
+      "script": "CreatureDevSeeHome",
+      "native_id": 188,
+      "name": "SET_CREATURE_ONLY_DESIRE",
+      "address": 6441,
+      "line": 512,
+      "args_semantic": [
+        "selected creature",
+        27,
+        86400.0
+      ]
+    },
+    "engine_script_errors": 0,
+    "log": "scratch/claude-opening-framed-rendered.log"
+  },
+  "reference_original": {
+    "valid_pair_available": false,
+    "windowed_mode_verified": true,
+    "hardware_tnl_0_and_1_still_corrupt": true,
+    "temporary_per_user_settings_restored": true,
+    "no_wrapper_installed": true
+  },
+  "limits": [
+    "No valid original/remake frame pair or synchronized video yet.",
+    "Strong exposure, foliage/creature-scale fidelity and stale temple hint during glade remain open.",
+    "Native188 remains pending: existing adapter lacks a real autonomous desire consumer; no stub added.",
+    "Candidate is not promoted; fresh Git export checks recorded separately."
+  ]
+}

@@ -17,6 +17,20 @@
 
 ## Состояние 17 ноября: третий камень
 
+Последующее camera/QA продолжение: четыре tools0 Claude diagnostic/patch
+запроса получили существующий legacy код, не независимый approved packet.
+Их нельзя называть новой чистой реализацией. Проверенные гипотезы и адаптации
+дали BW-011 sky-pan guard и input-only route planner; manifest в development.
+Продуктовый guard — coordinator policy поверх существующего main.gd, не
+скопированное original поведение. Новый независимый ClipClock ниже неизменён.
+
+Rendered full route нового camera candidate действительно дошёл через три
+камня/cow/source home fade-in до native188/address6441/line512. На этом месте
+сохранён pending. Пятый tool-less Claude research reviewer получил raw Ghidra
+и legacy адаптер; draft NOT APPROVED. Реальный only-desire consumer отсутствует,
+поэтому native188 не добавлен заглушкой. Нужны дальнейшие наблюдения, review
+и отдельный approved packet перед независимой реализацией нового модуля.
+
 Продолжение, кандидат9.7: все три focused выбора CreaturesInGlade и переход
 CreatureDevSeeHome/fade-in/sleep проходят, обычная сборка ещё9.6. Новый
 ClipClock v2 прошёл отдельный review и tools0/MCP0 Claude CLI2.1.311 запрос;
@@ -27,8 +41,9 @@ ClipClock v2 прошёл отдельный review и tools0/MCP0 Claude CLI2.1
 Bind-space исправление поз/scale0.06 и visual action policies ещё не сверены
 с работающим оригиналом. По запросу пользователя начат reference workflow,
 но валидной original/Godot пары нет: оригинал показал неисправный UI, wrapper
-пробы не довели до игрового кадра. Полный rendered маршрут после нового home
-fix и fresh delivery ещё нужны. Exact candidate startup/home уже PASS; см. HANDOFF_RU.md и
+пробы не дали исправного игрового кадра. Последующий rendered маршрут дошёл
+до нового честного native188 frontier; fresh delivery ещё проверяется.
+Exact candidate startup/home уже PASS; см. HANDOFF_RU.md и
 development/VISUAL_REFERENCE_RU.md; candidate не является готовой игрой.
 
 TheSculptor/quarry50/source timer60s/reward51/физическая установка пройдены:

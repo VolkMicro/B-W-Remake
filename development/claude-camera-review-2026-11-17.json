@@ -1,0 +1,81 @@
+{
+  "role": "Legacy diagnostic review and existing QA helper authorship; not independent clean-room module implementation",
+  "source_baseline": "12e1712",
+  "cli": "2.1.311",
+  "requests": [
+    {
+      "role": "Legacy diagnostic reviewer of existing test/controller code; not independent clean-room implementation",
+      "model": "claude-opus-5-5",
+      "packetSHA256": "80C5594887E5AA8AD32C1860D594FF13E248C2162DE9E3585173B54BED3DD32F",
+      "systemSHA256": "00D5E5D913D6EBD850E616423DC3D21AD4DB74C61D83D836CD21ACF4514BF8FE",
+      "resultSHA256": "BBD8C85C942F77D98C7C4699F7B4F043EE781EEEC8C961FA3119CEA6452D1AB8",
+      "safeMode": true,
+      "restrictedMode": true,
+      "tools": [],
+      "mcpServers": [],
+      "observedToolUses": 0,
+      "processExit": 0,
+      "acceptedCapabilityBoundary": true
+    },
+    {
+      "role": "Legacy camera/QA diagnostic reviewer; supplied existing source, not independent module implementation",
+      "model": "claude-fable-5-2",
+      "packetSHA256": "5199E150B8AAD90DC1C29BB8D95F0EF24789D1E5BE3E81DCCB145F91B3197BBC",
+      "systemSHA256": "00D5E5D913D6EBD850E616423DC3D21AD4DB74C61D83D836CD21ACF4514BF8FE",
+      "resultSHA256": "E846114C8E9C81BCB9F41E14988DEAE8636626758538BEF115D2CE5492B62AC0",
+      "safeMode": true,
+      "restrictedMode": true,
+      "tools": [],
+      "mcpServers": [],
+      "observedToolUses": 0,
+      "processExit": 0,
+      "acceptedCapabilityBoundary": true
+    },
+    {
+      "role": "Legacy test-driver patch reviewer/author; existing repo code supplied, no independent product-module claim",
+      "model": "claude-fable-5-2",
+      "packetSHA256": "DDD7A62221E8DA8D30B47AABE95A295E8BD6488094761800048BD2F008A7AE91",
+      "systemSHA256": "00D5E5D913D6EBD850E616423DC3D21AD4DB74C61D83D836CD21ACF4514BF8FE",
+      "resultSHA256": "45A6763E7DD9A5D781C3E8E403E236FB2B82F23DE3E3F12B82D5D8B2C70CF9B7",
+      "safeMode": true,
+      "restrictedMode": true,
+      "tools": [],
+      "mcpServers": [],
+      "observedToolUses": 0,
+      "processExit": 0,
+      "acceptedCapabilityBoundary": true
+    },
+    {
+      "role": "Legacy input-only scroll QA reviewer/author; existing test and controller source supplied",
+      "model": "claude-fable-5-2",
+      "packetSHA256": "96E90654BA770DD0E97AA5B2205F3C71BC1F51BB95DC2B78470F65C71C285979",
+      "systemSHA256": "00D5E5D913D6EBD850E616423DC3D21AD4DB74C61D83D836CD21ACF4514BF8FE",
+      "resultSHA256": "C4BB346E579BA3EF843C71BB5C6A361C209E8D818F5AD1062834D0D1D233483B",
+      "safeMode": true,
+      "restrictedMode": true,
+      "tools": [],
+      "mcpServers": [],
+      "observedToolUses": 0,
+      "processExit": 0,
+      "acceptedCapabilityBoundary": true
+    }
+  ],
+  "coordinator_changes": "Rejected unproven inertia/sea-depth hypotheses after additional source. Reproduced real sky-drag teleport before product fix. Integrated QA helper with96/16 budgets and global input_failure propagation; reviewed and tested locally. No original binary/decompiler code sent to these legacy QA requests.",
+  "research_requests": [
+    {
+      "role": "Research/specification reviewer with raw original Ghidra observations and legacy adapter; NOT a clean implementation worker",
+      "model": "claude-fable-5-2",
+      "packetSHA256": "2380A317031101BD7D21AD0891083BE875695CD1D68B2D92C7908D4F2DFC2323",
+      "systemSHA256": "CBD310B9F7B627C9AEA641C8A461C28A9D1B19A5DC170C12CA97C98F943F5460",
+      "resultSHA256": "623CF8F4E653285497E2B79794424E27642CB3C0A83F782E8B03BDE22346422C",
+      "safeMode": true,
+      "restrictedMode": true,
+      "tools": [],
+      "mcpServers": [],
+      "observedToolUses": 0,
+      "processExit": 0,
+      "acceptedCapabilityBoundary": true
+    }
+  ],
+  "research_result": "NOT APPROVED; native188 stays pending until desire semantics and a real autonomous consumer are verified. Raw original observations were given to researcher only, not an independent implementer."
+}

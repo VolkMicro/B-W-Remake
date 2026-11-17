@@ -40,17 +40,28 @@ var second_brother_released := false
 var second_key_delivered := false
 var second_drop_at := -1.0
 var second_drop_point := Vector3.INF
+var second_search_best := INF
+var second_search_stall := 0
 var unexpected_drop_point := Vector3.INF
 var unexpected_drop_at := -1.0
 var unexpected_drop_search := 0
 var unexpected_drops := 0
 var input_failure := ""
+
+# Legacy QA controller proposed by Claude; coordinator adjusts budget/failure reporting.
+const DRIVE_STALL_LIMIT := 96   # Bounded route recovery, including release events after an orbit.
+const DRIVE_PITCH_LIMIT := 16
+const DRIVE_PITCH_TARGET := 1.047 # ~60°
+var drive_stall := 0        # подряд вызовов без измеренного приближения; >= LIMIT — защёлкнутый провал
+var drive_pitch_steps := 0  # pitch-действий с последнего прибытия; успешный шаг НЕ сбрасывает
 var construction_diagnostics := false
 var continue_third_key := false
 var stop_after_second := false
 var third_key_finished := false
 var third_key_phase := "waiting for second key"
 var third_scroll_clicked := false
+var third_scroll_steps := 0   # камерные вводы (колесо/орбита) в поиске свитка
+var third_scroll_clicks := 0  # попытки Action по свитку
 var third_key_delivered := false
 var third_quarry_released := false
 var third_sculptor: WeakRef
@@ -253,6 +264,10 @@ func _process(delta: float) -> bool:
 					tasks.append("%s:%d" % [script, task["pc"]])
 				elif continue_second_key and second_key_required_script(script):
 					tasks.append("%s:%d" % [script, task["pc"]])
+				elif continue_third_key and third_key_required_script(script):
+					tasks.append("%s:%d" % [script, task["pc"]])
+				elif continue_creature and creature_required_script(script):
+					tasks.append("%s:%d" % [script, task["pc"]])
 		print("OPENING t=%.1f interface=%d camera=%d fade=%.2f movie=%s demo=%s text=%d tasks=%s" % [elapsed, world.story_interface_level, world.story_camera.owner_task,
 			world.story_fade_rect.color.a if world.story_fade_rect != null else 0.0,
 			world.story_intro_movie != null and world.story_intro_movie.active, world.story_hand_demo.playing,
@@ -262,6 +277,10 @@ func _process(delta: float) -> bool:
 			if construction_diagnostics: print("BUILD_JOBS ", JSON.stringify(world.story_construction.diagnostics()))
 		if continue_second_key:
 			print("SECOND KEY phase=", second_key_phase, " first=", first_key_finished, " scroll=", second_scroll_clicked, " released=", second_brother_released, " delivered=", second_key_delivered, " bits=", world.story_gate_plinth.info_bits() if world.story_gate_plinth != null else -1)
+			var watched: Node3D = second_brother.get_ref() as Node3D if second_brother != null else null
+			if is_instance_valid(watched):
+				var flat_gap := Vector2(world.focus.x - watched.position.x, world.focus.z - watched.position.z).length()
+				print("SECOND KEY target brother=", watched.position, " focus=", world.focus, " gap=", flat_gap, " best=", second_search_best, " stall=", second_search_stall, " pitch=", world.pitch, " yaw=", world.yaw, " dist=", world.dist, " zone_points=", world.story_camera._zone.size())
 		if continue_third_key:
 			print("THIRD KEY phase=", third_key_phase, " scroll=", third_scroll_clicked, " quarry_released=", third_quarry_released, " delivered=", third_key_delivered)
 		if continue_creature:
@@ -501,7 +520,7 @@ func third_key_required_script(script: String) -> bool:
 	return script in ["TheSculptor", "SetupSculptor", "KeepRockScripted", "SculptorSculptingOutside", "SculptorSculpting", "AdvisorSpotsRock", "CreatureRetrieveRockReturned", "ProtectQuarryRock", "ProtectGateKey3"]
 
 func creature_required_script(script: String) -> bool:
-	return script in ["CreaturesInGlade", "CreaturesPlayVarietyOfAnims"]
+	return script in ["CreaturesInGlade", "CreaturesPlayVarietyOfAnims", "CreatureDevSeeHome", "CreatureDevelopmentTrainerLeaveCitadel"]
 
 func creature_choice_established() -> bool:
 	return is_instance_valid(world.creature) and world.creature.species == requested_creature and world.creature.story_player_id == 1 and world.creature.story_home.is_finite() and world.creature.story_development_phase == 0 and not world.creature.story_script_controlled and world.story_bridge.profile_has_creature and world.story_creatures.size() == 1 and world.story_camera.owner_task == 0 and StoryVm.as_float(world.story_vm.variables[2]) == 1.0 and (world.story_fade_rect == null or world.story_fade_rect.color.a <= 0.01)
@@ -599,17 +618,58 @@ func drive_third_key_input() -> void:
 		third_key_phase = "finding original sculptor scroll"
 		for highlight in world.story_highlights:
 			if not is_instance_valid(highlight) or highlight.get_meta("challenge", -1) != 20: continue
-			if not drive_to_position(highlight.position, 12.0): return
+			if highlight.active:
+				# Только чтение. Успех — лишь если Action реально отправлялся.
+				if third_scroll_clicks > 0:
+					third_scroll_clicked = true
+					print("THIRD KEY sculptor scroll activated through mouse Action (observed on later frame)")
+				elif input_failure.is_empty():
+					input_failure = "THIRD SCROLL FAIL scroll 20 already active without harness Action"
+					printerr(input_failure)
+				return
+			if not drive_to_position(highlight.position, 12.0): return # DRIVE FAIL уже диагностируется там
+			var level: int = world.story_interface_level
+			if level != 0 or world._shift_camera or world.story_help_is_open() or world.story_inside_temple():
+				# Action здесь невозможен (main.gd:852-858, 910); ждём, бюджет не тратим.
+				third_key_phase = "sculptor scroll: Action forbidden (level=%d shift=%s); waiting" % [level, world._shift_camera]
+				return
 			var point: Vector3 = highlight.visual.global_transform * highlight.visual.mesh.get_aabb().get_center()
-			if world.cam.is_position_behind(point): return
-			var screen: Vector2 = world.cam.unproject_position(point)
-			if world.get_viewport().get_visible_rect().has_point(screen) and world.hand_target(screen).get("scroll") == highlight:
+			var behind: bool = world.cam.is_position_behind(point)
+			var screen: Vector2 = Vector2.INF if behind else world.cam.unproject_position(point)
+			var on_screen: bool = not behind and world.get_viewport().get_visible_rect().has_point(screen)
+			var picked: bool = on_screen and world.hand_target(screen).get("scroll") == highlight
+			var max_dist: float = float(world.cfg_camera["max_dist"])
+			var state := "behind=%s on_screen=%s picked=%s screen=%s point=%s scroll=%s eye=%s focus=%s dist=%.2f/%.2f pitch=%.3f yaw=%.3f steps=%d clicks=%d" % [behind, on_screen, picked, screen, point, highlight.position, world.cam.position, world.focus, world.dist, max_dist, world.pitch, world.yaw, third_scroll_steps, third_scroll_clicks]
+			if picked and not world._middle_down:
+				if third_scroll_clicks >= 4:
+					if input_failure.is_empty():
+						input_failure = "THIRD SCROLL FAIL Action hit scroll 4 times, never active: " + state
+						printerr(input_failure)
+					return
+				third_scroll_clicks += 1
 				click_at(screen)
 				third_scroll_clicked = highlight.active
 				if third_scroll_clicked: print("THIRD KEY sculptor scroll activated through mouse Action")
-			else: orbit_for_visible_pickup()
+				return
+			if third_scroll_steps >= 160:
+				if input_failure.is_empty():
+					input_failure = "THIRD SCROLL FAIL camera budget exhausted: " + state
+					printerr(input_failure)
+				return
+			third_scroll_steps += 1
+			# Вне кадра/позади — орбита вокруг focus не поможет, нужно отдаление.
+			# В кадре, но не выбирается (заслонён) — орбита; раз в ~оборот одно отдаление.
+			var want_zoom: bool = not on_screen or third_scroll_steps % 45 == 0
+			if want_zoom and world.dist < max_dist - 0.001:
+				wheel_out_once()
+				third_key_phase = "sculptor scroll: wheel-out; " + state
+			else:
+				orbit_for_visible_pickup() # заодно отпускает зажатую среднюю кнопку
+				third_key_phase = "sculptor scroll: orbit; " + state
 			return
+		third_key_phase = "waiting: no valid challenge-20 highlight in story_highlights"
 		return
+
 	if not is_instance_valid(sculptor) or sculptor.state == Thing.State.DEAD:
 		input_failure = "source sculptor absent or dead after introduction"
 		return
@@ -660,19 +720,100 @@ func drive_third_key_input() -> void:
 
 
 func drive_to_position(point: Vector3, stopping_distance := 3.0) -> bool:
+	if drive_stall >= DRIVE_STALL_LIMIT: return false # провал не превращается в успех
 	var flat: Vector3 = point - world.focus
 	flat.y = 0.0
-	if flat.length() <= stopping_distance: return true
-	# All movement goes through bounded drags on visible ground. No scene,
-	# actor or focus assignment is used to reach the next objective.
-	var center: Vector2 = world.get_viewport().get_visible_rect().size * 0.5
-	var right: Vector3 = world.cam.global_basis.x
-	right.y = 0.0
-	var forward: Vector3 = -world.cam.global_basis.z
-	forward.y = 0.0
-	var direction := Vector2(flat.dot(right.normalized()), -flat.dot(forward.normalized()))
-	var pixels := direction.normalized() * minf(70.0, direction.length() * 3.0)
-	drag(center + pixels, center)
+	var before: float = flat.length()
+	if before <= stopping_distance:
+		drive_stall = 0
+		drive_pitch_steps = 0
+		return true
+	# Кинематографическая камера глотает ввод (main.gd:863-870): ждём, бюджет не тратим,
+	# ограничение по времени — сторож вызывающего.
+	if world.story_camera.owner_task != 0 or (world.story_intro_movie != null and world.story_intro_movie.active):
+		return false
+	var rect: Rect2 = world.get_viewport().get_visible_rect()
+	var center: Vector2 = rect.size * 0.5
+	var level: int = world.story_interface_level
+	var reach: Vector3 = world.story_camera.constrain_player_focus(point)
+	var zone_gap: float = Vector2(point.x - reach.x, point.z - reach.z).length()
+	var reason := ""
+	if world.story_help_is_open() or world.story_inside_temple():
+		reason = "modal help/temple swallows input"
+	elif world._shift_camera:
+		reason = "shift-camera held: left pan disabled"
+	elif world._middle_down:
+		# Средняя кнопка осталась зажатой (drag(...,true)); реальное отпускание, как у игрока.
+		var up := InputEventMouseButton.new()
+		up.button_index = MOUSE_BUTTON_MIDDLE
+		up.position = center
+		up.pressed = false
+		world._unhandled_input(up)
+		reason = "middle button was held; released"
+	else:
+		var right: Vector3 = world.cam.global_basis.x
+		right.y = 0.0
+		var forward: Vector3 = -world.cam.global_basis.z
+		forward.y = 0.0
+		if forward.length() < 0.01:
+			forward = world.cam.global_basis.y
+			forward.y = 0.0
+		var aim := Vector2(flat.dot(right.normalized()), -flat.dot(forward.normalized())).normalized()
+		var mid: Vector3 = world.ground_point(center, false)
+		var found := false
+		var best_from := center
+		var best_to := center
+		var best_left: float = before - 0.25
+		if mid.is_finite():
+			for angle: float in [0.0, 0.6, -0.6, 1.2, -1.2]:
+				var dir: Vector2 = aim.rotated(angle)
+				for px: float in [70.0, 35.0, 17.5, 8.75, 6.5]: # всё выше порога 6 px
+					for anchored: bool in [true, false]:
+						# anchored: нажать в центре и тянуть от цели; иначе нажать у цели и тянуть в центр.
+						var other: Vector2 = center - dir * px if anchored else center + dir * px
+						if not rect.has_point(other): continue
+						var hit: Vector3 = world.ground_point(other, false)
+						if not hit.is_finite(): continue # промах: main.gd проигнорирует
+						var grab: Vector3 = mid if anchored else hit
+						var now: Vector3 = hit if anchored else mid
+						# Точное повторение main.gd:974 + 745.
+						var next: Vector3 = world.story_camera.constrain_player_focus(world.focus + Vector3(grab.x - now.x, 0.0, grab.z - now.z))
+						var left: float = Vector2(point.x - next.x, point.z - next.z).length()
+						if left < best_left:
+							best_left = left
+							best_from = center if anchored else other
+							best_to = other if anchored else center
+							found = true
+		if found:
+			drag(best_from, best_to)
+			var after: float = Vector2(point.x - world.focus.x, point.z - world.focus.z).length()
+			if after < before - 0.1:
+				drive_stall = 0
+				return false # прибытие подтвердит следующий вызов
+			reason = "drag predicted %.2f but measured %.2f (input ignored or altered)" % [best_left, after]
+		elif zone_gap > stopping_distance and before - zone_gap < 1.0:
+			reason = "focus clipped at camera-zone boundary; pitch/orbit skipped"
+		elif level in [0, 14, 15] and world.pitch < DRIVE_PITCH_TARGET - 0.02 and drive_pitch_steps < DRIVE_PITCH_LIMIT:
+			var pitch_before: float = world.pitch
+			var to: Vector2 = center + Vector2(0.0, clampf((DRIVE_PITCH_TARGET - pitch_before) / 0.004, 2.0, 40.0))
+			drag(center, to, true)
+			var up := InputEventMouseButton.new()
+			up.button_index = MOUSE_BUTTON_MIDDLE
+			up.position = to
+			up.pressed = false
+			world._unhandled_input(up)
+			drive_pitch_steps += 1
+			reason = "no safe drag; pitch %.3f->%.3f" % [pitch_before, world.pitch]
+		elif level in [0, 13, 14, 15]:
+			orbit_for_visible_pickup()
+			reason = "no safe drag; orbit"
+		else:
+			reason = "no safe drag; interface level forbids pitch/yaw"
+		if not mid.is_finite(): reason += "; screen centre misses ground"
+	drive_stall += 1
+	if drive_stall >= DRIVE_STALL_LIMIT:
+		input_failure = "DRIVE FAIL target=%s focus=%s gap=%.2f stop=%.2f zone_gap=%.2f zone_points=%d pitch=%.3f yaw=%.3f dist=%.1f level=%d pitch_steps=%d last=%s" % [point, world.focus, before, stopping_distance, zone_gap, world.story_camera._zone.size(), world.pitch, world.yaw, world.dist, level, drive_pitch_steps, reason]
+		printerr(input_failure)
 	return false
 
 
@@ -681,6 +822,14 @@ func mouse_move_to(screen: Vector2) -> void:
 	event.position = screen
 	event.relative = Vector2.ZERO
 	world._unhandled_input(event)
+
+
+func wheel_out_once() -> void:
+	var wheel := InputEventMouseButton.new()
+	wheel.button_index = MOUSE_BUTTON_WHEEL_DOWN # main.gd:961 — отдаление
+	wheel.pressed = true
+	wheel.position = world.get_viewport().get_visible_rect().size * 0.5
+	world._unhandled_input(wheel)
 
 
 func orbit_for_visible_pickup() -> void:
@@ -814,6 +963,8 @@ func drive_second_key_input() -> void:
 		return
 	if world.held == brother:
 		second_key_phase = "carrying brother to sister"
+		second_search_best = INF
+		second_search_stall = 0
 		if not drive_to_position(sister.position): return
 		if second_drop_at < 0.0:
 			for offset in [Vector3(2.5, 0, 0), Vector3(-2.5, 0, 0), Vector3(0, 0, 2.5), Vector3(0, 0, -2.5), Vector3.ZERO]:
@@ -848,6 +999,24 @@ func drive_second_key_input() -> void:
 		second_key_phase = "waiting for source reunion and reward"
 		return
 	second_key_phase = "finding and picking up living brother"
+	var gap := Vector2(world.focus.x - brother.position.x, world.focus.z - brother.position.z).length()
+	# Match the first-key driver: real mesh selection can precede an exact
+	# focus position. Failed Action still falls through to normal movement.
+	if gap < 15.0:
+		var seen := visible_pickup_screen(brother)
+		if seen.is_finite():
+			click_at(seen)
+			if world.held == brother:
+				print("SECOND KEY living brother picked up through mouse Action")
+				return
+	if gap < second_search_best - 1.0:
+		second_search_best = gap
+		second_search_stall = 0
+	else:
+		second_search_stall += 1
+		if second_search_stall > 480:
+			second_key_failure = "no camera progress toward living brother: brother=%s focus=%s gap=%.1f best=%.1f pitch=%.3f yaw=%.3f dist=%.1f zone_points=%d" % [brother.position, world.focus, gap, second_search_best, world.pitch, world.yaw, world.dist, world.story_camera._zone.size()]
+			return
 	if not drive_to_position(brother.position): return
 	var screen := visible_pickup_screen(brother)
 	if screen.is_finite():

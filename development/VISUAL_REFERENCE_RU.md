@@ -97,3 +97,20 @@ BA01AC0094029A430FB4829946976D8699BE3A5D33AD6DF9B43E6BBC074BBD5F.
 
 Приватный каталог: %LOCALAPPDATA%/BW-Restoration/Reference/2026-11-17.
 Оригинальные ресурсы, снимки, видео и профили в Git не добавлять.
+
+## Последующие штатные проверки
+
+Пользователь сообщил, что Setup не открывается. Без wrapper/элевации проверен
+неизменённый original exe с правильным cwd: растянутые треугольники сохранились.
+Ghidra read-only исследование нашло реальные BWSetup/HardwareTnL/FullScreen.
+Temporary per-user FullScreen0 действительно создал обычное окно; отдельно
+HardwareTnL1 в fullscreen после reactivation показал чёрное поле, и этот тест
+не отделяет renderer от surface-loss. Windowed с HardwareTnL1 и0 дал искажённую
+геометрию и не подходит для fidelity baseline. Снимки сохранены приватно.
+
+В штатном меню Options наблюдаются Fullscreen, FPS, Dump Bitmap, Log Properties
+и Pause. Попытка Dump Bitmap не дала найденного нового BMP/TGA в папке игры;
+успешная запись framebuffer не подтверждена. Screenshot оконного клиента
+содержит рамки/DPI-преобразование; автоматически считать его800x600 нельзя.
+Все свои original процессы остановлены, HardwareTnL/FullScreen восстановлены
+к исходно отсутствующим значениям. Системная защита/драйверы не менялись.
